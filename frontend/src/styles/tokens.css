@@ -1,36 +1,37 @@
 /* =========================================================
    NIRVAH — shared design tokens
-   Theme: "signal & circuit". A verified logistics network for
-   giving — deep graphite/navy nights, a brass "spark" accent for
-   the moment something changes hands, and a signal-teal accent
-   for verification and trust. Paper-white surfaces read calm,
-   precise and built rather than cafe-warm.
+   Theme: "the giving warmth". A sunrise coral-to-gold current
+   carries surplus from a giver's hands to an NGO's, and a living
+   sage green marks the moment it's verified and delivered.
+   Warm ember-charcoal nights (not navy), warm ivory paper by day —
+   this is a human cause, not a dev tool.
 ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --char: #0A0E15;
-  --char-2: #121926;
-  --char-3: #1B2436;
-  --spark: #E8A33D;
-  --spark-deep: #B9761E;
-  --gold: #F2C265;
-  --sage: #2FBE94;
-  --sage-deep: #12876A;
-  --parchment: #F4F5F8;
-  --parchment-2: #E2E5EC;
+  --char: #211710;
+  --char-2: #2C1F16;
+  --char-3: #3B2B1E;
+  --spark: #FF7A45;
+  --spark-deep: #C7461F;
+  --gold: #F4B942;
+  --gold-deep: #B9761E;
+  --sage: #6FA287;
+  --sage-deep: #3E6E56;
+  --parchment: #FBF4EA;
+  --parchment-2: #F0E4D3;
   --surface: #FFFFFF;
-  --ink: #0D121C;
-  --ink-soft: #545E70;
-  --line: rgba(13, 18, 28, 0.1);
-  --line-dark: rgba(244, 245, 248, 0.1);
+  --ink: #2A1D14;
+  --ink-soft: #6E5F51;
+  --line: rgba(42, 29, 20, 0.1);
+  --line-dark: rgba(251, 244, 234, 0.12);
 
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --shadow-soft: 0 20px 44px rgba(10, 14, 21, 0.08);
-  --shadow-deep: 0 24px 60px rgba(10, 14, 21, 0.4);
+  --shadow-soft: 0 20px 44px rgba(42, 29, 20, 0.09);
+  --shadow-deep: 0 24px 60px rgba(20, 13, 8, 0.45);
 }
 
 .nv-app, .nv-app * { box-sizing: border-box; }
@@ -57,27 +58,27 @@
   cursor: pointer;
   text-decoration: none;
   border: 1px solid transparent;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
   font-family: inherit;
 }
 .nv-btn.spark {
   background: linear-gradient(120deg, var(--spark), var(--spark-deep));
-  color: #17110A;
-  box-shadow: 0 14px 30px rgba(232, 163, 61, 0.28);
+  color: #FFF8F0;
+  box-shadow: 0 14px 30px rgba(255, 122, 69, 0.32);
 }
-.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(232, 163, 61, 0.4); }
+.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(255, 122, 69, 0.44); }
 .nv-btn.sage {
   background: linear-gradient(120deg, var(--sage), var(--sage-deep));
-  color: #06140F;
-  box-shadow: 0 14px 30px rgba(18, 135, 106, 0.28);
+  color: #F4FBF7;
+  box-shadow: 0 14px 30px rgba(62, 110, 86, 0.32);
 }
-.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(18, 135, 106, 0.4); }
+.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(62, 110, 86, 0.44); }
 .nv-btn.ghost-dark {
-  background: transparent;
-  border-color: rgba(244, 245, 248, 0.3);
+  background: rgba(251, 244, 234, 0.06);
+  border-color: rgba(251, 244, 234, 0.55);
   color: var(--parchment);
 }
-.nv-btn.ghost-dark:hover { background: rgba(244, 245, 248, 0.08); border-color: var(--gold); }
+.nv-btn.ghost-dark:hover { background: rgba(251, 244, 234, 0.14); border-color: var(--gold); color: var(--gold); }
 .nv-btn.ghost-light {
   background: var(--surface);
   border-color: var(--line);
@@ -99,9 +100,9 @@
   padding: 6px 13px;
   border-radius: 999px;
 }
-.nv-pill.spark { background: rgba(232, 163, 61, 0.12); color: var(--spark-deep); border: 1px solid rgba(232, 163, 61, 0.32); }
-.nv-pill.sage { background: rgba(47, 190, 148, 0.14); color: var(--sage-deep); border: 1px solid rgba(47, 190, 148, 0.32); }
-.nv-pill.gold { background: rgba(242, 194, 101, 0.16); color: #8A5B12; border: 1px solid rgba(242, 194, 101, 0.36); }
+.nv-pill.spark { background: rgba(255, 122, 69, 0.13); color: var(--spark-deep); border: 1px solid rgba(255, 122, 69, 0.32); }
+.nv-pill.sage { background: rgba(111, 162, 135, 0.16); color: var(--sage-deep); border: 1px solid rgba(111, 162, 135, 0.34); }
+.nv-pill.gold { background: rgba(244, 185, 66, 0.18); color: #8A5B12; border: 1px solid rgba(244, 185, 66, 0.4); }
 
 /* ---------- shared cards ---------- */
 .nv-card {
@@ -113,8 +114,8 @@
 
 /* ---------- glass surface, for use over dark/photographic areas ---------- */
 .nv-glass {
-  background: rgba(244, 245, 248, 0.05);
-  border: 1px solid rgba(244, 245, 248, 0.1);
+  background: rgba(251, 244, 234, 0.06);
+  border: 1px solid rgba(251, 244, 234, 0.12);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
@@ -138,6 +139,14 @@
   transition: opacity 0.8s cubic-bezier(.2,.7,.2,1), transform 0.8s cubic-bezier(.2,.7,.2,1);
 }
 .nv-reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ---------- living gradient wash, for use behind hero/dark sections ---------- */
+.nv-life-wash {
+  background-image:
+    radial-gradient(60% 50% at 12% 8%, rgba(255, 122, 69, 0.22), transparent 60%),
+    radial-gradient(55% 55% at 88% 18%, rgba(244, 185, 66, 0.16), transparent 65%),
+    radial-gradient(60% 60% at 50% 100%, rgba(111, 162, 135, 0.14), transparent 70%);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .nv-app * { animation: none !important; transition: none !important; }

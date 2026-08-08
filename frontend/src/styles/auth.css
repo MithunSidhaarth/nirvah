@@ -6,7 +6,7 @@
 }
 .nv-auth-side {
   position: relative;
-  background: radial-gradient(120% 100% at 20% 0%, #121926 0%, var(--char) 55%, #05070B 100%);
+  background: radial-gradient(120% 100% at 20% 0%, var(--char-2) 0%, var(--char) 55%, #140D08 100%);
   padding: 3rem 3rem;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   max-width: 460px;
 }
 .nv-auth-side .quote span { color: var(--gold); font-style: italic; }
-.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #B9C2D1; }
+.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #D8C7B4; }
 .nv-auth-form-wrap {
   display: flex;
   align-items: center;
