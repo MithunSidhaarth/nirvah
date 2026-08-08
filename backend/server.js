@@ -19,6 +19,8 @@ import csrRoutes from "./routes/csr.js";
 import settingsRoutes from "./routes/settings.js";
 import teamRoutes from "./routes/team.js";
 import adminRoutes from "./routes/admin.js";
+import adminUsersRoutes from "./routes/adminUsers.js";
+import siteSettingsRoutes from "./routes/siteSettings.js";
 import { generalLimiter } from "./middleware/rateLimit.js";
 import { UPLOAD_DIR } from "./lib/uploads.js";
 
@@ -83,6 +85,10 @@ app.use("/api/settings", settingsRoutes);
 // they sit alongside ngos.js's /me route.
 app.use("/api/ngos", teamRoutes);
 app.use("/api/admin", adminRoutes);
+// adminUsers.js (/users/...) and siteSettings.js (/settings) each define
+// their own sub-paths, mounted at /api/admin so they sit alongside admin.js.
+app.use("/api/admin", adminUsersRoutes);
+app.use("/api/admin", siteSettingsRoutes);
 
 // Uploaded documents/photos. Local disk today (see lib/uploads.js); swap
 // this for a signed-URL redirect to S3/Cloudinary later without touching

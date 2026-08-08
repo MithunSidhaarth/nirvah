@@ -26,6 +26,8 @@ import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminDonations from "./pages/AdminDonations";
 import AdminNgoVerification from "./pages/AdminNgoVerification";
+import AdminUsers from "./pages/AdminUsers";
+import AdminSettings from "./pages/AdminSettings";
 import RequireRole from "./components/RequireRole";
 
 export default function App() {
@@ -62,6 +64,8 @@ export default function App() {
         <Route path="/dashboard/admin" element={<RequireRole roles={["admin", "manager"]}><AdminDashboard /></RequireRole>} />
         <Route path="/dashboard/admin/donations" element={<RequireRole roles={["admin", "manager"]}><AdminDonations /></RequireRole>} />
         <Route path="/dashboard/admin/ngos" element={<RequireRole roles={["admin", "manager"]}><AdminNgoVerification /></RequireRole>} />
+        <Route path="/dashboard/admin/users" element={<RequireRole roles={["admin"]}><AdminUsers /></RequireRole>} />
+        <Route path="/dashboard/admin/settings" element={<RequireRole roles={["admin"]}><AdminSettings /></RequireRole>} />
 
         <Route path="*" element={<Landing />} />
       </Routes>

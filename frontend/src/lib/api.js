@@ -195,4 +195,16 @@ export const api = {
     request(`/ngos/${ngoId}/verify`, { method: "POST", body: { status, notes } }),
   reviewDocument: (documentId, { status, notes }) =>
     request(`/documents/${documentId}`, { method: "PATCH", body: { status, notes } }),
+
+  // ---- admin: user management (admin-only; a manager gets a 403) ----
+  adminListUsers: () => request("/admin/users"),
+  adminSetUserRole: (userId, role) =>
+    request(`/admin/users/${userId}/role`, { method: "PATCH", body: { role } }),
+  adminBanUser: (userId) => request(`/admin/users/${userId}/ban`, { method: "POST" }),
+  adminUnbanUser: (userId) => request(`/admin/users/${userId}/unban`, { method: "POST" }),
+  adminRemoveUser: (userId) => request(`/admin/users/${userId}`, { method: "DELETE" }),
+
+  // ---- admin: site settings (GET is staff, PATCH is admin-only) ----
+  getSiteSettings: () => request("/admin/settings"),
+  updateSiteSettings: (payload) => request("/admin/settings", { method: "PATCH", body: payload }),
 };

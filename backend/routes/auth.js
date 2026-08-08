@@ -224,6 +224,22 @@ router.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
     });
   }
 
+  if (user.banned_at) {
+    return res.status(403).json({ error: "This account has been suspended." });
+  }
+  if (user.deleted_at) {
+    return res.status(401).json({ error: "We could not find an account with that email." });
+  }
+
+  // Staff can still log in during maintenance mode (see routes/siteSettings.js)
+  // so an admin can turn it back off; donors and NGOs are held out.
+  if (user.role !== "admin" && user.role !== "manager") {
+    const maint = await pool.query("SELECT value FROM site_settings WHERE key = 'maintenance_mode'");
+    if (maint.rows[0]?.value === "true") {
+      return res.status(503).json({ error: "Nirvah is temporarily down for maintenance. Please check back soon." });
+    }
+  }
+
   const token = signToken(user);
   res.json({ token, user: publicUser(user) });
 });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import pool from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
-import { requireAdmin, requireStaff } from "../middleware/admin.js";
+import { requireStaff } from "../middleware/admin.js";
 import { validate, requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
 import { ngoProfileSchema, ngoVerifyDecisionSchema } from "../lib/schemas.js";
@@ -167,8 +167,10 @@ router.get("/:id/impact-summary", requireIntParam(), async (req, res) => {
 });
 
 // ---- admin / manager review ----
-// Managers can see the verification queue and drill into a pending NGO's
-// documents; only an admin can actually decide (POST /:id/verify below).
+// Managers can see the verification queue, drill into a pending NGO's
+// documents, and now also make the call — POST /:id/verify below is
+// requireStaff, not requireAdmin, so admin and manager accounts can both
+// verify or reject an NGO. Document approval (documents.js) stays admin-only.
 
 router.get("/pending", requireAuth, requireStaff, async (req, res) => {
   const result = await pool.query(
@@ -186,7 +188,7 @@ router.post(
   "/:id/verify",
   writeLimiter,
   requireAuth,
-  requireAdmin,
+  requireStaff,
   requireIntParam(),
   validate(ngoVerifyDecisionSchema),
   async (req, res) => {

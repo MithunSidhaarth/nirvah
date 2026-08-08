@@ -12,6 +12,8 @@ import {
   Receipt,
   Building2,
   ShieldCheck,
+  Users,
+  SlidersHorizontal,
 } from "lucide-react";
 import { setToken } from "../lib/api";
 import "../styles/tokens.css";
@@ -39,13 +41,23 @@ const STAFF_LINKS = [
   { label: "NGO verification", to: "/dashboard/admin/ngos", icon: ShieldCheck },
 ];
 
+// Admin-only, on top of the staff links above: managing who's staff (and
+// who's banned/removed) and site-wide settings stay sudo-only — see
+// requireAdmin in backend/middleware/admin.js.
+const ADMIN_ONLY_LINKS = [
+  { label: "Users", to: "/dashboard/admin/users", icon: Users },
+  { label: "Site settings", to: "/dashboard/admin/settings", icon: SlidersHorizontal },
+];
+
 const ROLE_LABEL = { ngo: "NGO account", admin: "Admin account", manager: "Manager account" };
 
 export default function DashboardShell({ role = "donor", user, children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isStaff = role === "admin" || role === "manager";
-  const links = isStaff ? STAFF_LINKS : role === "ngo" ? NGO_LINKS : DONOR_LINKS;
+  const links = isStaff
+    ? role === "admin" ? [...STAFF_LINKS, ...ADMIN_ONLY_LINKS] : STAFF_LINKS
+    : role === "ngo" ? NGO_LINKS : DONOR_LINKS;
   const initials = (user?.name || user?.org || "N V")
     .split(" ")
     .map((s) => s[0])

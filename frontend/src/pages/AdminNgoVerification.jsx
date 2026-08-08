@@ -11,6 +11,7 @@ export default function AdminNgoVerification() {
   const [busyId, setBusyId] = useState(null);
 
   const isAdmin = user?.role === "admin";
+  const isStaff = user?.role === "admin" || user?.role === "manager";
 
   async function load() {
     try {
@@ -55,7 +56,7 @@ export default function AdminNgoVerification() {
           <h1 className="font-display">NGO verification queue</h1>
           <p className="sub">
             An NGO stays unverified from signup until Nirvah checks its submitted documents.
-            {!isAdmin && " You can review what's been submitted here; only an admin can approve or reject."}
+            {!isStaff && " You can review what's been submitted here; only staff can approve or reject."}
           </p>
         </div>
       </div>
@@ -95,7 +96,7 @@ export default function AdminNgoVerification() {
             </ul>
           )}
 
-          {isAdmin ? (
+          {isStaff ? (
             <div style={{ display: "flex", gap: "0.6rem" }}>
               <button className="nv-btn spark sm" disabled={busyId === ngo.userId} onClick={() => decide(ngo.userId, "verified")}>
                 Mark verified

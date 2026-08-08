@@ -96,6 +96,18 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- banned_at: an admin suspended the account (see routes/adminUsers.js) —
+-- reversible, shows up as "banned" in the admin Users page.
+-- deleted_at: an admin removed the account. This is a soft delete, not a
+-- real SQL DELETE — donations, documents, and audit_logs all reference
+-- users.id with no ON DELETE CASCADE, so a hard delete would fail (or
+-- silently break history) for any user with even one donation on record.
+-- Both are checked on every authenticated request (see requireAuth in
+-- middleware/auth.js), so a ban/removal takes effect immediately rather
+-- than waiting for the user's existing 30-day token to expire.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
 DROP TRIGGER IF EXISTS users_set_updated_at ON users;
 CREATE TRIGGER users_set_updated_at
   BEFORE UPDATE ON users
@@ -260,3 +272,13 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
+
+-- ---------------------------------------------------------------------------
+-- site_settings — small fixed key/value store, admin-only (routes/siteSettings.js)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS site_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  updated_by INTEGER REFERENCES users(id),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

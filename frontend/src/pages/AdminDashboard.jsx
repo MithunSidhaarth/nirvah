@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { PackageSearch, ShieldCheck, ArrowRight } from "lucide-react";
+import { PackageSearch, ShieldCheck, ArrowRight, Users, SlidersHorizontal } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import { api } from "../lib/api";
 
@@ -36,8 +36,8 @@ export default function AdminDashboard() {
           <h1 className="font-display">Nirvah operations{user?.name ? `, ${user.name.split(" ")[0]}` : ""}.</h1>
           <p className="sub">
             {user?.role === "manager"
-              ? "You can view every donation, claim, and NGO in review. Verification decisions are made by an admin."
-              : "Full access: review NGOs, approve documents, and see everything moving through Nirvah."}
+              ? "You can view every donation, claim, and NGO in review — and verify or reject NGOs yourself."
+              : "Full access: review NGOs, approve documents, manage users, and see everything moving through Nirvah."}
           </p>
         </div>
       </div>
@@ -80,6 +80,18 @@ export default function AdminDashboard() {
           <h2><ShieldCheck size={18} /> NGO verification <ArrowRight size={16} style={{ marginLeft: "auto" }} /></h2>
           <p className="sub">NGOs that signed up as unclaimed/unverified and submitted documents for review.</p>
         </Link>
+        {user?.role === "admin" && (
+          <>
+            <Link to="/dashboard/admin/users" className="nv-panel" style={{ textDecoration: "none", color: "inherit" }}>
+              <h2><Users size={18} /> Users <ArrowRight size={16} style={{ marginLeft: "auto" }} /></h2>
+              <p className="sub">Promote a donor to manager, or ban/remove an account.</p>
+            </Link>
+            <Link to="/dashboard/admin/settings" className="nv-panel" style={{ textDecoration: "none", color: "inherit" }}>
+              <h2><SlidersHorizontal size={18} /> Site settings <ArrowRight size={16} style={{ marginLeft: "auto" }} /></h2>
+              <p className="sub">Site name, support email, announcement banner, and maintenance mode.</p>
+            </Link>
+          </>
+        )}
       </div>
     </DashboardShell>
   );

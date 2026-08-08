@@ -191,6 +191,25 @@ export const updateProfileSchema = z.object({
     .max(200, "That city name is too long."),
 });
 
+// ---------------------------------------------------------------------------
+// Admin: user management + site settings
+// ---------------------------------------------------------------------------
+
+export const updateUserRoleSchema = z.object({
+  role: z.enum(["donor", "manager"], {
+    errorMap: () => ({ message: "Role must be donor or manager." }),
+  }),
+});
+
+export const siteSettingsSchema = z
+  .object({
+    siteName: z.string().trim().min(1, "Site name can't be empty.").max(120, "That name is too long.").optional(),
+    supportEmail: email.optional().nullable(),
+    announcementBanner: z.string().trim().max(500, "Keep the banner under 500 characters.").optional().nullable(),
+    maintenanceMode: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, { message: "Nothing to update." });
+
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string({ required_error: "Please enter your current password." }).min(1, "Please enter your current password."),
