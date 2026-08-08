@@ -82,6 +82,58 @@ router.get("/", validate(listDonationsQuerySchema, "query"), async (req, res) =>
   res.json({ donations: await Promise.all(result.rows.map(serialize)) });
 });
 
+// Every listing the logged-in donor has ever posted, newest first — the
+// full history behind "My listings" (the dashboard overview only shows the
+// most recent 6). Ordering this before /:id matters even though
+// requireIntParam() would reject "mine" anyway: it keeps the routing
+// obviously correct without relying on that side effect.
+router.get("/mine", requireAuth, validate(listDonationsQuerySchema, "query"), async (req, res) => {
+  if (req.userRole !== "donor") return res.status(403).json({ error: "This view is for givers only." });
+
+  const { category, status } = req.query;
+  const clauses = ["donor_id = $1"];
+  const args = [req.userId];
+
+  if (category && category !== "all") {
+    args.push(category);
+    clauses.push(`category = $${args.length}`);
+  }
+  if (status) {
+    args.push(status);
+    clauses.push(`status = $${args.length}`);
+  }
+
+  const result = await pool.query(
+    `SELECT * FROM donations WHERE ${clauses.join(" AND ")} ORDER BY created_at DESC`,
+    args
+  );
+  res.json({ donations: await Promise.all(result.rows.map(serialize)) });
+});
+
+// Everything the logged-in NGO has claimed, newest first — "Claimed by us".
+router.get("/claimed", requireAuth, validate(listDonationsQuerySchema, "query"), async (req, res) => {
+  if (req.userRole !== "ngo") return res.status(403).json({ error: "This view is for NGOs only." });
+
+  const { category, status } = req.query;
+  const clauses = ["claimed_by = $1"];
+  const args = [req.userId];
+
+  if (category && category !== "all") {
+    args.push(category);
+    clauses.push(`category = $${args.length}`);
+  }
+  if (status) {
+    args.push(status);
+    clauses.push(`status = $${args.length}`);
+  }
+
+  const result = await pool.query(
+    `SELECT * FROM donations WHERE ${clauses.join(" AND ")} ORDER BY created_at DESC`,
+    args
+  );
+  res.json({ donations: await Promise.all(result.rows.map(serialize)) });
+});
+
 router.get("/:id", requireIntParam(), async (req, res) => {
   const result = await pool.query("SELECT * FROM donations WHERE id = $1", [req.params.id]);
   const row = result.rows[0];

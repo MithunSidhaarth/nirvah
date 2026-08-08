@@ -100,6 +100,26 @@ export const api = {
   donorStats: () => request("/dashboard/donor"),
   ngoStats: () => request("/dashboard/ngo"),
 
+  // ---- my listings / claimed by us ----
+  myListings: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/donations/mine${qs ? `?${qs}` : ""}`);
+  },
+  myClaimed: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/donations/claimed${qs ? `?${qs}` : ""}`);
+  },
+
+  // ---- settings ----
+  getProfile: () => request("/settings/profile"),
+  updateProfile: (payload) => request("/settings/profile", { method: "PATCH", body: payload }),
+  changePassword: (payload) => request("/settings/password", { method: "POST", body: payload }),
+
+  // ---- ngo team ----
+  listTeam: () => request("/ngos/me/team"),
+  addTeamMember: (payload) => request("/ngos/me/team", { method: "POST", body: payload }),
+  removeTeamMember: (id) => request(`/ngos/me/team/${id}`, { method: "DELETE" }),
+
   // ---- documents (section 9: Vault) ----
   // Documents attached to a specific donation (receipts, delivery proof,
   // tax documents, CSR evidence, etc.) — visible to the giver and the

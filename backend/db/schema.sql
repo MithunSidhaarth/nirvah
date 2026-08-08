@@ -174,6 +174,30 @@ CREATE INDEX IF NOT EXISTS idx_donations_status ON donations(status);
 CREATE INDEX IF NOT EXISTS idx_donations_category ON donations(category);
 
 -- ---------------------------------------------------------------------------
+-- ngo_team_members — volunteers/staff an NGO adds so claims move faster
+-- during busy hours. Not a login of their own yet (no user_id, no auth) —
+-- just a roster the NGO's own account manages. Wiring these up to real
+-- accounts with their own sign-in is a later migration, not a rewrite of
+-- this table.
+-- ---------------------------------------------------------------------------
+DO $$ BEGIN
+  CREATE TYPE ngo_team_role AS ENUM ('admin', 'member');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE TABLE IF NOT EXISTS ngo_team_members (
+  id SERIAL PRIMARY KEY,
+  ngo_id INTEGER NOT NULL REFERENCES ngos(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  role ngo_team_role NOT NULL DEFAULT 'member',
+  added_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ngo_team_members_ngo ON ngo_team_members(ngo_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ngo_team_members_unique_email ON ngo_team_members(ngo_id, email);
+
+-- ---------------------------------------------------------------------------
 -- documents — Giving Vault (TODO section 9) + NGO verification uploads
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS documents (

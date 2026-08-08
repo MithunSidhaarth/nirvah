@@ -16,6 +16,8 @@ import documentRoutes from "./routes/documents.js";
 import impactRoutes from "./routes/impact.js";
 import taxRoutes from "./routes/tax.js";
 import csrRoutes from "./routes/csr.js";
+import settingsRoutes from "./routes/settings.js";
+import teamRoutes from "./routes/team.js";
 import { generalLimiter } from "./middleware/rateLimit.js";
 import { UPLOAD_DIR } from "./lib/uploads.js";
 
@@ -75,6 +77,10 @@ app.use("/api", impactRoutes);
 // /api for the same reason as documents/impact above.
 app.use("/api", taxRoutes);
 app.use("/api", csrRoutes);
+app.use("/api/settings", settingsRoutes);
+// team.js defines its own /ngos/me/team sub-paths, mounted at /api/ngos so
+// they sit alongside ngos.js's /me route.
+app.use("/api/ngos", teamRoutes);
 
 // Uploaded documents/photos. Local disk today (see lib/uploads.js); swap
 // this for a signed-URL redirect to S3/Cloudinary later without touching

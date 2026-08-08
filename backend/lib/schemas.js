@@ -172,3 +172,47 @@ export const listDonationsQuerySchema = z.object({
     ])
     .optional(),
 });
+
+// ---------------------------------------------------------------------------
+// Settings (profile + password)
+// ---------------------------------------------------------------------------
+
+export const updateProfileSchema = z.object({
+  name: z
+    .string({ required_error: "Please enter your name." })
+    .trim()
+    .min(1, "Please enter your name.")
+    .max(200, "That name is too long."),
+  org: z.string().trim().max(200, "That organisation name is too long.").optional().nullable(),
+  city: z
+    .string({ required_error: "Please enter your city." })
+    .trim()
+    .min(1, "Please enter your city.")
+    .max(200, "That city name is too long."),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string({ required_error: "Please enter your current password." }).min(1, "Please enter your current password."),
+    newPassword: password("New password"),
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Your new password needs to be different from your current one.",
+    path: ["newPassword"],
+  });
+
+// ---------------------------------------------------------------------------
+// NGO team members
+// ---------------------------------------------------------------------------
+
+export const addTeamMemberSchema = z.object({
+  name: z
+    .string({ required_error: "Please enter their name." })
+    .trim()
+    .min(1, "Please enter their name.")
+    .max(200, "That name is too long."),
+  email,
+  role: z.enum(["admin", "member"], {
+    errorMap: () => ({ message: "Role must be either admin or member." }),
+  }).optional().default("member"),
+});
