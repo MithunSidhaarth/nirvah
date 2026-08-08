@@ -168,6 +168,11 @@ export default function ForNgos() {
             <div className="fn-mock-stat"><div className="n">128</div><div className="l">delivered this month</div></div>
             <div className="fn-mock-stat"><div className="n">6 min</div><div className="l">avg. claim-to-pickup</div></div>
           </div>
+          <div style={{ padding: "0 1.2rem 1.2rem" }}>
+            <Link to="/impact/asha-foundation" style={{ fontSize: "0.82rem", color: "#5EEAD4", textDecoration: "none", fontWeight: 600 }}>
+              See a live example impact page →
+            </Link>
+          </div>
         </motion.div>
       </header>
 

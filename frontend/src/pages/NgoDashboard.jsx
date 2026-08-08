@@ -8,6 +8,7 @@ import {
   MapPin,
   Info,
   Users2,
+  BarChart3,
 } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import StatRing from "../components/StatRing";
@@ -170,6 +171,18 @@ export default function NgoDashboard() {
               Add volunteers to your account so claims can be picked up faster during busy hours.
             </p>
             <Link to="/dashboard/ngo/team" className="nv-btn sage sm">Manage team</Link>
+          </div>
+
+          <div className="nv-panel" style={{ background: "linear-gradient(135deg, var(--char-2), var(--char))", borderColor: "transparent", color: "var(--parchment)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <BarChart3 size={18} color="var(--gold)" />
+              <strong style={{ fontFamily: "Fraunces, serif", fontSize: "1.05rem" }}>Share your impact</strong>
+            </div>
+            <p style={{ fontSize: "0.88rem", color: "#BFE3D3", lineHeight: 1.6, marginBottom: "1rem" }}>
+              A public page with your delivery stats — link it in funding pitches or your own site.
+            </p>
+            {/* Demo slug — once NGOs have a real id/slug from the backend, link to /impact/:ngoId for this org. */}
+            <Link to="/impact/asha-foundation" className="nv-btn ghost-dark sm">View your impact page</Link>
           </div>
         </div>
       </div>

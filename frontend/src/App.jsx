@@ -5,6 +5,8 @@ import Landing from "./pages/Landing";
 import HowItWorks from "./pages/HowItWorks";
 import ForNgos from "./pages/ForNgos";
 import Contact from "./pages/Contact";
+import NgoImpact from "./pages/NgoImpact";
+import DonorWrapped from "./pages/DonorWrapped";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import DonorDashboard from "./pages/DonorDashboard";
@@ -27,9 +29,11 @@ export default function App() {
 
         <Route path="/browse" element={<Browse />} />
         <Route path="/browse/:id" element={<DonationDetail />} />
+        <Route path="/impact/:ngoId" element={<NgoImpact />} />
 
         <Route path="/dashboard/donor" element={<DonorDashboard />} />
         <Route path="/dashboard/donor/new" element={<NewListing />} />
+        <Route path="/dashboard/donor/wrapped" element={<DonorWrapped />} />
         <Route
           path="/dashboard/donor/listings"
           element={<ComingSoon role="donor" title="My listings" description="Every donation you have ever posted, in one place." />}

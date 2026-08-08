@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Sparkles,
   Info,
+  Gift,
 } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import StatRing from "../components/StatRing";
@@ -155,6 +156,17 @@ export default function DonorDashboard() {
               Listings with a clear photo and pickup window are claimed about twice as fast. Add both next time you post.
             </p>
             <Link to="/dashboard/donor/new" className="nv-btn spark sm">List a donation <ArrowRight size={14} /></Link>
+          </div>
+
+          <div className="nv-panel" style={{ background: "linear-gradient(135deg, var(--char-2), var(--char))", borderColor: "transparent", color: "var(--parchment)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <Gift size={18} color="var(--gold)" />
+              <strong style={{ fontFamily: "Fraunces, serif", fontSize: "1.05rem" }}>Your year, wrapped</strong>
+            </div>
+            <p style={{ fontSize: "0.88rem", color: "#BFE3D3", lineHeight: 1.6, marginBottom: "1rem" }}>
+              See a shareable recap of everything you've given this year.
+            </p>
+            <Link to="/dashboard/donor/wrapped" className="nv-btn ghost-dark sm">View your wrapped <ArrowRight size={14} /></Link>
           </div>
         </div>
       </div>
