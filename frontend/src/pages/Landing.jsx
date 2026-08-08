@@ -197,10 +197,12 @@ function CircleGraphic({ parallaxX, parallaxY }) {
       style={{ x: parallaxX, y: parallaxY }}
     >
       <defs>
-        <filter id="nvGlow" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
+        <filter id="nvGlow" x="-140%" y="-140%" width="380%" height="380%">
+          <feGaussianBlur stdDeviation="4.5" result="blur1" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur2" />
           <feMerge>
-            <feMergeNode in="blur" />
+            <feMergeNode in="blur1" />
+            <feMergeNode in="blur2" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
@@ -208,6 +210,15 @@ function CircleGraphic({ parallaxX, parallaxY }) {
           <stop offset="0%" stopColor="#F2C265" />
           <stop offset="100%" stopColor="#E8A33D" />
         </linearGradient>
+        <radialGradient id="ballCore" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#FFFDF6" />
+          <stop offset="45%" stopColor="#FBEBD0" />
+          <stop offset="100%" stopColor="#E8A33D" />
+        </radialGradient>
+        <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#F2C265" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#F2C265" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
       <circle cx={cx} cy={cy} r={r} stroke="#F4F5F8" strokeOpacity="0.14" strokeWidth="1.5" />
@@ -223,17 +234,30 @@ function CircleGraphic({ parallaxX, parallaxY }) {
         opacity="0.7"
       />
 
+      {/* DONOR node */}
+      <circle cx={cx} cy={cy - r} r="15" fill="url(#nodeGlow)" />
       <circle cx={cx} cy={cy - r} r="6" fill="#F4F5F8" />
-      <text x={cx} y={cy - r - 16} textAnchor="middle" className="circle-label">GIVER</text>
+      <text x={cx} y={cy - r - 16} textAnchor="middle" className="circle-label">DONOR</text>
 
+      {/* DELIVERED node */}
+      <circle cx={cx} cy={cy + r} r="15" fill="url(#nodeGlow)" />
       <circle cx={cx} cy={cy + r} r="6" fill="#F4F5F8" />
       <text x={cx} y={cy + r + 24} textAnchor="middle" className="circle-label">DELIVERED</text>
 
+      {/* NGO node */}
+      <circle cx={cx + r} cy={cy} r="15" fill="url(#nodeGlow)" />
       <circle cx={cx + r} cy={cy} r="6" fill="#F4F5F8" />
       <text x={cx + r + 34} y={cy + 4} textAnchor="middle" className="circle-label">NGO</text>
 
+      {/* traveling spark: a glowing comet with a soft trailing tail,
+          running Donor -> NGO -> Delivered -> Donor, on loop */}
       <g filter="url(#nvGlow)">
-        <circle r="5" fill="#FBEBD0">
+        <circle r="9" fill="url(#ballCore)" opacity="0.35">
+          <animateMotion dur="6s" repeatCount="indefinite" rotate="auto" begin="-0.15s">
+            <mpath xlinkHref="#ringPath" />
+          </animateMotion>
+        </circle>
+        <circle r="6.5" fill="url(#ballCore)">
           <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
             <mpath xlinkHref="#ringPath" />
           </animateMotion>
@@ -308,22 +332,26 @@ export default function Landing() {
         .nv-landing .nv-nav {
           position: sticky; top: 0; z-index: 100;
           display: flex; align-items: center; justify-content: space-between;
-          padding: 20px 6vw; background: transparent;
-          transition: background 0.4s ease, padding 0.4s ease, box-shadow 0.4s ease;
+          padding: 18px 6vw;
+          background: linear-gradient(180deg, rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.6) 100%);
+          backdrop-filter: blur(12px) saturate(160%);
+          -webkit-backdrop-filter: blur(12px) saturate(160%);
+          border-bottom: 1px solid rgba(244,245,248,0.06);
+          transition: background 0.4s ease, padding 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
         }
         .nv-landing .nv-nav.scrolled {
-          background: rgba(10, 14, 21, 0.88); backdrop-filter: blur(14px) saturate(160%);
-          padding: 14px 6vw; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+          background: rgba(10, 14, 21, 0.94); backdrop-filter: blur(16px) saturate(160%);
+          padding: 13px 6vw; box-shadow: 0 8px 30px rgba(0,0,0,0.35);
         }
         .nv-brand {
           display: flex; align-items: center; gap: 10px;
           font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.5rem;
-          color: var(--parchment); text-decoration: none;
+          color: #FFFFFF; text-decoration: none;
         }
         .nv-links { display: flex; align-items: center; gap: 2.2rem; }
-        .nv-links a { font-size: 0.95rem; font-weight: 500; color: var(--parchment); opacity: 0.82; text-decoration: none; transition: opacity 0.2s ease; }
+        .nv-links a { font-size: 0.95rem; font-weight: 500; color: #F4F5F8; opacity: 0.88; text-decoration: none; transition: opacity 0.2s ease; }
         .nv-links a:hover { opacity: 1; }
-        .nv-menu-btn { display: none; background: none; border: none; color: var(--parchment); }
+        .nv-menu-btn { display: none; background: none; border: none; color: #F4F5F8; }
         @media (max-width: 900px) { .nv-links { display: none; } .nv-menu-btn { display: block; } }
 
         /* ---------- CINEMATIC HERO ---------- */
@@ -377,7 +405,7 @@ export default function Landing() {
         }
         .nv-hero p.lede { font-size: clamp(1.05rem, 1.6vw, 1.28rem); color: #B9C2D1; max-width: 620px; margin: 0 auto 2.6rem; line-height: 1.6; }
         .nv-hero-ctas { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 2.6rem; }
-        .circle-graphic { width: 260px; height: 260px; margin: 0 auto; display: block; }
+        .circle-graphic { width: 300px; height: 300px; margin: 0 auto; display: block; filter: drop-shadow(0 12px 30px rgba(232,163,61,0.16)); }
         .circle-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; fill: #B9C2D1; }
         .circle-center-1 { fill: var(--parchment); font-size: 15px; font-style: italic; }
         .circle-center-2 { fill: var(--gold); font-size: 10px; letter-spacing: 0.1em; }
