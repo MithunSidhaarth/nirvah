@@ -6,6 +6,9 @@ const router = Router();
 
 function serialize(row) {
   const donor = db.prepare("SELECT name, org, city FROM users WHERE id = ?").get(row.donor_id);
+  const ngo = row.claimed_by
+    ? db.prepare("SELECT name, org, city FROM users WHERE id = ?").get(row.claimed_by)
+    : null;
   return {
     id: row.id,
     title: row.title,
@@ -16,7 +19,11 @@ function serialize(row) {
     status: row.status,
     expiresAt: row.expires_at,
     donor: donor?.org || donor?.name || "A giver on Nirvah",
+    ngo: ngo ? (ngo.org || ngo.name) : null,
+    ngoCity: ngo?.city || null,
     createdAt: row.created_at,
+    claimedAt: row.claimed_at,
+    deliveredAt: row.delivered_at,
   };
 }
 

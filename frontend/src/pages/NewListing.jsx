@@ -45,8 +45,8 @@ export default function NewListing() {
     <DashboardShell role="donor">
       <div className="nv-topbar">
         <div>
-          <h1 className="font-display">List a donation</h1>
-          <p className="sub">A clear photo and pickup window helps NGOs claim it faster.</p>
+          <h1 className="font-display">Give something</h1>
+          <p className="sub">A clear description and pickup window helps it find the right hands faster.</p>
         </div>
       </div>
 
@@ -54,7 +54,7 @@ export default function NewListing() {
         {done ? (
           <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
             <CheckCircle2 size={40} color="var(--sage-deep)" style={{ marginBottom: "1rem" }} />
-            <h3 className="font-display" style={{ margin: "0 0 6px" }}>Listing posted</h3>
+            <h3 className="font-display" style={{ margin: "0 0 6px" }}>Your giving is on its way</h3>
             <p className="sub">Taking you back to your overview.</p>
           </div>
         ) : (
@@ -92,7 +92,7 @@ export default function NewListing() {
               </div>
             </div>
             <button type="submit" className="nv-btn spark" disabled={submitting} style={{ marginTop: "0.6rem" }}>
-              <PackagePlus size={17} /> {submitting ? "Posting..." : "Post this listing"}
+              <PackagePlus size={17} /> {submitting ? "Giving..." : "Give it"}
             </button>
           </form>
         )}

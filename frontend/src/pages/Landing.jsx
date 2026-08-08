@@ -24,6 +24,9 @@ import {
   Lock,
   CheckCircle2,
   Zap,
+  Leaf,
+  FileText,
+  Search,
 } from "lucide-react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
@@ -493,6 +496,36 @@ export default function Landing() {
         .nv-ticker-item .flame-ico { color: var(--spark); flex-shrink: 0; }
         .nv-ticker-item .sep { color: #2F6B54; }
 
+        /* ---------- BEFORE YOU THROW IT AWAY ---------- */
+        .nv-hook { padding: 6rem 6vw 6.5rem; background: var(--parchment); text-align: center; position: relative; overflow: hidden; }
+        .nv-hook::before {
+          content: ''; position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+          width: 560px; height: 300px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(52,211,153,0.14), transparent 68%); filter: blur(10px); pointer-events: none;
+        }
+        .nv-hook-inner { position: relative; max-width: 640px; margin: 0 auto; }
+        .nv-hook h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,3.6vw,2.7rem); font-weight: 600; color: var(--ink); margin: 0 0 1.2rem; }
+        .nv-hook-ask { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: clamp(1.4rem,2.6vw,1.9rem); color: var(--spark-deep); margin: 0 0 1.6rem; }
+        .nv-hook p.sub { color: var(--ink-soft); font-size: 1.02rem; line-height: 1.65; margin: 0 0 2rem; }
+        .nv-hook-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 2.4rem; }
+        .nv-hook-tags span {
+          font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--ink-soft);
+          background: var(--surface); border: 1px solid var(--line); padding: 7px 15px; border-radius: 999px;
+        }
+
+        /* ---------- THREE RETURNS ---------- */
+        .nv-returns { padding: 7rem 6vw; background: radial-gradient(120% 100% at 50% 0%, #0B3D2C 0%, var(--char) 60%, #06231A 100%); }
+        .nv-returns .nv-section-head h2 { color: var(--parchment); max-width: 720px; margin-left: auto; margin-right: auto; }
+        .nv-returns .nv-section-head p { color: #A9D6C3; }
+        .nv-returns-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
+        .nv-return-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 2.1rem 1.8rem; display: flex; flex-direction: column; }
+        .nv-return-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.2rem; }
+        .nv-return-icon { width: 48px; height: 48px; border-radius: 13px; display: grid; place-items: center; margin-bottom: 1.3rem; background: rgba(52,211,153,0.14); color: var(--gold); }
+        .nv-return-card h3 { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; color: var(--parchment); margin: 0 0 10px; }
+        .nv-return-card p { color: #A9D6C3; font-size: 0.92rem; line-height: 1.6; margin: 0; flex: 1; }
+        .nv-return-card a.see-more { margin-top: 1.2rem; font-size: 0.84rem; font-weight: 600; color: var(--gold); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .nv-returns-close { text-align: center; max-width: 520px; margin: 3rem auto 0; color: #BFE3D3; font-size: 0.98rem; font-style: italic; font-family: 'Fraunces', serif; }
+
         .nv-stats {
           position: relative; background: var(--parchment); padding: 4.4rem 6vw 3.8rem; overflow: hidden;
         }
@@ -647,6 +680,7 @@ export default function Landing() {
           .nv-legs-connector { display: none; }
           .nv-legs { grid-template-columns: 1fr; }
           .nv-feed-grid { grid-template-columns: 1fr; }
+          .nv-returns-grid { grid-template-columns: 1fr; }
           .nv-split { grid-template-columns: 1fr; }
           .nv-notes-grid { grid-template-columns: 1fr; }
           .nv-footer-grid { grid-template-columns: 1fr; gap: 2.2rem; }
@@ -795,6 +829,24 @@ export default function Landing() {
           </Marquee>
         </div>
       </motion.header>
+
+      {/* ---------- BEFORE YOU THROW IT AWAY ---------- */}
+      <section className="nv-hook" id="before">
+        <motion.div className="nv-hook-inner" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp}>
+          <h2 className="font-display">Before you throw it away&hellip;</h2>
+          <p className="nv-hook-ask">Could someone else use this?</p>
+          <p className="sub">Because sometimes the difference between waste and worth is simply finding the right person.</p>
+          <div className="nv-hook-tags">
+            <span>That old laptop</span>
+            <span>Clothes you haven't worn in months</span>
+            <span>Books you no longer open</span>
+            <span>Food that won't be used</span>
+          </div>
+          <Magnetic strength={0.3}>
+            <Link to="/browse" className="nv-btn spark"><Search size={16} /> Find someone who needs it</Link>
+          </Magnetic>
+        </motion.div>
+      </section>
 
       {/* ---------- STATS ---------- */}
       <section className="nv-stats">
@@ -1029,6 +1081,37 @@ export default function Landing() {
             </Magnetic>
           </motion.div>
         </div>
+      </section>
+
+      {/* ---------- THREE RETURNS ---------- */}
+      <section className="nv-returns" id="returns">
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
+          <span className="nv-kicker">What you get back</span>
+          <h2 className="font-display">Some returns can't be deposited into a bank account. They stay with people.</h2>
+          <p>Giving on Nirvah pays back in three ways — none of them measured in rupees.</p>
+        </motion.div>
+        <motion.div className="nv-returns-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={staggerParent}>
+          <motion.div className="nv-return-card" variants={fadeUp}>
+            <span className="nv-return-tag">Return 01</span>
+            <div className="nv-return-icon"><HeartHandshake size={22} /></div>
+            <h3>Human return</h3>
+            <p>You helped someone. Not a statistic — a name, a place and a reason it mattered.</p>
+          </motion.div>
+          <motion.div className="nv-return-card" variants={fadeUp}>
+            <span className="nv-return-tag">Return 02</span>
+            <div className="nv-return-icon"><Leaf size={22} /></div>
+            <h3>Environmental return</h3>
+            <p>You kept something useful from becoming waste, and gave it a second life instead.</p>
+          </motion.div>
+          <motion.div className="nv-return-card" variants={fadeUp}>
+            <span className="nv-return-tag">Return 03</span>
+            <div className="nv-return-icon"><FileText size={22} /></div>
+            <h3>Practical return</h3>
+            <p>You can see exactly what you gave, who received it and when — every donation keeps its own record.</p>
+            <Link to="/dashboard/donor" className="see-more">View my giving <ArrowRight size={14} /></Link>
+          </motion.div>
+        </motion.div>
+        <p className="nv-returns-close">"Doing good shouldn't mean losing track of what you gave."</p>
       </section>
 
       {/* ---------- TESTIMONIALS ---------- */}

@@ -23,6 +23,7 @@ const MOCK_LISTINGS = [
 ];
 
 const ICONS = { food: UtensilsCrossed, clothing: Shirt, supplies: BookOpen };
+const STATUS_LABEL = { listed: "Finding a match", claimed: "On its way", delivered: "Reached them ✓" };
 
 export default function DonorDashboard() {
   const [stats, setStats] = useState(MOCK_STATS);
@@ -54,11 +55,11 @@ export default function DonorDashboard() {
     <DashboardShell role="donor" user={user}>
       <div className="nv-topbar">
         <div>
-          <h1 className="font-display">Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}</h1>
-          <p className="sub">Here is what your circle of giving looks like right now.</p>
+          <h1 className="font-display">Good to see you again{user?.name ? `, ${user.name.split(" ")[0]}` : ""}.</h1>
+          <p className="sub">Here's what your giving has done.</p>
         </div>
         <Link to="/dashboard/donor/new" className="nv-btn spark">
-          <PackagePlus size={17} /> List a donation
+          <PackagePlus size={17} /> Give something
         </Link>
       </div>
 
@@ -105,28 +106,28 @@ export default function DonorDashboard() {
       <div className="nv-dash-grid">
         <div className="nv-panel">
           <h2>
-            Recent listings
+            Your recent impact
             <Link to="/dashboard/donor/listings" className="see-all">See all</Link>
           </h2>
           {listings.length === 0 ? (
             <div className="nv-empty">
               <div className="ic"><PackagePlus size={22} /></div>
-              <h3>Nothing listed yet</h3>
-              <p>Your first listing usually finds a match within twenty minutes.</p>
-              <Link to="/dashboard/donor/new" className="nv-btn spark sm">List your first donation</Link>
+              <h3>Nothing given yet</h3>
+              <p>Your first gift usually finds someone within twenty minutes.</p>
+              <Link to="/dashboard/donor/new" className="nv-btn spark sm">Give your first thing</Link>
             </div>
           ) : (
             listings.map((l) => {
               const Icon = ICONS[l.category] || PackagePlus;
               return (
-                <div className="nv-row" key={l.id}>
+                <Link to={`/browse/${l.id}`} className="nv-row" key={l.id} style={{ textDecoration: "none", color: "inherit" }}>
                   <div className="nv-row-icon"><Icon size={19} /></div>
                   <div className="nv-row-body">
                     <div className="nv-row-title">{l.title}</div>
                     <div className="nv-row-sub">{l.place}</div>
                   </div>
-                  <span className={`nv-row-status ${l.status}`}>{l.status}</span>
-                </div>
+                  <span className={`nv-row-status ${l.status}`}>{STATUS_LABEL[l.status] || l.status}</span>
+                </Link>
               );
             })
           )}
@@ -155,7 +156,7 @@ export default function DonorDashboard() {
             <p style={{ fontSize: "0.88rem", color: "var(--ink-soft)", lineHeight: 1.6, marginBottom: "1rem" }}>
               Listings with a clear photo and pickup window are claimed about twice as fast. Add both next time you post.
             </p>
-            <Link to="/dashboard/donor/new" className="nv-btn spark sm">List a donation <ArrowRight size={14} /></Link>
+            <Link to="/dashboard/donor/new" className="nv-btn spark sm">Give something <ArrowRight size={14} /></Link>
           </div>
 
           <div className="nv-panel" style={{ background: "linear-gradient(135deg, var(--char-2), var(--char))", borderColor: "transparent", color: "var(--parchment)" }}>

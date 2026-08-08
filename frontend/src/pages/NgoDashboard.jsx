@@ -64,8 +64,8 @@ export default function NgoDashboard() {
     <DashboardShell role="ngo" user={user}>
       <div className="nv-topbar">
         <div>
-          <h1 className="font-display">Welcome back{user?.org ? `, ${user.org}` : ""}</h1>
-          <p className="sub">Here is what is available near your service area right now.</p>
+          <h1 className="font-display">Your work gives things a second life.</h1>
+          <p className="sub">Here is what is waiting nearby, and what your organisation has already put to use.</p>
         </div>
         <Link to="/browse" className="nv-btn sage">
           <Compass size={17} /> Browse the network
@@ -136,7 +136,7 @@ export default function NgoDashboard() {
                   </div>
                   {d.status === "listed" ? (
                     <button className="nv-btn sage sm" disabled={claimingId === d.id} onClick={() => onClaim(d.id)}>
-                      {claimingId === d.id ? "Claiming..." : "Claim"}
+                      {claimingId === d.id ? "Claiming..." : "I can use this"}
                     </button>
                   ) : (
                     <span className="nv-row-status claimed">{d.status}</span>

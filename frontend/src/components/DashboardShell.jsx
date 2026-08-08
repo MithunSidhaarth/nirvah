@@ -16,7 +16,7 @@ import "../styles/dashboard.css";
 
 const DONOR_LINKS = [
   { label: "Overview", to: "/dashboard/donor", icon: LayoutGrid },
-  { label: "List a donation", to: "/dashboard/donor/new", icon: PackagePlus },
+  { label: "Give something", to: "/dashboard/donor/new", icon: PackagePlus },
   { label: "My listings", to: "/dashboard/donor/listings", icon: ListChecks },
   { label: "Explore network", to: "/browse", icon: Compass },
 ];
