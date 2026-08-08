@@ -2,6 +2,9 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Landing from "./pages/Landing";
+import HowItWorks from "./pages/HowItWorks";
+import ForNgos from "./pages/ForNgos";
+import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import DonorDashboard from "./pages/DonorDashboard";
@@ -16,6 +19,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/for-ngos" element={<ForNgos />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 

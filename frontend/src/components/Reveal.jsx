@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
  * Wraps children and fades/slides them in once they enter the viewport.
  * Purely presentational, no external dependencies.
  */
-export default function Reveal({ children, className = "", delay = 0, as = "div" }) {
+export default function Reveal({ children, className = "", delay = 0, as = "div", ...rest }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -32,6 +32,7 @@ export default function Reveal({ children, className = "", delay = 0, as = "div"
       ref={ref}
       className={`nv-reveal ${visible ? "in" : ""} ${className}`}
       style={{ transitionDelay: `${delay}s` }}
+      {...rest}
     >
       {children}
     </Tag>

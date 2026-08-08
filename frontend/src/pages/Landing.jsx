@@ -373,10 +373,10 @@ export default function Landing() {
   }
 
   const navLinks = [
-    { label: "How it works", href: "#how" },
-    { label: "Explore", href: "#feed" },
-    { label: "For NGOs", href: "#split" },
-    { label: "Contact", href: "#footer" },
+    { label: "How it works", to: "/how-it-works" },
+    { label: "Explore", to: "/browse" },
+    { label: "For NGOs", to: "/for-ngos" },
+    { label: "Contact", to: "/contact" },
   ];
 
   return (
@@ -679,7 +679,7 @@ export default function Landing() {
           Nirvah
         </Link>
         <div className="nv-links">
-          {navLinks.map((l) => <a key={l.label} href={l.href} className="nav-link">{l.label}</a>)}
+          {navLinks.map((l) => <Link key={l.label} to={l.to} className="nav-link">{l.label}</Link>)}
           <Link to="/login" className="nav-login">Log in</Link>
           <Magnetic strength={0.4}>
             <Link to="/signup" className="nv-btn spark sm">Start giving <ArrowRight size={15} /></Link>
@@ -700,9 +700,9 @@ export default function Landing() {
           >
             <div style={{ padding: "1.4rem 0 2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
               {navLinks.map((l) => (
-                <a key={l.label} href={l.href} style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }} onClick={() => setMenuOpen(false)}>
+                <Link key={l.label} to={l.to} style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }} onClick={() => setMenuOpen(false)}>
                   {l.label}
-                </a>
+                </Link>
               ))}
               <Link to="/login" style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }}>Log in</Link>
               <Link to="/signup" className="nv-btn spark sm" style={{ width: "fit-content" }}>Start giving <ArrowRight size={15} /></Link>
@@ -1095,8 +1095,10 @@ export default function Landing() {
           </div>
           <div>
             <h5>Quick links</h5>
-            <a href="#how">How it works</a>
-            <a href="#feed">Explore donations</a>
+            <Link to="/how-it-works">How it works</Link>
+            <Link to="/browse">Explore donations</Link>
+            <Link to="/for-ngos">For NGOs</Link>
+            <Link to="/contact">Contact</Link>
             <Link to="/login">Log in or register</Link>
           </div>
         </div>
