@@ -20,6 +20,26 @@ export function setToken(token) {
   else localStorage.removeItem("nirvah_token");
 }
 
+// UI-only convenience: decode the role out of the stored JWT so route
+// guards can redirect instantly without waiting on a network round trip.
+// This is never trusted for anything security-sensitive — every route that
+// matters is enforced server-side (requireAuth / requireRole), same as
+// before this existed.
+export function isLoggedIn() {
+  return !!getToken();
+}
+
+export function getStoredRole() {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role || null;
+  } catch {
+    return null;
+  }
+}
+
 async function request(path, { method = "GET", body, auth = true } = {}) {
   const headers = { "Content-Type": "application/json" };
   const token = getToken();
@@ -159,4 +179,20 @@ export const api = {
 
   // ---- csr (section 11) ----
   getCsrSummary: () => request("/ngos/me/csr-summary"),
+
+  // ---- public NGO impact page ----
+  getNgoImpactSummary: (ngoId) => request(`/ngos/${ngoId}/impact-summary`, { auth: false }),
+
+  // ---- admin / manager dashboard ----
+  // Read-only for both roles. Verify/reject decisions reuse the existing
+  // admin-only routes below — a manager calling them gets a 403 from the
+  // backend, same as any other role.
+  adminStats: () => request("/admin/stats"),
+  adminDonations: () => request("/admin/donations"),
+  adminPendingNgos: () => request("/ngos/pending"),
+  adminNgoDocuments: (ngoId) => request(`/ngos/${ngoId}/documents`),
+  verifyNgo: (ngoId, { status, notes }) =>
+    request(`/ngos/${ngoId}/verify`, { method: "POST", body: { status, notes } }),
+  reviewDocument: (documentId, { status, notes }) =>
+    request(`/documents/${documentId}`, { method: "PATCH", body: { status, notes } }),
 };

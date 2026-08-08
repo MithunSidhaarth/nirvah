@@ -26,7 +26,10 @@ export default function Login() {
     try {
       const data = await api.login(form);
       setToken(data.token);
-      navigate(data.user?.role === "ngo" ? "/dashboard/ngo" : "/dashboard/donor");
+      const role = data.user?.role;
+      if (role === "ngo") navigate("/dashboard/ngo");
+      else if (role === "admin" || role === "manager") navigate("/dashboard/admin");
+      else navigate("/dashboard/donor");
     } catch (err) {
       if (err.code === "EMAIL_NOT_VERIFIED") setNeedsVerification(true);
       setError(err.message || "Could not log you in. Please check your details.");

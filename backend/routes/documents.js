@@ -1,7 +1,7 @@
 import { Router } from "express";
 import pool from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
-import { requireAdmin } from "../middleware/admin.js";
+import { requireAdmin, requireStaff } from "../middleware/admin.js";
 import { requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
 import { upload, fileUrlFor, handleUploadErrors } from "../lib/uploads.js";
@@ -79,7 +79,7 @@ router.get("/ngos/me/documents", requireAuth, async (req, res) => {
 router.get(
   "/ngos/:id/documents",
   requireAuth,
-  requireAdmin,
+  requireStaff,
   requireIntParam(),
   async (req, res) => {
     const ngoResult = await pool.query("SELECT id FROM ngos WHERE user_id = $1", [req.params.id]);

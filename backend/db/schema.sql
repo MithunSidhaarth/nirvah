@@ -14,6 +14,15 @@ DO $$ BEGIN
   CREATE TYPE user_role AS ENUM ('donor', 'ngo');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
+-- 'admin' = full sudo access (site settings, NGO verification decisions,
+-- document approval). 'manager' = read-only staff access to the donations,
+-- claims, and NGO-verification queue, but no write/edit rights anywhere —
+-- see requireStaff vs requireAdmin in backend/middleware/admin.js. Neither
+-- role can be created via /api/auth/signup (see lib/schemas.js); accounts
+-- are provisioned directly with `npm run seed:staff` (backend/db/seed-staff.js).
+ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'admin';
+ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'manager';
+
 DO $$ BEGIN
   CREATE TYPE ngo_verification_status AS ENUM ('pending', 'under_review', 'verified', 'rejected');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;

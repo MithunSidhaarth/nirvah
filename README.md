@@ -75,17 +75,61 @@ donation get listed, claimed and delivered end to end.
   is ready in `backend/lib/email.js`, it just needs real credentials
 - File or photo uploads for listings, this version accepts text only
 - Real location based matching. Places are stored as plain text for now
-- An actual admin role. NGO verification and document review currently
-  gate on an `ADMIN_EMAILS` allowlist (see `backend/middleware/admin.js`)
-  rather than a real role in the `users` table — fine for a small team,
-  worth migrating to a proper role once more than a couple of people need
-  reviewer access
 - Cloud file storage. Uploaded documents/photos are written to local disk
   (`backend/uploads/`, served from `/uploads`) — that's fine for a single
   instance but won't survive a redeploy on Render/Railway. Swap
   `backend/lib/uploads.js` for S3/Cloudinary/R2 before you rely on this in
   production; every route already just calls `fileUrlFor()`, so that's the
   only file that needs to change
+
+## Staff accounts: admin & manager (site operations)
+
+There are now two staff roles in the `user_role` enum, alongside `donor`
+and `ngo` — neither can be created through `/api/auth/signup`, which only
+ever issues `donor`/`ngo`. Provision them directly:
+
+```bash
+cd backend
+ADMIN_EMAIL=mithun@yourdomain.org \
+MANAGER1_EMAIL=nidhi@yourdomain.org \
+MANAGER2_EMAIL=pramish@yourdomain.org \
+npm run seed:staff
+```
+
+If you don't also set `ADMIN_PASSWORD` / `MANAGER1_PASSWORD` /
+`MANAGER2_PASSWORD`, the script generates one per account and prints it
+once — save it immediately, it's only stored as a bcrypt hash after that.
+Anyone can also just use "Forgot password" afterward. Log in at `/login`
+like any other account; it redirects to `/dashboard/admin` automatically
+based on the role in the JWT.
+
+- **admin** — full sudo: can decide NGO verification (`POST
+  /api/ngos/:id/verify`), approve/reject uploaded documents (`PATCH
+  /api/documents/:id`), and everything a manager can do.
+- **manager** — read-only staff access: can see every donation and claim
+  (`GET /api/admin/donations`, `GET /api/admin/stats`) and the NGO
+  verification queue including submitted documents (`GET /api/ngos/pending`,
+  `GET /api/ngos/:id/documents`), but cannot approve/reject anything or
+  change any site setting — those routes are `requireAdmin`-only and return
+  403 for a manager, same as for a donor or NGO.
+- Route protection is enforced on the backend (`requireAdmin` /
+  `requireStaff` in `backend/middleware/admin.js`); the frontend also gates
+  `/dashboard/admin/*` client-side (`frontend/src/components/RequireRole.jsx`)
+  so a donor/NGO account can't even see the admin nav by guessing the URL.
+
+## NGO signup → verification → public impact page
+
+- A new NGO account starts in `pending` (shown in the admin queue as
+  effectively "unclaimed" — Nirvah hasn't reviewed it yet).
+- The NGO submits registration/12AB/80G details (`PATCH /api/ngos/me`) and
+  supporting documents (`POST /api/ngos/me/documents`), which moves it to
+  `under_review`.
+- An admin reviews the queue at `/dashboard/admin/ngos` and marks it
+  `verified` or `rejected` (`POST /api/ngos/:id/verify`).
+- Once verified, the NGO's public page at `/impact/:ngoId` (using its
+  numeric user id) goes live with real numbers pulled from delivered
+  donations (`GET /api/ngos/:id/impact-summary`). Before that, the page
+  shows a "not yet verified" message instead of any stats.
 
 ## Security
 

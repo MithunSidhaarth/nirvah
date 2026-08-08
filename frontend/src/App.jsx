@@ -23,6 +23,10 @@ import MyListings from "./pages/MyListings";
 import ClaimedByUs from "./pages/ClaimedByUs";
 import Team from "./pages/Team";
 import Settings from "./pages/Settings";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminDonations from "./pages/AdminDonations";
+import AdminNgoVerification from "./pages/AdminNgoVerification";
+import RequireRole from "./components/RequireRole";
 
 export default function App() {
   return (
@@ -42,18 +46,22 @@ export default function App() {
         <Route path="/browse/:id" element={<DonationDetail />} />
         <Route path="/impact/:ngoId" element={<NgoImpact />} />
 
-        <Route path="/dashboard/donor" element={<DonorDashboard />} />
-        <Route path="/dashboard/donor/new" element={<NewListing />} />
-        <Route path="/dashboard/donor/wrapped" element={<DonorWrapped />} />
-        <Route path="/dashboard/donor/listings" element={<MyListings />} />
-        <Route path="/dashboard/donor/tax" element={<TaxSummary />} />
+        <Route path="/dashboard/donor" element={<RequireRole roles={["donor"]}><DonorDashboard /></RequireRole>} />
+        <Route path="/dashboard/donor/new" element={<RequireRole roles={["donor"]}><NewListing /></RequireRole>} />
+        <Route path="/dashboard/donor/wrapped" element={<RequireRole roles={["donor"]}><DonorWrapped /></RequireRole>} />
+        <Route path="/dashboard/donor/listings" element={<RequireRole roles={["donor"]}><MyListings /></RequireRole>} />
+        <Route path="/dashboard/donor/tax" element={<RequireRole roles={["donor"]}><TaxSummary /></RequireRole>} />
 
-        <Route path="/dashboard/ngo" element={<NgoDashboard />} />
-        <Route path="/dashboard/ngo/claims" element={<ClaimedByUs />} />
-        <Route path="/dashboard/ngo/csr" element={<CsrSummary />} />
-        <Route path="/dashboard/ngo/team" element={<Team />} />
+        <Route path="/dashboard/ngo" element={<RequireRole roles={["ngo"]}><NgoDashboard /></RequireRole>} />
+        <Route path="/dashboard/ngo/claims" element={<RequireRole roles={["ngo"]}><ClaimedByUs /></RequireRole>} />
+        <Route path="/dashboard/ngo/csr" element={<RequireRole roles={["ngo"]}><CsrSummary /></RequireRole>} />
+        <Route path="/dashboard/ngo/team" element={<RequireRole roles={["ngo"]}><Team /></RequireRole>} />
 
-        <Route path="/dashboard/settings" element={<Settings />} />
+        <Route path="/dashboard/settings" element={<RequireRole roles={["donor", "ngo", "admin", "manager"]}><Settings /></RequireRole>} />
+
+        <Route path="/dashboard/admin" element={<RequireRole roles={["admin", "manager"]}><AdminDashboard /></RequireRole>} />
+        <Route path="/dashboard/admin/donations" element={<RequireRole roles={["admin", "manager"]}><AdminDonations /></RequireRole>} />
+        <Route path="/dashboard/admin/ngos" element={<RequireRole roles={["admin", "manager"]}><AdminNgoVerification /></RequireRole>} />
 
         <Route path="*" element={<Landing />} />
       </Routes>

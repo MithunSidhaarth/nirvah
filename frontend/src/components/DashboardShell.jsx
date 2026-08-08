@@ -11,6 +11,7 @@ import {
   LogOut,
   Receipt,
   Building2,
+  ShieldCheck,
 } from "lucide-react";
 import { setToken } from "../lib/api";
 import "../styles/tokens.css";
@@ -32,10 +33,19 @@ const NGO_LINKS = [
   { label: "Our team", to: "/dashboard/ngo/team", icon: Users2 },
 ];
 
+const STAFF_LINKS = [
+  { label: "Overview", to: "/dashboard/admin", icon: LayoutGrid },
+  { label: "Donations & claims", to: "/dashboard/admin/donations", icon: ListChecks },
+  { label: "NGO verification", to: "/dashboard/admin/ngos", icon: ShieldCheck },
+];
+
+const ROLE_LABEL = { ngo: "NGO account", admin: "Admin account", manager: "Manager account" };
+
 export default function DashboardShell({ role = "donor", user, children }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const links = role === "ngo" ? NGO_LINKS : DONOR_LINKS;
+  const isStaff = role === "admin" || role === "manager";
+  const links = isStaff ? STAFF_LINKS : role === "ngo" ? NGO_LINKS : DONOR_LINKS;
   const initials = (user?.name || user?.org || "N V")
     .split(" ")
     .map((s) => s[0])
@@ -55,7 +65,7 @@ export default function DashboardShell({ role = "donor", user, children }) {
           <Logo size={28} />
           Nirvah
         </Link>
-        <div className="nv-side-role">{role === "ngo" ? "NGO account" : "Giver account"}</div>
+        <div className="nv-side-role">{ROLE_LABEL[role] || "Giver account"}</div>
         <nav className="nv-side-nav">
           {links.map((l) => {
             const Icon = l.icon;

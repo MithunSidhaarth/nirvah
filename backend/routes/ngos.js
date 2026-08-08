@@ -1,7 +1,7 @@
 import { Router } from "express";
 import pool from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
-import { requireAdmin } from "../middleware/admin.js";
+import { requireAdmin, requireStaff } from "../middleware/admin.js";
 import { validate, requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
 import { ngoProfileSchema, ngoVerifyDecisionSchema } from "../lib/schemas.js";
@@ -108,9 +108,69 @@ router.get("/:id/status", requireIntParam(), async (req, res) => {
   });
 });
 
-// ---- admin review ----
+// Public impact page (frontend: /impact/:ngoId). Only returns real numbers
+// once the NGO is verified — until then it just says so, so the page can't
+// be used to fake a track record before Nirvah has actually checked the
+// NGO's documents.
+router.get("/:id/impact-summary", requireIntParam(), async (req, res) => {
+  const ngoResult = await pool.query(
+    `SELECT n.*, u.name, u.org, u.city FROM ngos n JOIN users u ON u.id = n.user_id WHERE n.user_id = $1`,
+    [req.params.id]
+  );
+  const ngo = ngoResult.rows[0];
+  if (!ngo) return res.status(404).json({ error: "NGO not found." });
 
-router.get("/pending", requireAuth, requireAdmin, async (req, res) => {
+  if (ngo.verification_status !== "verified") {
+    return res.json({
+      ngo: { userId: ngo.user_id, name: ngo.name, org: ngo.org, city: ngo.city },
+      verified: false,
+    });
+  }
+
+  const DELIVERED_STAGES = ["delivered", "acknowledged", "impact_recorded", "documentation_complete", "closed"];
+  const [statsResult, recentResult] = await Promise.all([
+    pool.query(
+      `SELECT COUNT(*) FILTER (WHERE d.status = ANY($2)) AS delivered_count,
+              COUNT(DISTINCT d.donor_id) AS donor_count,
+              COALESCE(SUM(ir.beneficiary_count), 0) AS beneficiaries
+       FROM donations d
+       LEFT JOIN impact_records ir ON ir.donation_id = d.id
+       WHERE d.claimed_by = $1`,
+      [req.params.id, DELIVERED_STAGES]
+    ),
+    pool.query(
+      `SELECT ir.* FROM impact_records ir
+       JOIN donations d ON d.id = ir.donation_id
+       WHERE d.claimed_by = $1
+       ORDER BY ir.created_at DESC LIMIT 6`,
+      [req.params.id]
+    ),
+  ]);
+  const stats = statsResult.rows[0];
+
+  res.json({
+    ngo: { userId: ngo.user_id, name: ngo.name, org: ngo.org, city: ngo.city },
+    verified: true,
+    csrEligible: ngo.csr_eligible,
+    stats: {
+      delivered: Number(stats.delivered_count),
+      donors: Number(stats.donor_count),
+      beneficiaries: Number(stats.beneficiaries),
+    },
+    recent: recentResult.rows.map((r) => ({
+      location: r.location,
+      itemsDelivered: r.items_delivered,
+      beneficiaryCount: r.beneficiary_count,
+      createdAt: r.created_at,
+    })),
+  });
+});
+
+// ---- admin / manager review ----
+// Managers can see the verification queue and drill into a pending NGO's
+// documents; only an admin can actually decide (POST /:id/verify below).
+
+router.get("/pending", requireAuth, requireStaff, async (req, res) => {
   const result = await pool.query(
     `SELECT n.*, u.name, u.org, u.city, u.email FROM ngos n
      JOIN users u ON u.id = n.user_id

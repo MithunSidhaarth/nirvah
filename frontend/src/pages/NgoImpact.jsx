@@ -8,6 +8,7 @@ import {
 import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/motion/CountUp";
+import { api } from "../lib/api";
 import "../styles/tokens.css";
 
 /* ---------------------------------------------------------
@@ -50,11 +51,63 @@ export default function NgoImpact() {
   const { ngoId } = useParams();
   const [ngo, setNgo] = useState(MOCK_NGOS[ngoId] || DEFAULT_NGO);
   const [copied, setCopied] = useState(false);
+  // "demo" (marketing slugs like /impact/asha-foundation, or a numeric id
+  // that fails to load), "unverified" (real NGO, hasn't cleared Nirvah's
+  // document review yet), "verified" (real NGO, real numbers).
+  const [status, setStatus] = useState("demo");
+  const [unverifiedName, setUnverifiedName] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
     setNgo(MOCK_NGOS[ngoId] || DEFAULT_NGO);
-    // Swap for api.getNgoImpact(ngoId) once the backend exposes a public stats endpoint.
+    setStatus("demo");
+
+    // Real NGOs are keyed by numeric user id; marketing/demo pages use a
+    // slug like "asha-foundation", so only hit the API for numeric ids.
+    if (/^\d+$/.test(ngoId || "")) {
+      (async () => {
+        try {
+          const res = await api.getNgoImpactSummary(ngoId);
+          if (cancelled) return;
+
+          if (!res.verified) {
+            setStatus("unverified");
+            setUnverifiedName(res.ngo?.org || res.ngo?.name || "This NGO");
+            return;
+          }
+
+          setStatus("verified");
+          setNgo({
+            name: res.ngo?.org || res.ngo?.name || "This NGO",
+            tagline: "Verified by the Nirvah team. Every number below comes from real, delivered donations.",
+            verified: true,
+            serviceArea: res.ngo?.city || "Service area not listed",
+            categories: [],
+            recent: (res.recent || []).map((r) => ({
+              text: [r.itemsDelivered, r.location && `in ${r.location}`].filter(Boolean).join(" ") || "A delivery was logged",
+              when: new Date(r.createdAt).toLocaleDateString(),
+            })),
+            statCards: [
+              { value: res.stats?.delivered || 0, suffix: "", label: "donations delivered" },
+              { value: res.stats?.donors || 0, suffix: "", label: "donors matched with" },
+              { value: res.stats?.beneficiaries || 0, suffix: "", label: "people reached" },
+            ],
+          });
+        } catch {
+          if (!cancelled) setStatus("demo");
+        }
+      })();
+    }
+
+    return () => { cancelled = true; };
   }, [ngoId]);
+
+  const statCards = ngo.statCards || [
+    { value: ngo.totals?.delivered, suffix: "", label: "items delivered, all time" },
+    { value: ngo.totals?.pickups, suffix: "", label: "completed pickups" },
+    { value: ngo.totals?.donors, suffix: "", label: "donors matched with" },
+    { value: ngo.totals?.avgPickupMin, suffix: " min", label: "avg. claim to pickup" },
+  ];
 
   function share() {
     const url = window.location.href;
@@ -66,6 +119,23 @@ export default function NgoImpact() {
         setTimeout(() => setCopied(false), 2000);
       });
     }
+  }
+
+  if (status === "unverified") {
+    return (
+      <div className="nv-app" style={{ minHeight: "100vh" }}>
+        <PageNav />
+        <div style={{ maxWidth: 560, margin: "6rem auto", textAlign: "center", padding: "0 6vw" }}>
+          <h1 className="font-display">{unverifiedName}</h1>
+          <p className="sub" style={{ marginTop: "0.8rem" }}>
+            This NGO has signed up on Nirvah but hasn't completed verification yet — their impact page
+            goes live once the Nirvah team has reviewed their documents.
+          </p>
+          <Link to="/browse" className="nv-btn spark" style={{ marginTop: "1.4rem" }}>See what's on Nirvah <ArrowRight size={15} /></Link>
+        </div>
+        <PageFooter />
+      </div>
+    );
   }
 
   return (
@@ -134,13 +204,8 @@ export default function NgoImpact() {
         </div>
       </header>
 
-      <div className="ni-stats">
-        {[
-          { value: ngo.totals.delivered, suffix: "", label: "items delivered, all time" },
-          { value: ngo.totals.pickups, suffix: "", label: "completed pickups" },
-          { value: ngo.totals.donors, suffix: "", label: "donors matched with" },
-          { value: ngo.totals.avgPickupMin, suffix: " min", label: "avg. claim to pickup" },
-        ].map((s) => (
+      <div className="ni-stats" style={statCards.length !== 4 ? { gridTemplateColumns: `repeat(${statCards.length}, 1fr)` } : undefined}>
+        {statCards.map((s) => (
           <Reveal key={s.label} className="ni-stat">
             <div className="num"><CountUp value={s.value} suffix={s.suffix} /></div>
             <div className="lbl">{s.label}</div>
@@ -148,23 +213,25 @@ export default function NgoImpact() {
         ))}
       </div>
 
-      <section className="ni-section">
-        <Reveal className="ni-section-head">
-          <span className="ni-kicker">What's been delivered</span>
-          <h2 className="font-display">A breakdown by category</h2>
-          <p>Share of total items delivered by {ngo.name}, across every donation claimed on the network.</p>
-        </Reveal>
-        <motion.div className="ni-cat-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
-          {ngo.categories.map((c) => (
-            <motion.div className="ni-cat-card" key={c.key} variants={fadeUp}>
-              <div className="icn"><c.icon size={20} /></div>
-              <div className="share">{c.share}%</div>
-              <div style={{ color: "var(--ink-soft)", fontSize: "0.88rem", marginTop: 2 }}>{c.label}</div>
-              <div className="ni-cat-bar"><span style={{ width: `${c.share}%` }} /></div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
+      {ngo.categories.length > 0 && (
+        <section className="ni-section">
+          <Reveal className="ni-section-head">
+            <span className="ni-kicker">What's been delivered</span>
+            <h2 className="font-display">A breakdown by category</h2>
+            <p>Share of total items delivered by {ngo.name}, across every donation claimed on the network.</p>
+          </Reveal>
+          <motion.div className="ni-cat-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
+            {ngo.categories.map((c) => (
+              <motion.div className="ni-cat-card" key={c.key} variants={fadeUp}>
+                <div className="icn"><c.icon size={20} /></div>
+                <div className="share">{c.share}%</div>
+                <div style={{ color: "var(--ink-soft)", fontSize: "0.88rem", marginTop: 2 }}>{c.label}</div>
+                <div className="ni-cat-bar"><span style={{ width: `${c.share}%` }} /></div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+      )}
 
       <section className="ni-section">
         <Reveal className="ni-section-head">
@@ -172,8 +239,11 @@ export default function NgoImpact() {
           <h2 className="font-display">The last few circles closed</h2>
         </Reveal>
         <Reveal className="ni-timeline">
-          {ngo.recent.map((r) => (
-            <div className="ni-timeline-row" key={r.text}>
+          {ngo.recent.length === 0 && (
+            <div className="ni-timeline-text" style={{ padding: "0.6rem 0" }}>Nothing logged yet.</div>
+          )}
+          {ngo.recent.map((r, i) => (
+            <div className="ni-timeline-row" key={`${r.text}-${i}`}>
               <span className="dot" />
               <span className="ni-timeline-text">{r.text}</span>
               <span className="ni-timeline-when">{r.when}</span>
