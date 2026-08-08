@@ -1,0 +1,123 @@
+/* =========================================================
+   NIRVAH — shared design tokens
+   Theme: "full circle giving". Warm charcoal nights, an ember
+   accent for givers, a sage accent for receiving organisations,
+   and a parchment surface for anything that needs to read calm
+   and legible in daylight.
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --char: #14110C;
+  --char-2: #1D170F;
+  --char-3: #271F14;
+  --spark: #FF7A45;
+  --spark-deep: #C7461F;
+  --gold: #F4B942;
+  --sage: #6FA287;
+  --sage-deep: #3E6E56;
+  --parchment: #FBF3E7;
+  --parchment-2: #EFE1CB;
+  --surface: #FFFDF9;
+  --ink: #241C15;
+  --ink-soft: #6C5B45;
+  --line: rgba(36, 28, 21, 0.1);
+  --line-dark: rgba(251, 243, 231, 0.1);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-soft: 0 20px 44px rgba(20, 17, 12, 0.08);
+  --shadow-deep: 0 24px 60px rgba(20, 17, 12, 0.35);
+}
+
+.nv-app, .nv-app * { box-sizing: border-box; }
+.nv-app {
+  font-family: 'Inter', sans-serif;
+  background: var(--parchment);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+.nv-app .font-display { font-family: 'Fraunces', serif; }
+.nv-app .font-mono { font-family: 'IBM Plex Mono', monospace; }
+.nv-app *:focus-visible { outline: 2px solid var(--spark); outline-offset: 3px; }
+.nv-app a { color: inherit; }
+
+/* ---------- shared buttons ---------- */
+.nv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 13px 26px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  font-family: inherit;
+}
+.nv-btn.spark {
+  background: linear-gradient(120deg, var(--spark), var(--spark-deep));
+  color: var(--parchment);
+  box-shadow: 0 14px 30px rgba(255, 122, 69, 0.3);
+}
+.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(255, 122, 69, 0.42); }
+.nv-btn.sage {
+  background: linear-gradient(120deg, var(--sage), var(--sage-deep));
+  color: var(--parchment);
+  box-shadow: 0 14px 30px rgba(62, 110, 86, 0.3);
+}
+.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(62, 110, 86, 0.42); }
+.nv-btn.ghost-dark {
+  background: transparent;
+  border-color: rgba(251, 243, 231, 0.3);
+  color: var(--parchment);
+}
+.nv-btn.ghost-dark:hover { background: rgba(251, 243, 231, 0.08); border-color: var(--gold); }
+.nv-btn.ghost-light {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.nv-btn.ghost-light:hover { border-color: var(--spark-deep); color: var(--spark-deep); transform: translateY(-2px); }
+.nv-btn.sm { padding: 9px 18px; font-size: 0.86rem; border-radius: 9px; }
+.nv-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+
+/* ---------- shared badges / pills ---------- */
+.nv-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 13px;
+  border-radius: 999px;
+}
+.nv-pill.spark { background: rgba(255, 122, 69, 0.12); color: var(--spark-deep); border: 1px solid rgba(255, 122, 69, 0.3); }
+.nv-pill.sage { background: rgba(111, 162, 135, 0.14); color: var(--sage-deep); border: 1px solid rgba(111, 162, 135, 0.3); }
+.nv-pill.gold { background: rgba(244, 185, 66, 0.14); color: #9A6A0E; border: 1px solid rgba(244, 185, 66, 0.35); }
+
+/* ---------- shared cards ---------- */
+.nv-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---------- scroll reveal ---------- */
+.nv-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.8s cubic-bezier(.2,.7,.2,1), transform 0.8s cubic-bezier(.2,.7,.2,1);
+}
+.nv-reveal.in { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-app * { animation: none !important; transition: none !important; }
+}
