@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Flame, ArrowLeft, MapPin, User, HeartHandshake } from "lucide-react";
+import { ArrowLeft, MapPin, User, HeartHandshake } from "lucide-react";
+import Logo from "../components/Logo";
 import { api } from "../lib/api";
 import "../styles/tokens.css";
 
@@ -45,7 +46,7 @@ export default function DonationDetail() {
       `}</style>
 
       <nav className="nv-detail-nav">
-        <Link to="/" className="nv-brand"><span className="badge"><Flame size={16} /></span> Nirvah</Link>
+        <Link to="/" className="nv-brand"><Logo size={28} /> Nirvah</Link>
         <Link to="/browse" className="nv-btn ghost-light sm"><ArrowLeft size={15} /> Back to browse</Link>
       </nav>
 

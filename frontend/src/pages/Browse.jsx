@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, MapPin, UtensilsCrossed, Shirt, BookOpen, PackageSearch, ArrowLeft } from "lucide-react";
+import { MapPin, UtensilsCrossed, Shirt, BookOpen, PackageSearch, ArrowLeft } from "lucide-react";
+import Logo from "../components/Logo";
 import { api } from "../lib/api";
 import "../styles/tokens.css";
 
@@ -53,7 +54,7 @@ export default function Browse() {
       `}</style>
 
       <nav className="nv-browse-nav">
-        <Link to="/" className="nv-brand"><span className="badge"><Flame size={16} /></span> Nirvah</Link>
+        <Link to="/" className="nv-brand"><Logo size={28} /> Nirvah</Link>
         <Link to="/" className="nv-btn ghost-dark sm"><ArrowLeft size={15} /> Home</Link>
       </nav>
 

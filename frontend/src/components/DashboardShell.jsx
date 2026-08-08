@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Logo from "./Logo";
 import {
-  Flame,
   LayoutGrid,
   PackagePlus,
   ListChecks,
@@ -48,7 +48,7 @@ export default function DashboardShell({ role = "donor", user, children }) {
     <div className="nv-app nv-dash">
       <aside className="nv-side">
         <Link to="/" className="nv-side-brand">
-          <span className="badge"><Flame size={16} strokeWidth={2.4} /></span>
+          <Logo size={28} />
           Nirvah
         </Link>
         <div className="nv-side-role">{role === "ngo" ? "NGO account" : "Giver account"}</div>

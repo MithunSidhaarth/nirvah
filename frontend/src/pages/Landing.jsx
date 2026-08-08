@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Flame,
   MapPin,
   Clock,
   PackagePlus,
@@ -17,9 +16,14 @@ import {
   BookOpen,
   Users2,
   Sparkles,
-  Circle,
+  Flame,
 } from "lucide-react";
-import Reveal from "../components/Reveal";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import Logo from "../components/Logo";
+import Magnetic from "../components/motion/Magnetic";
+import CountUp from "../components/motion/CountUp";
+import Marquee from "../components/motion/Marquee";
+import TiltCard from "../components/motion/TiltCard";
 import "../styles/tokens.css";
 
 /* ---------------------------------------------------------
@@ -77,7 +81,66 @@ function formatCountdown(ms) {
   return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
 }
 
-function EmberField({ count = 18 }) {
+/* ---------- animation variants ---------- */
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.2, 0.7, 0.2, 1] } },
+};
+const staggerParent = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+};
+const wordVariant = {
+  hidden: { opacity: 0, y: "0.6em" },
+  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.2, 0.75, 0.15, 1] } },
+};
+
+function SplitHeadline({ text, className = "", delayStart = 0 }) {
+  const words = text.split(" ");
+  return (
+    <motion.span
+      className={className}
+      style={{ display: "inline" }}
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.055, delayChildren: delayStart } } }}
+    >
+      {words.map((w, i) => (
+        <span key={i} style={{ display: "inline-block", overflow: "hidden", verticalAlign: "top" }}>
+          <motion.span variants={wordVariant} style={{ display: "inline-block" }}>
+            {w}
+            {i < words.length - 1 ? "\u00A0" : ""}
+          </motion.span>
+        </span>
+      ))}
+    </motion.span>
+  );
+}
+
+/* Ambient mesh blobs drifting slowly behind the hero content */
+function MeshBlobs() {
+  return (
+    <div className="nv-mesh" aria-hidden="true">
+      <motion.div
+        className="nv-blob nv-blob-1"
+        animate={{ x: [0, 60, -20, 0], y: [0, -40, 30, 0], scale: [1, 1.15, 0.95, 1] }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="nv-blob nv-blob-2"
+        animate={{ x: [0, -50, 40, 0], y: [0, 40, -30, 0], scale: [1, 0.9, 1.1, 1] }}
+        transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="nv-blob nv-blob-3"
+        animate={{ x: [0, 30, -40, 0], y: [0, -25, 20, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  );
+}
+
+function EmberField({ count = 16 }) {
   const particles = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
@@ -110,13 +173,21 @@ function EmberField({ count = 18 }) {
   );
 }
 
-/* Signature visual: a spark travelling a closed ring, "full circle giving" */
-function CircleGraphic() {
+/* Signature visual: a spark travelling a closed ring, with light
+   cursor-parallax so it feels like it is floating in the scene. */
+function CircleGraphic({ parallaxX, parallaxY }) {
   const r = 92;
   const cx = 130;
   const cy = 130;
   return (
-    <svg className="circle-graphic" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <motion.svg
+      className="circle-graphic"
+      viewBox="0 0 260 260"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      style={{ x: parallaxX, y: parallaxY }}
+    >
       <defs>
         <filter id="nvGlow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="5" result="blur" />
@@ -163,7 +234,7 @@ function CircleGraphic() {
 
       <text x={cx} y={cy - 6} textAnchor="middle" className="circle-center-1 font-display">Full circle</text>
       <text x={cx} y={cy + 16} textAnchor="middle" className="circle-center-2 font-mono">giving</text>
-    </svg>
+    </motion.svg>
   );
 }
 
@@ -188,8 +259,19 @@ function CountdownChip({ ms }) {
 export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
-  const [tickerVisible, setTickerVisible] = useState(true);
+
+  const heroRef = useRef(null);
+  const mvX = useMotionValue(0);
+  const mvY = useMotionValue(0);
+  const parallaxX = useSpring(useTransform(mvX, [-1, 1], [-14, 14]), { stiffness: 60, damping: 18 });
+  const parallaxY = useSpring(useTransform(mvY, [-1, 1], [-14, 14]), { stiffness: 60, damping: 18 });
+  const spotX = useSpring(useTransform(mvX, [-1, 1], [30, 70]), { stiffness: 40, damping: 20 });
+  const spotY = useSpring(useTransform(mvY, [-1, 1], [30, 70]), { stiffness: 40, damping: 20 });
+
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 80]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -197,16 +279,13 @@ export default function Landing() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    const iv = setInterval(() => {
-      setTickerVisible(false);
-      setTimeout(() => {
-        setTickerIndex((i) => (i + 1) % RELAY_EVENTS.length);
-        setTickerVisible(true);
-      }, 400);
-    }, 4200);
-    return () => clearInterval(iv);
-  }, []);
+  function handleHeroMouseMove(e) {
+    const el = heroRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    mvX.set(((e.clientX - rect.left) / rect.width) * 2 - 1);
+    mvY.set(((e.clientY - rect.top) / rect.height) * 2 - 1);
+  }
 
   const navLinks = [
     { label: "How it works", href: "#how" },
@@ -225,19 +304,13 @@ export default function Landing() {
           transition: background 0.4s ease, padding 0.4s ease, box-shadow 0.4s ease;
         }
         .nv-landing .nv-nav.scrolled {
-          background: rgba(20, 17, 12, 0.92); backdrop-filter: blur(10px);
+          background: rgba(20, 17, 12, 0.86); backdrop-filter: blur(14px) saturate(160%);
           padding: 14px 6vw; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
         }
         .nv-brand {
-          display: flex; align-items: center; gap: 9px;
+          display: flex; align-items: center; gap: 10px;
           font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.5rem;
           color: var(--parchment); text-decoration: none;
-        }
-        .nv-brand .badge {
-          display: grid; place-items: center; width: 34px; height: 34px;
-          border-radius: 10px;
-          background: linear-gradient(145deg, var(--gold), var(--spark-deep));
-          color: var(--char);
         }
         .nv-links { display: flex; align-items: center; gap: 2.2rem; }
         .nv-links a { font-size: 0.95rem; font-weight: 500; color: var(--parchment); opacity: 0.82; text-decoration: none; transition: opacity 0.2s ease; }
@@ -245,11 +318,26 @@ export default function Landing() {
         .nv-menu-btn { display: none; background: none; border: none; color: var(--parchment); }
         @media (max-width: 900px) { .nv-links { display: none; } .nv-menu-btn { display: block; } }
 
+        /* ---------- CINEMATIC HERO ---------- */
         .nv-hero {
           position: relative;
           background: radial-gradient(120% 100% at 15% 0%, #241C13 0%, var(--char) 55%, #0d0b08 100%);
           padding: 4vw 6vw 6vw; overflow: hidden;
+          min-height: 92vh; display: flex; flex-direction: column;
         }
+        .nv-hero-spotlight {
+          position: absolute; inset: 0; z-index: 1; pointer-events: none;
+          background: radial-gradient(600px circle at var(--sx, 50%) var(--sy, 30%), rgba(255,140,80,0.14), transparent 60%);
+        }
+        .nv-grain {
+          position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .nv-mesh { position: absolute; inset: 0; z-index: 0; }
+        .nv-blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.35; }
+        .nv-blob-1 { width: 420px; height: 420px; top: -8%; left: 4%; background: radial-gradient(circle, var(--spark), transparent 70%); }
+        .nv-blob-2 { width: 380px; height: 380px; bottom: -12%; right: 6%; background: radial-gradient(circle, var(--gold), transparent 70%); }
+        .nv-blob-3 { width: 300px; height: 300px; top: 30%; right: 18%; background: radial-gradient(circle, var(--sage), transparent 72%); opacity: 0.18; }
         .ember-field { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
         .ember-particle {
           position: absolute; bottom: -20px; border-radius: 50%;
@@ -261,7 +349,7 @@ export default function Landing() {
           12% { opacity: 0.9; } 80% { opacity: 0.5; }
           100% { opacity: 0; transform: translate(var(--drift), -520px) scale(1.1); }
         }
-        .nv-hero-inner { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding-top: 4.5rem; text-align: center; }
+        .nv-hero-inner { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding-top: 4.5rem; text-align: center; flex: 1; }
         .nv-eyebrow {
           display: inline-flex; align-items: center; gap: 10px;
           font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
@@ -285,13 +373,16 @@ export default function Landing() {
         .circle-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; fill: #CFC3B0; }
         .circle-center-1 { fill: var(--parchment); font-size: 15px; font-style: italic; }
         .circle-center-2 { fill: var(--gold); font-size: 10px; letter-spacing: 0.1em; }
-        .nv-live-ticker { margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #CFC3B0; min-height: 20px; }
-        .nv-live-ticker .flame-ico { color: var(--spark); flex-shrink: 0; }
-        .nv-live-ticker span.msg { transition: opacity 0.4s ease, transform 0.4s ease; }
-        .nv-live-ticker span.msg.hidden { opacity: 0; transform: translateY(4px); }
-        .nv-live-ticker span.msg.shown { opacity: 1; transform: translateY(0); }
 
-        .nv-stats { background: var(--parchment); padding: 3.4rem 6vw; border-bottom: 1px solid var(--parchment-2); }
+        .nv-ticker-wrap { margin-top: 1.2rem; position: relative; z-index: 2; border-top: 1px solid rgba(247,239,227,0.08); }
+        .nv-marquee { overflow: hidden; padding: 14px 0; }
+        .nv-marquee-track { display: flex; width: max-content; }
+        .nv-marquee-set { display: flex; align-items: center; flex-shrink: 0; }
+        .nv-ticker-item { display: inline-flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #CFC3B0; padding: 0 2.4rem; white-space: nowrap; }
+        .nv-ticker-item .flame-ico { color: var(--spark); flex-shrink: 0; }
+        .nv-ticker-item .sep { color: #5A4F3E; }
+
+        .nv-stats { background: var(--parchment); padding: 3.6rem 6vw; border-bottom: 1px solid var(--parchment-2); }
         .nv-stats-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; text-align: center; }
         .nv-stat-num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: clamp(1.9rem,3.4vw,2.6rem); color: var(--spark-deep); }
         .nv-stat-label { margin-top: 6px; font-size: 0.92rem; color: var(--ink-soft); font-weight: 500; }
@@ -303,8 +394,7 @@ export default function Landing() {
         .nv-section-head h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,3.6vw,2.8rem); font-weight: 600; color: var(--ink); margin: 0 0 1rem; }
         .nv-section-head p { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; }
         .nv-legs { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2.4rem; }
-        .nv-leg { background: #fff; border: 1px solid var(--parchment-2); border-radius: 20px; padding: 2.2rem 1.9rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .nv-leg:hover { transform: translateY(-6px); box-shadow: 0 22px 40px rgba(36,28,21,0.08); }
+        .nv-leg { background: #fff; border: 1px solid var(--parchment-2); border-radius: 20px; padding: 2.2rem 1.9rem; }
         .nv-leg .leg-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; }
         .nv-leg .leg-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg,#FFE6D2,#FFCBA4); color: var(--spark-deep); margin: 14px 0 18px; }
         .nv-leg h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; margin: 0 0 10px; color: var(--ink); }
@@ -314,8 +404,9 @@ export default function Landing() {
         .nv-feed .nv-section-head h2 { color: var(--parchment); }
         .nv-feed .nv-section-head p { color: #B9AC98; }
         .nv-feed-grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
-        .nv-card2 { background: var(--char-2); border: 1px solid rgba(247,239,227,0.08); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, border-color 0.3s ease; }
-        .nv-card2:hover { transform: translateY(-5px); border-color: rgba(255,122,69,0.4); }
+        .nv-tilt-card { position: relative; transform-style: preserve-3d; }
+        .nv-tilt-glow { position: absolute; inset: 0; z-index: 1; border-radius: 18px; pointer-events: none; }
+        .nv-card2 { position: relative; z-index: 2; background: var(--char-2); border: 1px solid rgba(247,239,227,0.08); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; height: 100%; }
         .nv-card2-media { height: 130px; display: grid; place-items: center; background: linear-gradient(135deg, var(--char-3), var(--char-2)); color: var(--gold); position: relative; }
         .nv-card2-media::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,122,69,0.18), transparent 60%); }
         .nv-card2-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; flex: 1; }
@@ -344,11 +435,7 @@ export default function Landing() {
 
         .nv-notes { padding: 7rem 6vw; background: var(--parchment); }
         .nv-notes-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-        .nv-note { background: #FFFDF8; border: 1px solid var(--parchment-2); border-radius: 4px 4px 16px 16px; padding: 2rem 1.7rem; box-shadow: 0 16px 30px rgba(36,28,21,0.06); position: relative; transition: transform 0.3s ease; }
-        .nv-note:nth-child(2) { transform: rotate(-0.6deg); }
-        .nv-note:nth-child(1) { transform: rotate(0.8deg); }
-        .nv-note:nth-child(3) { transform: rotate(-0.3deg); }
-        .nv-note:hover { transform: translateY(-6px) rotate(0deg); }
+        .nv-note { background: #FFFDF8; border: 1px solid var(--parchment-2); border-radius: 4px 4px 16px 16px; padding: 2rem 1.7rem; box-shadow: 0 16px 30px rgba(36,28,21,0.06); position: relative; }
         .nv-note .tape { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 54px; height: 20px; background: rgba(244,185,66,0.35); border: 1px solid rgba(244,185,66,0.5); }
         .nv-note-avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 0.95rem; background: linear-gradient(145deg, var(--gold), var(--spark-deep)); color: var(--char); margin-bottom: 14px; }
         .nv-note p.quote { font-size: 0.98rem; line-height: 1.6; color: var(--ink); margin: 0 0 16px; font-style: italic; }
@@ -375,148 +462,219 @@ export default function Landing() {
           .nv-notes-grid { grid-template-columns: 1fr; }
           .nv-footer-grid { grid-template-columns: 1fr; gap: 2.2rem; }
         }
+        @media (prefers-reduced-motion: reduce) {
+          .nv-mesh, .nv-hero-spotlight { display: none; }
+        }
       `}</style>
 
       {/* ---------- NAV ---------- */}
       <nav className={`nv-nav ${scrolled ? "scrolled" : ""}`}>
         <Link to="/" className="nv-brand">
-          <span className="badge"><Flame size={18} strokeWidth={2.4} /></span>
+          <Logo size={32} />
           Nirvah
         </Link>
         <div className="nv-links">
           {navLinks.map((l) => <a key={l.label} href={l.href}>{l.label}</a>)}
           <Link to="/login" style={{ textDecoration: "none" }}>Log in</Link>
-          <Link to="/signup" className="nv-btn spark sm">Start giving <ArrowRight size={15} /></Link>
+          <Magnetic strength={0.4}>
+            <Link to="/signup" className="nv-btn spark sm">Start giving <ArrowRight size={15} /></Link>
+          </Magnetic>
         </div>
         <button className="nv-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Toggle menu">
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
-      {menuOpen && (
-        <div style={{ background: "var(--char)", padding: "1.4rem 6vw 2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {navLinks.map((l) => (
-            <a key={l.label} href={l.href} style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }} onClick={() => setMenuOpen(false)}>
-              {l.label}
-            </a>
-          ))}
-          <Link to="/login" style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }}>Log in</Link>
-          <Link to="/signup" className="nv-btn spark sm" style={{ width: "fit-content" }}>Start giving <ArrowRight size={15} /></Link>
-        </div>
-      )}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={{ background: "var(--char)", padding: "0 6vw", display: "flex", flexDirection: "column", gap: "1rem", overflow: "hidden" }}
+          >
+            <div style={{ padding: "1.4rem 0 2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {navLinks.map((l) => (
+                <a key={l.label} href={l.href} style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }} onClick={() => setMenuOpen(false)}>
+                  {l.label}
+                </a>
+              ))}
+              <Link to="/login" style={{ color: "var(--parchment)", textDecoration: "none", fontWeight: 500 }}>Log in</Link>
+              <Link to="/signup" className="nv-btn spark sm" style={{ width: "fit-content" }}>Start giving <ArrowRight size={15} /></Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ---------- HERO ---------- */}
-      <header className="nv-hero">
-        <EmberField count={18} />
+      {/* ---------- CINEMATIC HERO ---------- */}
+      <motion.header
+        className="nv-hero"
+        ref={heroRef}
+        onMouseMove={handleHeroMouseMove}
+        style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+      >
+        <MeshBlobs />
+        <EmberField count={16} />
+        <motion.div className="nv-hero-spotlight" style={{ "--sx": useTransform(spotX, (v) => `${v}%`), "--sy": useTransform(spotY, (v) => `${v}%`) }} />
+        <div className="nv-grain" />
+
         <div className="nv-hero-inner">
-          <span className="nv-eyebrow"><span className="dot" /> Live matching, right now</span>
+          <motion.span
+            className="nv-eyebrow"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="dot" /> Live matching, right now
+          </motion.span>
+
           <h1 className="font-display">
-            Nothing good <br /> should go <em>to waste.</em>
+            <SplitHeadline text="Nothing good" delayStart={0.1} />
+            <br />
+            <SplitHeadline text="should go" delayStart={0.42} />{" "}
+            <motion.em
+              initial={{ opacity: 0, y: "0.6em" }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.62, ease: [0.2, 0.75, 0.15, 1] }}
+              style={{ display: "inline-block" }}
+            >
+              to waste.
+            </motion.em>
           </h1>
-          <p className="lede">
+
+          <motion.p
+            className="lede"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85 }}
+          >
             Nirvah connects surplus food, clothing and supplies from people who have
             more to neighbours who have less. Matched to a verified NGO in minutes,
             tracked until it is actually delivered.
-          </p>
-          <div className="nv-hero-ctas">
-            <Link to="/signup?role=donor" className="nv-btn spark">I am a giver <ArrowRight size={17} /></Link>
-            <Link to="/signup?role=ngo" className="nv-btn ghost-dark">I am an NGO <ArrowRight size={17} /></Link>
-          </div>
+          </motion.p>
 
-          <CircleGraphic />
+          <motion.div
+            className="nv-hero-ctas"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.0 }}
+          >
+            <Magnetic strength={0.3}>
+              <Link to="/signup?role=donor" className="nv-btn spark">I am a giver <ArrowRight size={17} /></Link>
+            </Magnetic>
+            <Magnetic strength={0.3}>
+              <Link to="/signup?role=ngo" className="nv-btn ghost-dark">I am an NGO <ArrowRight size={17} /></Link>
+            </Magnetic>
+          </motion.div>
 
-          <div className="nv-live-ticker">
-            <Flame size={15} className="flame-ico" />
-            <span className={`msg ${tickerVisible ? "shown" : "hidden"}`}>{RELAY_EVENTS[tickerIndex]}</span>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 1.1, ease: [0.2, 0.7, 0.2, 1] }}
+          >
+            <CircleGraphic parallaxX={parallaxX} parallaxY={parallaxY} />
+          </motion.div>
         </div>
-      </header>
+
+        <div className="nv-ticker-wrap">
+          <Marquee speed={32}>
+            {RELAY_EVENTS.map((msg, i) => (
+              <span className="nv-ticker-item" key={i}>
+                <Flame size={13} className="flame-ico" /> {msg} <span className="sep">•</span>
+              </span>
+            ))}
+          </Marquee>
+        </div>
+      </motion.header>
 
       {/* ---------- STATS ---------- */}
       <section className="nv-stats">
-        <Reveal className="nv-stats-grid">
-          <div>
-            <div className="nv-stat-num">12,480</div>
+        <motion.div
+          className="nv-stats-grid"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          variants={staggerParent}
+        >
+          <motion.div variants={fadeUp}>
+            <div className="nv-stat-num"><CountUp value={12480} /></div>
             <div className="nv-stat-label">meals delivered since launch</div>
-          </div>
-          <div>
-            <div className="nv-stat-num">340+</div>
+          </motion.div>
+          <motion.div variants={fadeUp}>
+            <div className="nv-stat-num"><CountUp value={340} suffix="+" /></div>
             <div className="nv-stat-label">verified NGOs on the network</div>
-          </div>
-          <div>
-            <div className="nv-stat-num">18 min</div>
+          </motion.div>
+          <motion.div variants={fadeUp}>
+            <div className="nv-stat-num"><CountUp value={18} suffix=" min" /></div>
             <div className="nv-stat-label">average time to first match</div>
-          </div>
-        </Reveal>
+          </motion.div>
+        </motion.div>
         <p className="nv-stats-note">Illustrative platform figures, updated as the Nirvah network grows.</p>
       </section>
 
       {/* ---------- HOW IT WORKS ---------- */}
       <section className="nv-how" id="how">
-        <Reveal className="nv-section-head">
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
           <span className="nv-kicker">The full circle, in three steps</span>
           <h2 className="font-display">From your shelf to their table</h2>
           <p>No warehouses, no waiting lists. Nirvah is built for the gap between "we have extra" and "someone needs it right now."</p>
-        </Reveal>
-        <div className="nv-legs">
-          <Reveal delay={0}>
-            <div className="nv-leg">
-              <span className="leg-tag">Step one</span>
-              <div className="leg-icon"><PackagePlus size={24} /></div>
-              <h3>List what you have</h3>
-              <p>Snap a photo, pick a category and drop a pin. Perishable food gets an automatic expiry countdown so timing is never a guess.</p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <div className="nv-leg">
-              <span className="leg-tag">Step two</span>
-              <div className="leg-icon"><Radar size={24} /></div>
-              <h3>Get matched instantly</h3>
-              <p>Nearby verified NGOs see your listing the moment it goes live, ranked by distance and need. No cold calls, no phone trees.</p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.24}>
-            <div className="nv-leg">
-              <span className="leg-tag">Step three</span>
-              <div className="leg-icon"><HeartHandshake size={24} /></div>
-              <h3>Watch it get delivered</h3>
-              <p>An NGO claims it, picks it up and delivers it. You see the handoff through: a name, a place, a reason it mattered.</p>
-            </div>
-          </Reveal>
-        </div>
+        </motion.div>
+        <motion.div className="nv-legs" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={staggerParent}>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+            <span className="leg-tag">Step one</span>
+            <div className="leg-icon"><PackagePlus size={24} /></div>
+            <h3>List what you have</h3>
+            <p>Snap a photo, pick a category and drop a pin. Perishable food gets an automatic expiry countdown so timing is never a guess.</p>
+          </motion.div>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+            <span className="leg-tag">Step two</span>
+            <div className="leg-icon"><Radar size={24} /></div>
+            <h3>Get matched instantly</h3>
+            <p>Nearby verified NGOs see your listing the moment it goes live, ranked by distance and need. No cold calls, no phone trees.</p>
+          </motion.div>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+            <span className="leg-tag">Step three</span>
+            <div className="leg-icon"><HeartHandshake size={24} /></div>
+            <h3>Watch it get delivered</h3>
+            <p>An NGO claims it, picks it up and delivers it. You see the handoff through: a name, a place, a reason it mattered.</p>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ---------- LIVE FEED ---------- */}
       <section className="nv-feed" id="feed">
-        <Reveal className="nv-section-head">
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
           <span className="nv-kicker">Happening on Nirvah right now</span>
           <h2 className="font-display">A few things waiting for a match</h2>
           <p>A live style preview of what is currently listed on the network. Real listings look exactly like this.</p>
-        </Reveal>
-        <div className="nv-feed-grid">
-          {DONATIONS.map((d, i) => {
+        </motion.div>
+        <motion.div className="nv-feed-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={staggerParent}>
+          {DONATIONS.map((d) => {
             const Icon = d.icon;
             return (
-              <Reveal key={d.id} delay={i * 0.1}>
-                <div className="nv-card2">
-                  <div className="nv-card2-media"><Icon size={34} strokeWidth={1.6} /></div>
-                  <div className="nv-card2-body">
-                    <span className="nv-pill gold">{d.category}</span>
-                    <h4>{d.donor}</h4>
-                    <p className="desc">{d.desc}</p>
-                    {d.expiresInMs !== null && <CountdownChip ms={d.expiresInMs} />}
-                    <div className="place"><MapPin size={13} /> {d.place}</div>
+              <motion.div key={d.id} variants={fadeUp}>
+                <TiltCard maxTilt={6}>
+                  <div className="nv-card2">
+                    <div className="nv-card2-media"><Icon size={34} strokeWidth={1.6} /></div>
+                    <div className="nv-card2-body">
+                      <span className="nv-pill gold">{d.category}</span>
+                      <h4>{d.donor}</h4>
+                      <p className="desc">{d.desc}</p>
+                      {d.expiresInMs !== null && <CountdownChip ms={d.expiresInMs} />}
+                      <div className="place"><MapPin size={13} /> {d.place}</div>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
+                </TiltCard>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
       {/* ---------- SPLIT: GIVER / NGO ---------- */}
       <section className="nv-split" id="split">
         <div className="nv-split-panel giver">
-          <Reveal>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} variants={fadeUp}>
             <div className="panel-icon"><Sparkles size={26} /></div>
             <h3 className="font-display">For givers</h3>
             <p className="copy">Whatever is in surplus, a kitchen's evening extras, a closet clearout, last term's supplies, takes minutes to list and finds a real recipient instead of a landfill.</p>
@@ -525,11 +683,13 @@ export default function Landing() {
               <li><span className="bullet">◆</span> Automatic urgency countdowns for perishables</li>
               <li><span className="bullet">◆</span> See exactly which NGO claimed your donation</li>
             </ul>
-            <Link to="/signup?role=donor" className="nv-btn spark">Become a giver <ArrowRight size={16} /></Link>
-          </Reveal>
+            <Magnetic strength={0.3}>
+              <Link to="/signup?role=donor" className="nv-btn spark">Become a giver <ArrowRight size={16} /></Link>
+            </Magnetic>
+          </motion.div>
         </div>
         <div className="nv-split-panel ngo">
-          <Reveal>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} variants={fadeUp}>
             <div className="panel-icon"><Users2 size={26} /></div>
             <h3 className="font-display">For NGOs</h3>
             <p className="copy">Stop chasing leads. Verified organisations get a live feed of nearby donations, filterable by category and distance, so your team spends time delivering, not searching.</p>
@@ -538,43 +698,52 @@ export default function Landing() {
               <li><span className="bullet">◆</span> Single tap claim, with the giver notified immediately</li>
               <li><span className="bullet">◆</span> A dashboard of everything your org has delivered</li>
             </ul>
-            <Link to="/signup?role=ngo" className="nv-btn sage">Register your NGO <ArrowRight size={16} /></Link>
-          </Reveal>
+            <Magnetic strength={0.3}>
+              <Link to="/signup?role=ngo" className="nv-btn sage">Register your NGO <ArrowRight size={16} /></Link>
+            </Magnetic>
+          </motion.div>
         </div>
       </section>
 
       {/* ---------- TESTIMONIALS ---------- */}
       <section className="nv-notes">
-        <Reveal className="nv-section-head">
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
           <span className="nv-kicker">Notes from the network</span>
           <h2 className="font-display">People who have passed it on</h2>
-        </Reveal>
-        <div className="nv-notes-grid">
+        </motion.div>
+        <motion.div className="nv-notes-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={staggerParent}>
           {[
-            { initials: "SJ", quote: "I listed our restaurant's evening surplus at 9pm and it was claimed before we had finished closing up. Genuinely did not expect it to be that fast.", who: "Sarah Johnson", role: "Giver, Bengaluru" },
-            { initials: "MB", quote: "We used to spend hours cold calling donors. Now listings come to us, sorted by distance, the moment they go up.", who: "Michael Brown", role: "NGO Coordinator, Asha Foundation" },
-            { initials: "LM", quote: "The countdown on perishable listings changed everything for us. We know exactly what needs picking up first.", who: "Lisa Miller", role: "Volunteer Lead" },
-          ].map((t, i) => (
-            <Reveal key={t.who} delay={i * 0.1}>
-              <div className="nv-note">
-                <div className="tape" />
-                <div className="nv-note-avatar">{t.initials}</div>
-                <p className="quote">"{t.quote}"</p>
-                <div className="who">{t.who}</div>
-                <div className="role">{t.role}</div>
-              </div>
-            </Reveal>
+            { initials: "SJ", quote: "I listed our restaurant's evening surplus at 9pm and it was claimed before we had finished closing up. Genuinely did not expect it to be that fast.", who: "Sarah Johnson", role: "Giver, Bengaluru", rotate: 0.8 },
+            { initials: "MB", quote: "We used to spend hours cold calling donors. Now listings come to us, sorted by distance, the moment they go up.", who: "Michael Brown", role: "NGO Coordinator, Asha Foundation", rotate: -0.6 },
+            { initials: "LM", quote: "The countdown on perishable listings changed everything for us. We know exactly what needs picking up first.", who: "Lisa Miller", role: "Volunteer Lead", rotate: -0.3 },
+          ].map((t) => (
+            <motion.div
+              key={t.who}
+              variants={fadeUp}
+              className="nv-note"
+              style={{ rotate: t.rotate }}
+              whileHover={{ y: -6, rotate: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="tape" />
+              <div className="nv-note-avatar">{t.initials}</div>
+              <p className="quote">"{t.quote}"</p>
+              <div className="who">{t.who}</div>
+              <div className="role">{t.role}</div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ---------- CTA BANNER ---------- */}
       <section className="nv-banner">
-        <Reveal>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
           <h2 className="font-display">Your surplus is someone's tonight.</h2>
           <p>Free to join. Takes two minutes. The next circle starts with you.</p>
-          <Link to="/signup" className="nv-btn spark">Get started, it is free <ArrowRight size={17} /></Link>
-        </Reveal>
+          <Magnetic strength={0.3}>
+            <Link to="/signup" className="nv-btn spark">Get started, it is free <ArrowRight size={17} /></Link>
+          </Magnetic>
+        </motion.div>
       </section>
 
       {/* ---------- FOOTER ---------- */}
@@ -582,7 +751,7 @@ export default function Landing() {
         <div className="nv-footer-grid">
           <div>
             <div className="nv-brand" style={{ marginBottom: "1rem" }}>
-              <span className="badge"><Flame size={18} /></span>
+              <Logo size={30} />
               Nirvah
             </div>
             <p style={{ color: "#9C8E79", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>

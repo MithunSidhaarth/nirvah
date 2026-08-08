@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Logo from "../components/Logo";
 import { api, setToken } from "../lib/api";
 import "../styles/tokens.css";
 import "../styles/auth.css";
@@ -32,7 +33,7 @@ export default function Login() {
     <div className="nv-app nv-auth">
       <div className="nv-auth-side">
         <Link to="/" className="nv-brand">
-          <span className="badge"><Flame size={18} strokeWidth={2.4} /></span>
+          <Logo size={32} />
           Nirvah
         </Link>
         <div>
