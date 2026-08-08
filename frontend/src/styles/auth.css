@@ -6,7 +6,7 @@
 }
 .nv-auth-side {
   position: relative;
-  background: radial-gradient(120% 100% at 20% 0%, #241C13 0%, var(--char) 55%, #0d0b08 100%);
+  background: radial-gradient(120% 100% at 20% 0%, #121926 0%, var(--char) 55%, #05070B 100%);
   padding: 3rem 3rem;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   max-width: 460px;
 }
 .nv-auth-side .quote span { color: var(--gold); font-style: italic; }
-.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #CFC3B0; }
+.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #B9C2D1; }
 .nv-auth-form-wrap {
   display: flex;
   align-items: center;
@@ -74,8 +74,8 @@
   gap: 8px;
   transition: all 0.2s ease;
 }
-.nv-role-btn.active.donor { border-color: var(--spark); color: var(--spark-deep); background: rgba(255,122,69,0.08); }
-.nv-role-btn.active.ngo { border-color: var(--sage); color: var(--sage-deep); background: rgba(111,162,135,0.1); }
+.nv-role-btn.active.donor { border-color: var(--spark); color: var(--spark-deep); background: rgba(232,163,61,0.08); }
+.nv-role-btn.active.ngo { border-color: var(--sage); color: var(--sage-deep); background: rgba(47,190,148,0.1); }
 .nv-auth-error {
   background: rgba(199, 70, 31, 0.08);
   border: 1px solid rgba(199, 70, 31, 0.3);

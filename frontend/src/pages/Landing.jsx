@@ -17,6 +17,13 @@ import {
   Users2,
   Sparkles,
   Flame,
+  ShieldCheck,
+  Activity,
+  Bell,
+  BarChart3,
+  Lock,
+  CheckCircle2,
+  Zap,
 } from "lucide-react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
@@ -24,6 +31,7 @@ import Magnetic from "../components/motion/Magnetic";
 import CountUp from "../components/motion/CountUp";
 import Marquee from "../components/motion/Marquee";
 import TiltCard from "../components/motion/TiltCard";
+import ClickSpark from "../components/motion/ClickSpark";
 import "../styles/tokens.css";
 
 /* ---------------------------------------------------------
@@ -197,12 +205,12 @@ function CircleGraphic({ parallaxX, parallaxY }) {
           </feMerge>
         </filter>
         <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#F4B942" />
-          <stop offset="100%" stopColor="#FF7A45" />
+          <stop offset="0%" stopColor="#F2C265" />
+          <stop offset="100%" stopColor="#E8A33D" />
         </linearGradient>
       </defs>
 
-      <circle cx={cx} cy={cy} r={r} stroke="#F7EFE3" strokeOpacity="0.14" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={r} stroke="#F4F5F8" strokeOpacity="0.14" strokeWidth="1.5" />
       <circle
         id="ringPath"
         cx={cx}
@@ -215,17 +223,17 @@ function CircleGraphic({ parallaxX, parallaxY }) {
         opacity="0.7"
       />
 
-      <circle cx={cx} cy={cy - r} r="6" fill="#F7EFE3" />
+      <circle cx={cx} cy={cy - r} r="6" fill="#F4F5F8" />
       <text x={cx} y={cy - r - 16} textAnchor="middle" className="circle-label">GIVER</text>
 
-      <circle cx={cx} cy={cy + r} r="6" fill="#F7EFE3" />
+      <circle cx={cx} cy={cy + r} r="6" fill="#F4F5F8" />
       <text x={cx} y={cy + r + 24} textAnchor="middle" className="circle-label">DELIVERED</text>
 
-      <circle cx={cx + r} cy={cy} r="6" fill="#F7EFE3" />
+      <circle cx={cx + r} cy={cy} r="6" fill="#F4F5F8" />
       <text x={cx + r + 34} y={cy + 4} textAnchor="middle" className="circle-label">NGO</text>
 
       <g filter="url(#nvGlow)">
-        <circle r="5" fill="#FFD9A0">
+        <circle r="5" fill="#FBEBD0">
           <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
             <mpath xlinkHref="#ringPath" />
           </animateMotion>
@@ -304,7 +312,7 @@ export default function Landing() {
           transition: background 0.4s ease, padding 0.4s ease, box-shadow 0.4s ease;
         }
         .nv-landing .nv-nav.scrolled {
-          background: rgba(20, 17, 12, 0.86); backdrop-filter: blur(14px) saturate(160%);
+          background: rgba(10, 14, 21, 0.88); backdrop-filter: blur(14px) saturate(160%);
           padding: 14px 6vw; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
         }
         .nv-brand {
@@ -321,13 +329,13 @@ export default function Landing() {
         /* ---------- CINEMATIC HERO ---------- */
         .nv-hero {
           position: relative;
-          background: radial-gradient(120% 100% at 15% 0%, #241C13 0%, var(--char) 55%, #0d0b08 100%);
+          background: radial-gradient(120% 100% at 15% 0%, #121926 0%, var(--char) 55%, #05070B 100%);
           padding: 4vw 6vw 6vw; overflow: hidden;
           min-height: 92vh; display: flex; flex-direction: column;
         }
         .nv-hero-spotlight {
           position: absolute; inset: 0; z-index: 1; pointer-events: none;
-          background: radial-gradient(600px circle at var(--sx, 50%) var(--sy, 30%), rgba(255,140,80,0.14), transparent 60%);
+          background: radial-gradient(600px circle at var(--sx, 50%) var(--sy, 30%), rgba(232,163,61,0.14), transparent 60%);
         }
         .nv-grain {
           position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
@@ -341,7 +349,7 @@ export default function Landing() {
         .ember-field { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
         .ember-particle {
           position: absolute; bottom: -20px; border-radius: 50%;
-          background: radial-gradient(circle, #FFD9A0 0%, var(--spark) 60%, transparent 100%);
+          background: radial-gradient(circle, #FBEBD0 0%, var(--spark) 60%, transparent 100%);
           opacity: 0; animation-name: emberRise; animation-timing-function: ease-in; animation-iteration-count: infinite;
         }
         @keyframes emberRise {
@@ -353,11 +361,11 @@ export default function Landing() {
         .nv-eyebrow {
           display: inline-flex; align-items: center; gap: 10px;
           font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
-          color: var(--gold); background: rgba(244,185,66,0.08); border: 1px solid rgba(244,185,66,0.35);
+          color: var(--gold); background: rgba(242,194,101,0.08); border: 1px solid rgba(242,194,101,0.35);
           padding: 7px 16px; border-radius: 999px; margin-bottom: 2rem;
         }
         .nv-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--spark); animation: pulseDot 1.8s infinite; }
-        @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(255,122,69,0.55);} 70% { box-shadow: 0 0 0 8px rgba(255,122,69,0);} 100% { box-shadow: 0 0 0 0 rgba(255,122,69,0);} }
+        @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(232,163,61,0.55);} 70% { box-shadow: 0 0 0 8px rgba(232,163,61,0);} 100% { box-shadow: 0 0 0 0 rgba(232,163,61,0);} }
         .nv-hero h1 {
           font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(2.6rem, 5.4vw, 4.6rem);
           line-height: 1.05; color: var(--parchment); letter-spacing: -0.01em; margin: 0 0 1.6rem;
@@ -367,26 +375,32 @@ export default function Landing() {
           background: linear-gradient(120deg, var(--gold), var(--spark));
           -webkit-background-clip: text; background-clip: text; color: transparent;
         }
-        .nv-hero p.lede { font-size: clamp(1.05rem, 1.6vw, 1.28rem); color: #CFC3B0; max-width: 620px; margin: 0 auto 2.6rem; line-height: 1.6; }
+        .nv-hero p.lede { font-size: clamp(1.05rem, 1.6vw, 1.28rem); color: #B9C2D1; max-width: 620px; margin: 0 auto 2.6rem; line-height: 1.6; }
         .nv-hero-ctas { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 2.6rem; }
         .circle-graphic { width: 260px; height: 260px; margin: 0 auto; display: block; }
-        .circle-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; fill: #CFC3B0; }
+        .circle-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; fill: #B9C2D1; }
         .circle-center-1 { fill: var(--parchment); font-size: 15px; font-style: italic; }
         .circle-center-2 { fill: var(--gold); font-size: 10px; letter-spacing: 0.1em; }
 
-        .nv-ticker-wrap { margin-top: 1.2rem; position: relative; z-index: 2; border-top: 1px solid rgba(247,239,227,0.08); }
+        .nv-ticker-wrap { margin-top: 1.2rem; position: relative; z-index: 2; border-top: 1px solid rgba(244,245,248,0.08); }
         .nv-marquee { overflow: hidden; padding: 14px 0; }
         .nv-marquee-track { display: flex; width: max-content; }
         .nv-marquee-set { display: flex; align-items: center; flex-shrink: 0; }
-        .nv-ticker-item { display: inline-flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #CFC3B0; padding: 0 2.4rem; white-space: nowrap; }
+        .nv-ticker-item { display: inline-flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #B9C2D1; padding: 0 2.4rem; white-space: nowrap; }
         .nv-ticker-item .flame-ico { color: var(--spark); flex-shrink: 0; }
-        .nv-ticker-item .sep { color: #5A4F3E; }
+        .nv-ticker-item .sep { color: #4A5568; }
 
         .nv-stats { background: var(--parchment); padding: 3.6rem 6vw; border-bottom: 1px solid var(--parchment-2); }
         .nv-stats-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; text-align: center; }
         .nv-stat-num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: clamp(1.9rem,3.4vw,2.6rem); color: var(--spark-deep); }
         .nv-stat-label { margin-top: 6px; font-size: 0.92rem; color: var(--ink-soft); font-weight: 500; }
         .nv-stats-note { text-align: center; margin-top: 1.6rem; font-size: 0.78rem; color: var(--ink-soft); opacity: 0.7; }
+
+        /* ---------- TRUST BAR ---------- */
+        .nv-trust { background: var(--parchment); padding: 0 6vw 3.6rem; border-bottom: 1px solid var(--parchment-2); }
+        .nv-trust-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.4rem; }
+        .nv-trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; font-weight: 500; color: var(--ink-soft); }
+        .nv-trust-item svg { color: var(--sage-deep); flex-shrink: 0; }
 
         .nv-how { padding: 7rem 6vw; background: var(--parchment); }
         .nv-section-head { max-width: 640px; margin: 0 auto 4rem; text-align: center; }
@@ -396,37 +410,88 @@ export default function Landing() {
         .nv-legs { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2.4rem; }
         .nv-leg { background: #fff; border: 1px solid var(--parchment-2); border-radius: 20px; padding: 2.2rem 1.9rem; }
         .nv-leg .leg-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; }
-        .nv-leg .leg-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg,#FFE6D2,#FFCBA4); color: var(--spark-deep); margin: 14px 0 18px; }
+        .nv-leg .leg-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg,#FBEBD0,#F6D9A8); color: var(--spark-deep); margin: 14px 0 18px; }
         .nv-leg h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; margin: 0 0 10px; color: var(--ink); }
         .nv-leg p { color: var(--ink-soft); font-size: 0.96rem; line-height: 1.55; margin: 0; }
 
+        /* ---------- LIVE OPS PREVIEW ---------- */
+        .nv-ops {
+          padding: 6rem 6vw 7.5rem;
+          background: radial-gradient(120% 100% at 50% 0%, #121926 0%, var(--char) 60%, #05070B 100%);
+          position: relative;
+        }
+        .nv-ops .nv-section-head h2 { color: var(--parchment); }
+        .nv-ops .nv-section-head p { color: #A9B4C4; }
+        .nv-ops-panel {
+          max-width: 1080px; margin: 0 auto; border-radius: 20px; overflow: hidden;
+          box-shadow: var(--shadow-deep);
+        }
+        .nv-ops-chrome {
+          display: flex; align-items: center; gap: 7px;
+          padding: 14px 18px; border-bottom: 1px solid rgba(244,245,248,0.08);
+        }
+        .nv-ops-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+        .nv-ops-chrome .dot.r { background: #E8604A; }
+        .nv-ops-chrome .dot.y { background: #F2C265; }
+        .nv-ops-chrome .dot.g { background: #2FBE94; }
+        .nv-ops-chrome-label { margin-left: 12px; font-size: 0.74rem; color: #7C8798; letter-spacing: 0.02em; }
+        .nv-ops-body { display: grid; grid-template-columns: 1.5fr 1fr; gap: 0; }
+        .nv-ops-feed { padding: 1.6rem 1.8rem; border-right: 1px solid rgba(244,245,248,0.08); }
+        .nv-ops-feed-head { display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: #7C8798; margin-bottom: 1.1rem; }
+        .live-dot { display: inline-flex; align-items: center; gap: 6px; color: var(--sage); }
+        .live-dot .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); animation: pulseDot 1.8s infinite; }
+        .nv-ops-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(244,245,248,0.06); }
+        .nv-ops-row:last-child { border-bottom: none; }
+        .nv-ops-row-icon { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+        .nv-ops-row-icon.spark { background: rgba(232,163,61,0.14); color: var(--spark); }
+        .nv-ops-row-icon.gold { background: rgba(242,194,101,0.14); color: var(--gold); }
+        .nv-ops-row-icon.sage { background: rgba(47,190,148,0.14); color: var(--sage); }
+        .nv-ops-row-text { flex: 1; font-size: 0.86rem; color: #D6DBE3; line-height: 1.4; }
+        .nv-ops-row-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; flex-shrink: 0; }
+        .nv-ops-row-tag.spark { background: rgba(232,163,61,0.14); color: var(--spark); }
+        .nv-ops-row-tag.gold { background: rgba(242,194,101,0.14); color: var(--gold); }
+        .nv-ops-row-tag.sage { background: rgba(47,190,148,0.14); color: var(--sage); }
+        .nv-ops-side { padding: 1.6rem 1.8rem; display: flex; flex-direction: column; gap: 1rem; }
+        .nv-ops-stat { display: flex; align-items: center; gap: 10px; color: var(--gold); }
+        .nv-ops-stat .num { font-size: 1.1rem; font-weight: 600; color: var(--parchment); line-height: 1.1; }
+        .nv-ops-stat .lbl { font-size: 0.74rem; color: #7C8798; margin-top: 2px; }
+        .nv-ops-chart { padding-top: 0.4rem; }
+        .nv-ops-chart-head { display: flex; align-items: center; gap: 7px; font-size: 0.76rem; color: #7C8798; margin-bottom: 10px; }
+        .nv-ops-bars { display: flex; align-items: flex-end; gap: 6px; height: 64px; }
+        .nv-ops-bars span { flex: 1; background: linear-gradient(180deg, var(--gold), var(--spark-deep)); border-radius: 3px; transform-origin: bottom; }
+        .nv-ops-notif { display: flex; align-items: center; gap: 9px; margin-top: 0.4rem; padding: 10px 12px; border-radius: 10px; background: rgba(242,194,101,0.08); border: 1px solid rgba(242,194,101,0.2); color: var(--gold); font-size: 0.78rem; }
+        @media (max-width: 780px) {
+          .nv-ops-body { grid-template-columns: 1fr; }
+          .nv-ops-feed { border-right: none; border-bottom: 1px solid rgba(244,245,248,0.08); }
+        }
+
         .nv-feed { background: var(--char); padding: 7rem 6vw; }
         .nv-feed .nv-section-head h2 { color: var(--parchment); }
-        .nv-feed .nv-section-head p { color: #B9AC98; }
+        .nv-feed .nv-section-head p { color: #A9B4C4; }
         .nv-feed-grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
         .nv-tilt-card { position: relative; transform-style: preserve-3d; }
         .nv-tilt-glow { position: absolute; inset: 0; z-index: 1; border-radius: 18px; pointer-events: none; }
-        .nv-card2 { position: relative; z-index: 2; background: var(--char-2); border: 1px solid rgba(247,239,227,0.08); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; height: 100%; }
+        .nv-card2 { position: relative; z-index: 2; background: var(--char-2); border: 1px solid rgba(244,245,248,0.08); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; height: 100%; }
         .nv-card2-media { height: 130px; display: grid; place-items: center; background: linear-gradient(135deg, var(--char-3), var(--char-2)); color: var(--gold); position: relative; }
-        .nv-card2-media::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,122,69,0.18), transparent 60%); }
+        .nv-card2-media::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(232,163,61,0.18), transparent 60%); }
         .nv-card2-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; flex: 1; }
         .nv-card2 h4 { font-family: 'Fraunces', serif; color: var(--parchment); font-size: 1.1rem; margin: 0; font-weight: 600; }
-        .nv-card2 p.desc { color: #B9AC98; font-size: 0.9rem; line-height: 1.55; margin: 0; flex: 1; }
-        .nv-card2 .place { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #9C8E79; padding-top: 10px; border-top: 1px solid rgba(247,239,227,0.08); }
-        .countdown-chip { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; font-weight: 600; color: var(--gold); background: rgba(244,185,66,0.1); padding: 6px 10px; border-radius: 8px; width: fit-content; }
-        .countdown-chip.urgent { color: #FF8B6B; background: rgba(255,122,69,0.14); }
+        .nv-card2 p.desc { color: #A9B4C4; font-size: 0.9rem; line-height: 1.55; margin: 0; flex: 1; }
+        .nv-card2 .place { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #7C8798; padding-top: 10px; border-top: 1px solid rgba(244,245,248,0.08); }
+        .countdown-chip { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; font-weight: 600; color: var(--gold); background: rgba(242,194,101,0.1); padding: 6px 10px; border-radius: 8px; width: fit-content; }
+        .countdown-chip.urgent { color: #F0784A; background: rgba(232,163,61,0.14); }
 
         .nv-split { display: grid; grid-template-columns: 1fr 1fr; }
         .nv-split-panel { padding: 6rem 4.5vw; }
         .nv-split-panel.giver { background: var(--parchment); }
         .nv-split-panel.ngo { background: var(--ink); color: var(--parchment); }
         .nv-split-panel .panel-icon { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; margin-bottom: 1.6rem; }
-        .nv-split-panel.giver .panel-icon { background: linear-gradient(145deg,#FFE6D2,#FFCBA4); color: var(--spark-deep); }
-        .nv-split-panel.ngo .panel-icon { background: rgba(111,162,135,0.16); color: var(--sage); }
+        .nv-split-panel.giver .panel-icon { background: linear-gradient(145deg,#FBEBD0,#F6D9A8); color: var(--spark-deep); }
+        .nv-split-panel.ngo .panel-icon { background: rgba(47,190,148,0.16); color: var(--sage); }
         .nv-split-panel h3 { font-family: 'Fraunces', serif; font-size: clamp(1.6rem,2.6vw,2.1rem); font-weight: 600; margin: 0 0 1rem; }
         .nv-split-panel p.copy { line-height: 1.65; margin-bottom: 1.8rem; max-width: 460px; }
         .nv-split-panel.giver p.copy { color: var(--ink-soft); }
-        .nv-split-panel.ngo p.copy { color: #C9BEAC; }
+        .nv-split-panel.ngo p.copy { color: #B9C2D1; }
         .nv-split-list { list-style: none; padding: 0; margin: 0 0 2.2rem; display: flex; flex-direction: column; gap: 12px; max-width: 460px; }
         .nv-split-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.5; }
         .nv-split-panel.giver .nv-split-list li .bullet { color: var(--spark); }
@@ -435,24 +500,24 @@ export default function Landing() {
 
         .nv-notes { padding: 7rem 6vw; background: var(--parchment); }
         .nv-notes-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-        .nv-note { background: #FFFDF8; border: 1px solid var(--parchment-2); border-radius: 4px 4px 16px 16px; padding: 2rem 1.7rem; box-shadow: 0 16px 30px rgba(36,28,21,0.06); position: relative; }
-        .nv-note .tape { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 54px; height: 20px; background: rgba(244,185,66,0.35); border: 1px solid rgba(244,185,66,0.5); }
+        .nv-note { background: #FCFCFE; border: 1px solid var(--parchment-2); border-radius: 4px 4px 16px 16px; padding: 2rem 1.7rem; box-shadow: 0 16px 30px rgba(13,18,28,0.06); position: relative; }
+        .nv-note .tape { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 54px; height: 20px; background: rgba(242,194,101,0.35); border: 1px solid rgba(242,194,101,0.5); }
         .nv-note-avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 0.95rem; background: linear-gradient(145deg, var(--gold), var(--spark-deep)); color: var(--char); margin-bottom: 14px; }
         .nv-note p.quote { font-size: 0.98rem; line-height: 1.6; color: var(--ink); margin: 0 0 16px; font-style: italic; }
         .nv-note .who { font-size: 0.86rem; color: var(--ink-soft); font-weight: 600; }
         .nv-note .role { font-size: 0.8rem; color: var(--spark-deep); }
 
         .nv-banner { position: relative; background: linear-gradient(120deg, var(--spark-deep), var(--spark) 60%, var(--gold)); padding: 5.5rem 6vw; text-align: center; overflow: hidden; }
-        .nv-banner h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,4vw,3rem); font-weight: 600; color: #241205; margin: 0 0 1.4rem; max-width: 700px; margin-left: auto; margin-right: auto; }
-        .nv-banner p { color: rgba(36,18,5,0.75); font-size: 1.05rem; margin-bottom: 2.2rem; }
+        .nv-banner h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,4vw,3rem); font-weight: 600; color: #1C140A; margin: 0 0 1.4rem; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .nv-banner p { color: rgba(28,20,10,0.72); font-size: 1.05rem; margin-bottom: 2.2rem; }
         .nv-banner .nv-btn.spark { background: var(--char); box-shadow: 0 14px 30px rgba(0,0,0,0.25); }
 
         .nv-footer { background: var(--char); color: var(--parchment); padding: 5rem 6vw 2.4rem; }
         .nv-footer-grid { max-width: 1080px; margin: 0 auto 3rem; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 3rem; }
         .nv-footer h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.1rem; }
-        .nv-footer a, .nv-footer .line { display: flex; align-items: center; gap: 8px; color: #CFC3B0; text-decoration: none; font-size: 0.92rem; margin-bottom: 10px; }
+        .nv-footer a, .nv-footer .line { display: flex; align-items: center; gap: 8px; color: #B9C2D1; text-decoration: none; font-size: 0.92rem; margin-bottom: 10px; }
         .nv-footer a:hover { color: var(--gold); }
-        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(247,239,227,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #8C7E6A; font-family: 'IBM Plex Mono', monospace; }
+        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(244,245,248,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #6B7688; font-family: 'IBM Plex Mono', monospace; }
 
         @media (max-width: 900px) {
           .nv-stats-grid { grid-template-columns: 1fr; gap: 2.2rem; }
@@ -518,7 +583,7 @@ export default function Landing() {
         <motion.div className="nv-hero-spotlight" style={{ "--sx": useTransform(spotX, (v) => `${v}%`), "--sy": useTransform(spotY, (v) => `${v}%`) }} />
         <div className="nv-grain" />
 
-        <div className="nv-hero-inner">
+        <ClickSpark sparkColor="#F2C265" sparkCount={10} sparkRadius={22} duration={550} className="nv-hero-inner">
           <motion.span
             className="nv-eyebrow"
             initial={{ opacity: 0, y: -10 }}
@@ -574,7 +639,7 @@ export default function Landing() {
           >
             <CircleGraphic parallaxX={parallaxX} parallaxY={parallaxY} />
           </motion.div>
-        </div>
+        </ClickSpark>
 
         <div className="nv-ticker-wrap">
           <Marquee speed={32}>
@@ -612,6 +677,24 @@ export default function Landing() {
         <p className="nv-stats-note">Illustrative platform figures, updated as the Nirvah network grows.</p>
       </section>
 
+      {/* ---------- TRUST BAR ---------- */}
+      <section className="nv-trust">
+        <div className="nv-trust-grid">
+          <div className="nv-trust-item">
+            <ShieldCheck size={18} />
+            <span>Every NGO manually verified before it can claim</span>
+          </div>
+          <div className="nv-trust-item">
+            <Lock size={18} />
+            <span>Nothing sold, nothing warehoused — direct handoff only</span>
+          </div>
+          <div className="nv-trust-item">
+            <Activity size={18} />
+            <span>Every listing tracked from post to confirmed delivery</span>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- HOW IT WORKS ---------- */}
       <section className="nv-how" id="how">
         <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
@@ -620,24 +703,113 @@ export default function Landing() {
           <p>No warehouses, no waiting lists. Nirvah is built for the gap between "we have extra" and "someone needs it right now."</p>
         </motion.div>
         <motion.div className="nv-legs" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={staggerParent}>
-          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(13,18,28,0.1)" }} transition={{ duration: 0.25 }}>
             <span className="leg-tag">Step one</span>
             <div className="leg-icon"><PackagePlus size={24} /></div>
             <h3>List what you have</h3>
             <p>Snap a photo, pick a category and drop a pin. Perishable food gets an automatic expiry countdown so timing is never a guess.</p>
           </motion.div>
-          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(13,18,28,0.1)" }} transition={{ duration: 0.25 }}>
             <span className="leg-tag">Step two</span>
             <div className="leg-icon"><Radar size={24} /></div>
             <h3>Get matched instantly</h3>
             <p>Nearby verified NGOs see your listing the moment it goes live, ranked by distance and need. No cold calls, no phone trees.</p>
           </motion.div>
-          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(36,28,21,0.1)" }} transition={{ duration: 0.25 }}>
+          <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(13,18,28,0.1)" }} transition={{ duration: 0.25 }}>
             <span className="leg-tag">Step three</span>
             <div className="leg-icon"><HeartHandshake size={24} /></div>
             <h3>Watch it get delivered</h3>
             <p>An NGO claims it, picks it up and delivers it. You see the handoff through: a name, a place, a reason it mattered.</p>
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ---------- LIVE OPS PREVIEW ---------- */}
+      <section className="nv-ops">
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+          <span className="nv-kicker">Infrastructure, not a spreadsheet</span>
+          <h2 className="font-display">Built like the network it claims to be</h2>
+          <p>Every listing, match and delivery moves through the same system NGOs use on the ground. Here is a snapshot of what that looks like.</p>
+        </motion.div>
+
+        <motion.div
+          className="nv-ops-panel nv-glass"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
+        >
+          <div className="nv-ops-chrome">
+            <span className="dot r" /><span className="dot y" /><span className="dot g" />
+            <span className="nv-ops-chrome-label font-mono">nirvah.org / ops — live</span>
+          </div>
+
+          <div className="nv-ops-body">
+            <div className="nv-ops-feed">
+              <div className="nv-ops-feed-head">
+                <span>Activity</span>
+                <span className="live-dot">
+                  <span className="pulse" /> Live
+                </span>
+              </div>
+              {[
+                { icon: PackagePlus, text: "Green Leaf Kitchen listed 40 portions of biryani", tag: "New", tone: "spark" },
+                { icon: Radar, text: "Asha Foundation matched with a Whitefield listing", tag: "Matched", tone: "gold" },
+                { icon: CheckCircle2, text: "Lakeview School donation confirmed delivered", tag: "Delivered", tone: "sage" },
+              ].map((row, i) => (
+                <motion.div
+                  className="nv-ops-row"
+                  key={i}
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.12 }}
+                >
+                  <span className={`nv-ops-row-icon ${row.tone}`}><row.icon size={15} /></span>
+                  <span className="nv-ops-row-text">{row.text}</span>
+                  <span className={`nv-ops-row-tag ${row.tone}`}>{row.tag}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="nv-ops-side">
+              <div className="nv-ops-stat">
+                <Zap size={16} />
+                <div>
+                  <div className="num font-mono">18 min</div>
+                  <div className="lbl">avg. time to match</div>
+                </div>
+              </div>
+              <div className="nv-ops-stat">
+                <ShieldCheck size={16} />
+                <div>
+                  <div className="num font-mono">340+</div>
+                  <div className="lbl">verified NGOs live</div>
+                </div>
+              </div>
+              <div className="nv-ops-chart">
+                <div className="nv-ops-chart-head">
+                  <BarChart3 size={14} /> <span>Matches this week</span>
+                </div>
+                <div className="nv-ops-bars">
+                  {[38, 52, 44, 68, 60, 82, 71].map((h, i) => (
+                    <motion.span
+                      key={i}
+                      style={{ height: `${h}%` }}
+                      initial={{ scaleY: 0 }}
+                      whileInView={{ scaleY: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.1 + i * 0.05, ease: "easeOut" }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="nv-ops-notif">
+                <Bell size={14} />
+                <span>Notified: pickup window closes in 42 min</span>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -737,13 +909,15 @@ export default function Landing() {
 
       {/* ---------- CTA BANNER ---------- */}
       <section className="nv-banner">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
-          <h2 className="font-display">Your surplus is someone's tonight.</h2>
-          <p>Free to join. Takes two minutes. The next circle starts with you.</p>
-          <Magnetic strength={0.3}>
-            <Link to="/signup" className="nv-btn spark">Get started, it is free <ArrowRight size={17} /></Link>
-          </Magnetic>
-        </motion.div>
+        <ClickSpark sparkColor="#1C140A" sparkCount={9} sparkRadius={20} duration={480}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+            <h2 className="font-display">Your surplus is someone's tonight.</h2>
+            <p>Free to join. Takes two minutes. The next circle starts with you.</p>
+            <Magnetic strength={0.3}>
+              <Link to="/signup" className="nv-btn spark">Get started, it is free <ArrowRight size={17} /></Link>
+            </Magnetic>
+          </motion.div>
+        </ClickSpark>
       </section>
 
       {/* ---------- FOOTER ---------- */}
@@ -754,7 +928,7 @@ export default function Landing() {
               <Logo size={30} />
               Nirvah
             </div>
-            <p style={{ color: "#9C8E79", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>
+            <p style={{ color: "#7C8798", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>
               A network connecting givers and NGOs, so surplus finds its way to
               someone who needs it instead of a bin.
             </p>

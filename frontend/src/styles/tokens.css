@@ -1,35 +1,36 @@
 /* =========================================================
    NIRVAH — shared design tokens
-   Theme: "full circle giving". Warm charcoal nights, an ember
-   accent for givers, a sage accent for receiving organisations,
-   and a parchment surface for anything that needs to read calm
-   and legible in daylight.
+   Theme: "signal & circuit". A verified logistics network for
+   giving — deep graphite/navy nights, a brass "spark" accent for
+   the moment something changes hands, and a signal-teal accent
+   for verification and trust. Paper-white surfaces read calm,
+   precise and built rather than cafe-warm.
 ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --char: #14110C;
-  --char-2: #1D170F;
-  --char-3: #271F14;
-  --spark: #FF7A45;
-  --spark-deep: #C7461F;
-  --gold: #F4B942;
-  --sage: #6FA287;
-  --sage-deep: #3E6E56;
-  --parchment: #FBF3E7;
-  --parchment-2: #EFE1CB;
-  --surface: #FFFDF9;
-  --ink: #241C15;
-  --ink-soft: #6C5B45;
-  --line: rgba(36, 28, 21, 0.1);
-  --line-dark: rgba(251, 243, 231, 0.1);
+  --char: #0A0E15;
+  --char-2: #121926;
+  --char-3: #1B2436;
+  --spark: #E8A33D;
+  --spark-deep: #B9761E;
+  --gold: #F2C265;
+  --sage: #2FBE94;
+  --sage-deep: #12876A;
+  --parchment: #F4F5F8;
+  --parchment-2: #E2E5EC;
+  --surface: #FFFFFF;
+  --ink: #0D121C;
+  --ink-soft: #545E70;
+  --line: rgba(13, 18, 28, 0.1);
+  --line-dark: rgba(244, 245, 248, 0.1);
 
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --shadow-soft: 0 20px 44px rgba(20, 17, 12, 0.08);
-  --shadow-deep: 0 24px 60px rgba(20, 17, 12, 0.35);
+  --shadow-soft: 0 20px 44px rgba(10, 14, 21, 0.08);
+  --shadow-deep: 0 24px 60px rgba(10, 14, 21, 0.4);
 }
 
 .nv-app, .nv-app * { box-sizing: border-box; }
@@ -61,22 +62,22 @@
 }
 .nv-btn.spark {
   background: linear-gradient(120deg, var(--spark), var(--spark-deep));
-  color: var(--parchment);
-  box-shadow: 0 14px 30px rgba(255, 122, 69, 0.3);
+  color: #17110A;
+  box-shadow: 0 14px 30px rgba(232, 163, 61, 0.28);
 }
-.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(255, 122, 69, 0.42); }
+.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(232, 163, 61, 0.4); }
 .nv-btn.sage {
   background: linear-gradient(120deg, var(--sage), var(--sage-deep));
-  color: var(--parchment);
-  box-shadow: 0 14px 30px rgba(62, 110, 86, 0.3);
+  color: #06140F;
+  box-shadow: 0 14px 30px rgba(18, 135, 106, 0.28);
 }
-.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(62, 110, 86, 0.42); }
+.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(18, 135, 106, 0.4); }
 .nv-btn.ghost-dark {
   background: transparent;
-  border-color: rgba(251, 243, 231, 0.3);
+  border-color: rgba(244, 245, 248, 0.3);
   color: var(--parchment);
 }
-.nv-btn.ghost-dark:hover { background: rgba(251, 243, 231, 0.08); border-color: var(--gold); }
+.nv-btn.ghost-dark:hover { background: rgba(244, 245, 248, 0.08); border-color: var(--gold); }
 .nv-btn.ghost-light {
   background: var(--surface);
   border-color: var(--line);
@@ -98,9 +99,9 @@
   padding: 6px 13px;
   border-radius: 999px;
 }
-.nv-pill.spark { background: rgba(255, 122, 69, 0.12); color: var(--spark-deep); border: 1px solid rgba(255, 122, 69, 0.3); }
-.nv-pill.sage { background: rgba(111, 162, 135, 0.14); color: var(--sage-deep); border: 1px solid rgba(111, 162, 135, 0.3); }
-.nv-pill.gold { background: rgba(244, 185, 66, 0.14); color: #9A6A0E; border: 1px solid rgba(244, 185, 66, 0.35); }
+.nv-pill.spark { background: rgba(232, 163, 61, 0.12); color: var(--spark-deep); border: 1px solid rgba(232, 163, 61, 0.32); }
+.nv-pill.sage { background: rgba(47, 190, 148, 0.14); color: var(--sage-deep); border: 1px solid rgba(47, 190, 148, 0.32); }
+.nv-pill.gold { background: rgba(242, 194, 101, 0.16); color: #8A5B12; border: 1px solid rgba(242, 194, 101, 0.36); }
 
 /* ---------- shared cards ---------- */
 .nv-card {
@@ -108,6 +109,26 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
+}
+
+/* ---------- glass surface, for use over dark/photographic areas ---------- */
+.nv-glass {
+  background: rgba(244, 245, 248, 0.05);
+  border: 1px solid rgba(244, 245, 248, 0.1);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* ---------- verified checkmark badge ---------- */
+.nv-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--sage);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* ---------- scroll reveal ---------- */
