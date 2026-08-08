@@ -36,7 +36,35 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
 
   if (!res.ok) {
     const message = data?.error || `Request failed with status ${res.status}`;
-    throw new Error(message);
+    const error = new Error(message);
+    if (data?.code) error.code = data.code;
+    throw error;
+  }
+  return data;
+}
+
+// Same as `request`, but sends a FormData body (file uploads) instead of
+// JSON. Never set a Content-Type header by hand here — the browser needs to
+// add its own multipart boundary, so leaving it unset is deliberate.
+async function requestForm(path, { method = "POST", formData, auth = true } = {}) {
+  const headers = {};
+  const token = getToken();
+  if (auth && token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers,
+    body: formData,
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const data = isJson ? await res.json() : null;
+
+  if (!res.ok) {
+    const message = data?.error || `Request failed with status ${res.status}`;
+    const error = new Error(message);
+    if (data?.code) error.code = data.code;
+    throw error;
   }
   return data;
 }
@@ -45,7 +73,13 @@ export const api = {
   // ---- auth ----
   signup: (payload) => request("/auth/signup", { method: "POST", body: payload, auth: false }),
   login: (payload) => request("/auth/login", { method: "POST", body: payload, auth: false }),
+  logout: () => request("/auth/logout", { method: "POST" }),
   me: () => request("/auth/me"),
+  verifyEmail: (token) => request("/auth/verify-email", { method: "POST", body: { token }, auth: false }),
+  resendVerification: (email) => request("/auth/resend-verification", { method: "POST", body: { email }, auth: false }),
+  forgotPassword: (email) => request("/auth/forgot-password", { method: "POST", body: { email }, auth: false }),
+  resetPassword: (token, password) =>
+    request("/auth/reset-password", { method: "POST", body: { token, password }, auth: false }),
 
   // ---- donations ----
   listDonations: (params = {}) => {
@@ -53,11 +87,56 @@ export const api = {
     return request(`/donations${qs ? `?${qs}` : ""}`, { auth: false });
   },
   getDonation: (id) => request(`/donations/${id}`, { auth: false }),
+  getDonationHistory: (id) => request(`/donations/${id}/history`),
   createDonation: (payload) => request("/donations", { method: "POST", body: payload }),
   claimDonation: (id) => request(`/donations/${id}/claim`, { method: "POST" }),
+  acceptDonation: (id) => request(`/donations/${id}/accept`, { method: "POST" }),
+  pickupDonation: (id) => request(`/donations/${id}/pickup`, { method: "POST" }),
   completeDonation: (id) => request(`/donations/${id}/complete`, { method: "POST" }),
+  acknowledgeDonation: (id) => request(`/donations/${id}/acknowledge`, { method: "POST" }),
+  closeDonation: (id) => request(`/donations/${id}/close`, { method: "POST" }),
 
   // ---- dashboards ----
   donorStats: () => request("/dashboard/donor"),
   ngoStats: () => request("/dashboard/ngo"),
+
+  // ---- documents (section 9: Vault) ----
+  // Documents attached to a specific donation (receipts, delivery proof,
+  // tax documents, CSR evidence, etc.) — visible to the giver and the
+  // claiming NGO.
+  listDonationDocuments: (donationId) => request(`/donations/${donationId}/documents`),
+  uploadDonationDocument: (donationId, { type, file }) => {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("file", file);
+    return requestForm(`/donations/${donationId}/documents`, { formData });
+  },
+  // An NGO's own verification documents (registration cert, 12AB, 80G proof).
+  listMyNgoDocuments: () => request("/ngos/me/documents"),
+  uploadNgoDocument: ({ type, file }) => {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("file", file);
+    return requestForm("/ngos/me/documents", { formData });
+  },
+
+  // ---- impact (section 12) ----
+  // Anyone can read impact records for a donation; only the claiming NGO
+  // can log one, and only once the donation has been delivered.
+  getDonationImpact: (donationId) => request(`/donations/${donationId}/impact`, { auth: false }),
+  logDonationImpact: (donationId, { beneficiaryCount, location, itemsDelivered, notes, photos }) => {
+    const formData = new FormData();
+    if (beneficiaryCount !== "" && beneficiaryCount != null) formData.append("beneficiaryCount", beneficiaryCount);
+    if (location) formData.append("location", location);
+    if (itemsDelivered) formData.append("itemsDelivered", itemsDelivered);
+    if (notes) formData.append("notes", notes);
+    (photos || []).forEach((file) => formData.append("photos", file));
+    return requestForm(`/donations/${donationId}/impact`, { formData });
+  },
+
+  // ---- tax (section 10) ----
+  getTaxSummary: () => request("/donors/me/tax-summary"),
+
+  // ---- csr (section 11) ----
+  getCsrSummary: () => request("/ngos/me/csr-summary"),
 };

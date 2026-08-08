@@ -1,0 +1,21 @@
+# Local Postgres for development. Not used in production — Render/Neon/
+# Supabase provide the managed database there via DATABASE_URL.
+#
+# Usage:
+#   docker compose up -d
+#   cd backend && npm run migrate
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nirvah
+      POSTGRES_PASSWORD: nirvah
+      POSTGRES_DB: nirvah
+    ports:
+      - "5432:5432"
+    volumes:
+      - nirvah_pgdata:/var/lib/postgresql/data
+
+volumes:
+  nirvah_pgdata:

@@ -1,9 +1,22 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import db from "../db/index.js";
+import pool from "../db/index.js";
 import { signToken, requireAuth } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { authLimiter } from "../middleware/rateLimit.js";
+import {
+  signupSchema,
+  loginSchema,
+  emailOnlySchema,
+  verifyEmailSchema,
+  resetPasswordSchema,
+} from "../lib/schemas.js";
+import { generateToken, hashToken, TOKEN_TTL_MS } from "../lib/tokens.js";
+import { sendEmail } from "../lib/email.js";
 
 const router = Router();
+
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 function publicUser(row) {
   if (!row) return null;
@@ -11,47 +24,220 @@ function publicUser(row) {
   return rest;
 }
 
-router.post("/signup", async (req, res) => {
-  const { role, name, org, email, password, city } = req.body || {};
-  if (!role || !name || !email || !password || !city) {
-    return res.status(400).json({ error: "Please fill in every field." });
-  }
-  if (!["donor", "ngo"].includes(role)) {
-    return res.status(400).json({ error: "Role must be either donor or ngo." });
-  }
-  if (role === "ngo" && !org) {
-    return res.status(400).json({ error: "Please include your organisation's name." });
-  }
+async function issueToken(client, userId, type) {
+  const { raw, hash } = generateToken();
+  const expiresAt = new Date(Date.now() + TOKEN_TTL_MS[type]);
+  await client.query(
+    `INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES ($1, $2, $3, $4)`,
+    [userId, type, hash, expiresAt]
+  );
+  return raw;
+}
 
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
-  if (existing) return res.status(409).json({ error: "An account with that email already exists." });
+async function sendVerificationEmail(client, user) {
+  const raw = await issueToken(client, user.id, "email_verify");
+  const link = `${FRONTEND_URL}/verify-email?token=${raw}`;
+  await sendEmail({
+    to: user.email,
+    subject: "Verify your Nirvah account",
+    text: `Hi ${user.name},\n\nVerify your email to finish setting up your Nirvah account:\n${link}\n\nThis link expires in 24 hours.`,
+  });
+}
+
+router.post("/signup", authLimiter, validate(signupSchema), async (req, res) => {
+  const { role, name, org, email, password, city } = req.body;
+
+  const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
+  if (existing.rows.length) {
+    return res.status(409).json({ error: "An account with that email already exists." });
+  }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const info = db
-    .prepare("INSERT INTO users (role, name, org, email, password_hash, city) VALUES (?, ?, ?, ?, ?, ?)")
-    .run(role, name, org || null, email, passwordHash, city);
 
-  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
-  const token = signToken(user);
-  res.status(201).json({ token, user: publicUser(user) });
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const inserted = await client.query(
+      `INSERT INTO users (role, name, org, email, password_hash, city)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [role, name, org || null, email, passwordHash, city]
+    );
+    const user = inserted.rows[0];
+
+    if (role === "ngo") {
+      await client.query("INSERT INTO ngos (user_id) VALUES ($1)", [user.id]);
+    }
+
+    await sendVerificationEmail(client, user);
+
+    await client.query("COMMIT");
+
+    // No token/session issued at signup: the account can't log in until
+    // the email is verified, so there's nothing useful to authenticate yet.
+    res.status(201).json({
+      user: publicUser(user),
+      message: "Check your email to verify your account before logging in.",
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Signup failed:", err.message);
+    res.status(500).json({ error: "Something went wrong creating your account. Please try again." });
+  } finally {
+    client.release();
+  }
 });
 
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body || {};
-  if (!email || !password) return res.status(400).json({ error: "Please enter your email and password." });
+router.post("/verify-email", authLimiter, validate(verifyEmailSchema), async (req, res) => {
+  const { token } = req.body;
 
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  const hash = hashToken(token);
+  const result = await pool.query(
+    `SELECT * FROM auth_tokens WHERE token_hash = $1 AND type = 'email_verify'`,
+    [hash]
+  );
+  const tokenRow = result.rows[0];
+
+  if (!tokenRow || tokenRow.used_at || new Date(tokenRow.expires_at) < new Date()) {
+    return res.status(400).json({ error: "This verification link is invalid or has expired." });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("UPDATE users SET email_verified = TRUE WHERE id = $1", [tokenRow.user_id]);
+    await client.query("UPDATE auth_tokens SET used_at = now() WHERE id = $1", [tokenRow.id]);
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Email verification failed:", err.message);
+    return res.status(500).json({ error: "Something went wrong verifying your email. Please try again." });
+  } finally {
+    client.release();
+  }
+
+  res.json({ message: "Email verified. You can now log in." });
+});
+
+router.post("/resend-verification", authLimiter, validate(emailOnlySchema), async (req, res) => {
+  const { email } = req.body;
+
+  const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+  const user = result.rows[0];
+
+  // Same response whether or not the account exists / is already verified,
+  // so this endpoint can't be used to check who has signed up.
+  const genericResponse = { message: "If that account needs verifying, we've sent a new link." };
+
+  if (!user || user.email_verified) return res.json(genericResponse);
+
+  const client = await pool.connect();
+  try {
+    await sendVerificationEmail(client, user);
+  } finally {
+    client.release();
+  }
+
+  res.json(genericResponse);
+});
+
+router.post("/forgot-password", authLimiter, validate(emailOnlySchema), async (req, res) => {
+  const { email } = req.body;
+
+  const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+  const user = result.rows[0];
+
+  const genericResponse = { message: "If that email has an account, we've sent a reset link." };
+  if (!user) return res.json(genericResponse);
+
+  const client = await pool.connect();
+  try {
+    const raw = await issueToken(client, user.id, "password_reset");
+    const link = `${FRONTEND_URL}/reset-password?token=${raw}`;
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your Nirvah password",
+      text: `Hi ${user.name},\n\nReset your password here:\n${link}\n\nThis link expires in 1 hour. If you didn't request this, you can ignore this email.`,
+    });
+  } finally {
+    client.release();
+  }
+
+  res.json(genericResponse);
+});
+
+router.post("/reset-password", authLimiter, validate(resetPasswordSchema), async (req, res) => {
+  const { token, password } = req.body;
+
+  const hash = hashToken(token);
+  const result = await pool.query(
+    `SELECT * FROM auth_tokens WHERE token_hash = $1 AND type = 'password_reset'`,
+    [hash]
+  );
+  const tokenRow = result.rows[0];
+
+  if (!tokenRow || tokenRow.used_at || new Date(tokenRow.expires_at) < new Date()) {
+    return res.status(400).json({ error: "This reset link is invalid or has expired." });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("UPDATE users SET password_hash = $1 WHERE id = $2", [passwordHash, tokenRow.user_id]);
+    await client.query("UPDATE auth_tokens SET used_at = now() WHERE id = $1", [tokenRow.id]);
+    // Any other outstanding reset tokens for this user are now stale —
+    // invalidate them so an old, unused link can't also be used.
+    await client.query(
+      `UPDATE auth_tokens SET used_at = now()
+       WHERE user_id = $1 AND type = 'password_reset' AND used_at IS NULL`,
+      [tokenRow.user_id]
+    );
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Password reset failed:", err.message);
+    return res.status(500).json({ error: "Something went wrong resetting your password. Please try again." });
+  } finally {
+    client.release();
+  }
+
+  res.json({ message: "Password updated. You can now log in." });
+});
+
+router.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
+  const { email, password } = req.body;
+
+  const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+  const user = result.rows[0];
   if (!user) return res.status(401).json({ error: "We could not find an account with that email." });
 
   const ok = await bcrypt.compare(password, user.password_hash);
   if (!ok) return res.status(401).json({ error: "That password does not match." });
 
+  if (!user.email_verified) {
+    return res.status(403).json({
+      error: "Please verify your email before logging in.",
+      code: "EMAIL_NOT_VERIFIED",
+    });
+  }
+
   const token = signToken(user);
   res.json({ token, user: publicUser(user) });
 });
 
-router.get("/me", requireAuth, (req, res) => {
-  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.userId);
+// JWTs are stateless, so there's no server-side session to destroy — this
+// exists for API symmetry and so the frontend has a single place to call
+// before it clears the token client-side.
+router.post("/logout", requireAuth, (req, res) => {
+  res.json({ message: "Logged out." });
+});
+
+router.get("/me", requireAuth, async (req, res) => {
+  const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.userId]);
+  const user = result.rows[0];
   if (!user) return res.status(404).json({ error: "Account not found." });
   res.json({ user: publicUser(user) });
 });

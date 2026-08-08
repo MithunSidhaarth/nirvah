@@ -9,6 +9,8 @@ import {
   Compass,
   Settings,
   LogOut,
+  Receipt,
+  Building2,
 } from "lucide-react";
 import { setToken } from "../lib/api";
 import "../styles/tokens.css";
@@ -18,6 +20,7 @@ const DONOR_LINKS = [
   { label: "Overview", to: "/dashboard/donor", icon: LayoutGrid },
   { label: "Give something", to: "/dashboard/donor/new", icon: PackagePlus },
   { label: "My listings", to: "/dashboard/donor/listings", icon: ListChecks },
+  { label: "Tax summary", to: "/dashboard/donor/tax", icon: Receipt },
   { label: "Explore network", to: "/browse", icon: Compass },
 ];
 
@@ -25,6 +28,7 @@ const NGO_LINKS = [
   { label: "Overview", to: "/dashboard/ngo", icon: LayoutGrid },
   { label: "Browse donations", to: "/browse", icon: Compass },
   { label: "Claimed by us", to: "/dashboard/ngo/claims", icon: ListChecks },
+  { label: "CSR summary", to: "/dashboard/ngo/csr", icon: Building2 },
   { label: "Our team", to: "/dashboard/ngo/team", icon: Users2 },
 ];
 

@@ -1,39 +1,29 @@
-import Database from "better-sqlite3";
-import path from "path";
-import { fileURLToPath } from "url";
+import pg from "pg";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const db = new Database(path.join(__dirname, "nirvah.sqlite"));
+const { Pool } = pg;
 
-db.pragma("journal_mode = WAL");
+if (!process.env.DATABASE_URL) {
+  console.warn("DATABASE_URL is not set — the server will fail on the first query. Copy .env.example to .env.");
+}
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    role TEXT NOT NULL CHECK (role IN ('donor', 'ngo')),
-    name TEXT NOT NULL,
-    org TEXT,
-    email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    city TEXT,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  );
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // Managed Postgres providers (Render, Neon, Supabase) require SSL but use
+  // certs that aren't in Node's default trust store. Localhost doesn't need
+  // SSL at all, so only turn it on when we're not talking to localhost.
+  ssl: process.env.DATABASE_URL?.includes("localhost") ? false : { rejectUnauthorized: false },
+});
 
-  CREATE TABLE IF NOT EXISTS donations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    donor_id INTEGER NOT NULL REFERENCES users(id),
-    title TEXT NOT NULL,
-    category TEXT NOT NULL,
-    quantity TEXT,
-    description TEXT,
-    place TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'listed' CHECK (status IN ('listed', 'claimed', 'delivered')),
-    expires_at TEXT,
-    claimed_by INTEGER REFERENCES users(id),
-    claimed_at TEXT,
-    delivered_at TEXT,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+pool.on("error", (err) => {
+  console.error("Unexpected Postgres pool error:", err);
+});
 
-export default db;
+/**
+ * Thin query helper. Everything downstream (routes) calls db.query(text, params)
+ * the same way the pg driver expects: $1, $2... placeholders, returns { rows }.
+ */
+export function query(text, params) {
+  return pool.query(text, params);
+}
+
+export default pool;

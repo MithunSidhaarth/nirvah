@@ -23,7 +23,26 @@ const MOCK_LISTINGS = [
 ];
 
 const ICONS = { food: UtensilsCrossed, clothing: Shirt, supplies: BookOpen };
-const STATUS_LABEL = { listed: "Finding a match", claimed: "On its way", delivered: "Reached them ✓" };
+// Every stage past "claimed" still reads as "on its way" here — the
+// dashboard row is a summary, not the full journey. See DonationDetail.jsx
+// for the real per-stage timeline and the action buttons that move a
+// donation between stages.
+const STATUS_LABEL = {
+  listed: "Finding a match",
+  claimed: "On its way", accepted: "On its way", pickup: "On its way",
+  delivered: "Reached them ✓", acknowledged: "Reached them ✓",
+  impact_recorded: "Impact logged ✓", documentation_complete: "Impact logged ✓",
+  closed: "Closed",
+};
+// Only listed/claimed/delivered have their own color in dashboard.css —
+// map every later stage onto the closest of those three so new statuses
+// don't render unstyled.
+const STATUS_STYLE_CLASS = {
+  listed: "listed",
+  claimed: "claimed", accepted: "claimed", pickup: "claimed",
+  delivered: "delivered", acknowledged: "delivered",
+  impact_recorded: "delivered", documentation_complete: "delivered", closed: "delivered",
+};
 
 export default function DonorDashboard() {
   const [stats, setStats] = useState(MOCK_STATS);
@@ -126,7 +145,7 @@ export default function DonorDashboard() {
                     <div className="nv-row-title">{l.title}</div>
                     <div className="nv-row-sub">{l.place}</div>
                   </div>
-                  <span className={`nv-row-status ${l.status}`}>{STATUS_LABEL[l.status] || l.status}</span>
+                  <span className={`nv-row-status ${STATUS_STYLE_CLASS[l.status] || "listed"}`}>{STATUS_LABEL[l.status] || l.status}</span>
                 </Link>
               );
             })

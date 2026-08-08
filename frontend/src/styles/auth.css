@@ -87,6 +87,32 @@
 }
 .nv-auth-switch { margin-top: 1.6rem; font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
 .nv-auth-switch a { color: var(--spark-deep); font-weight: 600; text-decoration: none; }
+.nv-auth-note {
+  background: rgba(13,148,136, 0.08);
+  border: 1px solid rgba(13,148,136, 0.25);
+  color: var(--sage-deep);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  margin-bottom: 1.2rem;
+}
+.nv-inline-link {
+  color: var(--spark-deep);
+  font-size: 0.85rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+.nv-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--spark-deep);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
 .nv-back-link {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--ink-soft); text-decoration: none; font-size: 0.88rem; margin-bottom: 2rem;

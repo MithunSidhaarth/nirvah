@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Sparkles, Users2 } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Sparkles, Users2, MailCheck } from "lucide-react";
 import Logo from "../components/Logo";
-import { api, setToken } from "../lib/api";
+import { api } from "../lib/api";
 import "../styles/tokens.css";
 import "../styles/auth.css";
 
 export default function Signup() {
   const [params] = useSearchParams();
-  const navigate = useNavigate();
   const [role, setRole] = useState(params.get("role") === "ngo" ? "ngo" : "donor");
   const [form, setForm] = useState({ name: "", org: "", email: "", password: "", city: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -21,15 +21,48 @@ export default function Signup() {
     setError("");
     setLoading(true);
     try {
-      const data = await api.signup({ ...form, role });
-      setToken(data.token);
-      navigate(role === "ngo" ? "/dashboard/ngo" : "/dashboard/donor");
+      await api.signup({ ...form, role });
+      setSubmittedEmail(form.email);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (submittedEmail) {
+    return (
+      <div className="nv-app nv-auth">
+        <div className="nv-auth-side">
+          <Link to="/" className="nv-brand">
+            <Logo size={32} />
+            Nirvah
+          </Link>
+          <div>
+            <p className="quote font-display">
+              "The countdown on perishable listings changed everything for us. We know exactly what needs picking up first."
+              <span> Lisa Miller</span>
+            </p>
+            <div className="who">Volunteer Lead, community kitchen network</div>
+          </div>
+        </div>
+        <div className="nv-auth-form-wrap">
+          <div className="nv-auth-card">
+            <Link to="/" className="nv-back-link"><ArrowLeft size={15} /> Back to Nirvah</Link>
+            <MailCheck size={32} style={{ marginBottom: "0.75rem" }} />
+            <h1 className="font-display">Check your email</h1>
+            <p className="sub">
+              We sent a verification link to <strong>{submittedEmail}</strong>. Open it to activate your
+              account, then come back and log in.
+            </p>
+            <div className="nv-auth-switch">
+              Didn't get it? <Link to="/login" state={{ resendFor: submittedEmail }}>Log in to resend it</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="nv-app nv-auth">
@@ -88,7 +121,7 @@ export default function Signup() {
             </div>
             <div className="nv-field">
               <label htmlFor="password">Password</label>
-              <input id="password" type="password" name="password" value={form.password} onChange={onChange} placeholder="Choose a password" minLength={6} required />
+              <input id="password" type="password" name="password" value={form.password} onChange={onChange} placeholder="Choose a password" minLength={8} required />
             </div>
             <button type="submit" className={`nv-btn ${role === "ngo" ? "sage" : "spark"}`} style={{ width: "100%", justifyContent: "center" }} disabled={loading}>
               {loading ? "Creating account..." : "Create free account"}
