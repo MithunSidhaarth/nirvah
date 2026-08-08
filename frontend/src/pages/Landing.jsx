@@ -149,9 +149,18 @@ function MeshBlobs() {
 }
 
 function EmberField({ count = 16 }) {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 720px)");
+    const update = () => setIsSmall(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const effectiveCount = isSmall ? Math.ceil(count / 2.5) : count;
   const particles = useMemo(
     () =>
-      Array.from({ length: count }).map((_, i) => ({
+      Array.from({ length: effectiveCount }).map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         size: 3 + Math.random() * 5,
@@ -159,7 +168,7 @@ function EmberField({ count = 16 }) {
         delay: Math.random() * 10,
         drift: (Math.random() - 0.5) * 60,
       })),
-    [count]
+    [effectiveCount]
   );
   return (
     <div className="ember-field" aria-hidden="true">
@@ -267,6 +276,50 @@ function CircleGraphic({ parallaxX, parallaxY }) {
       <text x={cx} y={cy - 6} textAnchor="middle" className="circle-center-1 font-display">Full circle</text>
       <text x={cx} y={cy + 16} textAnchor="middle" className="circle-center-2 font-mono">giving</text>
     </motion.svg>
+  );
+}
+
+/* Small glass toasts that drift beside the hero graphic, cycling through
+   live-sounding activity so the hero feels alive rather than static. */
+const TOAST_MESSAGES = [
+  { icon: UtensilsCrossed, text: "40 meals matched", place: "HSR Layout", tone: "spark" },
+  { icon: Shirt, text: "30 jackets claimed", place: "Indiranagar", tone: "gold" },
+  { icon: BookOpen, text: "180 notebooks delivered", place: "Whitefield", tone: "sage" },
+  { icon: HeartHandshake, text: "Rice & dal picked up", place: "Koramangala", tone: "spark" },
+];
+
+function HeroToast({ side, offset }) {
+  const [index, setIndex] = useState(offset);
+  useEffect(() => {
+    const iv = setInterval(() => setIndex((i) => (i + 1) % TOAST_MESSAGES.length), 3400);
+    return () => clearInterval(iv);
+  }, []);
+  const item = TOAST_MESSAGES[index];
+  const Icon = item.icon;
+  return (
+    <motion.div
+      className={`nv-hero-toast ${side}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: [0, -9, 0] }}
+      transition={{ opacity: { duration: 0.6, delay: 1.5 }, y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 } }}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={index}
+          className="nv-glass toast-card"
+          initial={{ opacity: 0, x: side === "left" ? -14 : 14 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: side === "left" ? 14 : -14 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+        >
+          <span className={`toast-icon ${item.tone}`}><Icon size={15} /></span>
+          <span className="toast-text">
+            <strong>{item.text}</strong>
+            <em>{item.place}</em>
+          </span>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
@@ -412,6 +465,26 @@ export default function Landing() {
         .circle-center-1 { fill: var(--parchment); font-size: 15px; font-style: italic; }
         .circle-center-2 { fill: var(--gold); font-size: 10px; letter-spacing: 0.1em; }
 
+        .nv-hero-graphic-wrap { position: relative; }
+        .nv-hero-toast { position: absolute; top: 50%; z-index: 4; pointer-events: none; }
+        .nv-hero-toast.left { left: -6%; transform: translateY(-140%); }
+        .nv-hero-toast.right { right: -6%; transform: translateY(40%); }
+        .toast-card {
+          display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px;
+          border-radius: 13px; box-shadow: 0 14px 30px rgba(0,0,0,0.28); white-space: nowrap;
+        }
+        .toast-icon { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+        .toast-icon.spark { background: rgba(16,185,129,0.18); color: var(--spark); }
+        .toast-icon.gold { background: rgba(52,211,153,0.18); color: var(--gold); }
+        .toast-icon.sage { background: rgba(13,148,136,0.2); color: var(--sage); }
+        .toast-text { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; }
+        .toast-text strong { font-size: 0.8rem; font-weight: 600; color: var(--parchment); }
+        .toast-text em { font-style: normal; font-size: 0.7rem; color: #8FCDB2; }
+        @media (max-width: 1080px) {
+          .nv-hero-toast.left { left: -2%; }
+          .nv-hero-toast.right { right: -2%; }
+        }
+
         .nv-ticker-wrap { margin-top: 1.2rem; position: relative; z-index: 2; border-top: 1px solid rgba(255,255,255,0.08); }
         .nv-marquee { overflow: hidden; padding: 14px 0; }
         .nv-marquee-track { display: flex; width: max-content; }
@@ -420,24 +493,44 @@ export default function Landing() {
         .nv-ticker-item .flame-ico { color: var(--spark); flex-shrink: 0; }
         .nv-ticker-item .sep { color: #2F6B54; }
 
-        .nv-stats { background: var(--parchment); padding: 3.6rem 6vw; border-bottom: 1px solid var(--parchment-2); }
-        .nv-stats-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; text-align: center; }
-        .nv-stat-num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: clamp(1.9rem,3.4vw,2.6rem); color: var(--spark-deep); }
+        .nv-stats {
+          position: relative; background: var(--parchment); padding: 4.4rem 6vw 3.8rem; overflow: hidden;
+        }
+        .nv-stats::before {
+          content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+          width: 640px; height: 320px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(16,185,129,0.14), transparent 68%); filter: blur(10px); pointer-events: none;
+        }
+        .nv-stats-grid { position: relative; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; text-align: center; }
+        .nv-stat-num { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: clamp(1.9rem,3.4vw,2.6rem); background: linear-gradient(120deg, var(--spark-deep), var(--sage-deep)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .nv-stat-label { margin-top: 6px; font-size: 0.92rem; color: var(--ink-soft); font-weight: 500; }
-        .nv-stats-note { text-align: center; margin-top: 1.6rem; font-size: 0.78rem; color: var(--ink-soft); opacity: 0.7; }
+        .nv-stats-note { position: relative; text-align: center; margin-top: 1.8rem; font-size: 0.78rem; color: var(--ink-soft); opacity: 0.7; }
 
         /* ---------- TRUST BAR ---------- */
-        .nv-trust { background: var(--parchment); padding: 0 6vw 3.6rem; border-bottom: 1px solid var(--parchment-2); }
+        .nv-trust {
+          background: linear-gradient(180deg, var(--parchment-2) 0%, var(--parchment) 100%);
+          padding: 2.4rem 6vw; border-top: 1px solid rgba(16,185,129,0.16); border-bottom: 1px solid rgba(16,185,129,0.16);
+        }
         .nv-trust-grid { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.4rem; }
-        .nv-trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; font-weight: 500; color: var(--ink-soft); }
+        .nv-trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; font-weight: 600; color: var(--spark-deep); }
         .nv-trust-item svg { color: var(--sage-deep); flex-shrink: 0; }
 
-        .nv-how { padding: 7rem 6vw; background: var(--parchment); }
+        .nv-how {
+          padding: 7rem 6vw; background: var(--surface);
+          background-image: radial-gradient(50% 60% at 85% 0%, rgba(13,148,136,0.06), transparent 70%), radial-gradient(45% 50% at 5% 100%, rgba(16,185,129,0.07), transparent 70%);
+        }
         .nv-section-head { max-width: 640px; margin: 0 auto 4rem; text-align: center; }
         .nv-kicker { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--spark-deep); margin-bottom: 1rem; display: block; }
         .nv-section-head h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,3.6vw,2.8rem); font-weight: 600; color: var(--ink); margin: 0 0 1rem; }
         .nv-section-head p { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; }
-        .nv-legs { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2.4rem; }
+        .nv-legs-wrap { position: relative; max-width: 1080px; margin: 0 auto; }
+        .nv-legs-connector {
+          position: absolute; top: 60px; left: calc(8.33% + 26px); right: calc(8.33% + 26px);
+          height: 2px; transform-origin: left center;
+          background: repeating-linear-gradient(90deg, var(--spark) 0 8px, transparent 8px 16px);
+          opacity: 0.55; z-index: 0;
+        }
+        .nv-legs { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3,1fr); gap: 2.4rem; }
         .nv-leg { background: #fff; border: 1px solid var(--parchment-2); border-radius: 20px; padding: 2.2rem 1.9rem; }
         .nv-leg .leg-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; }
         .nv-leg .leg-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg,#D1FAE5,#A7F3D0); color: var(--spark-deep); margin: 14px 0 18px; }
@@ -464,10 +557,10 @@ export default function Landing() {
         .nv-ops-chrome .dot.r { background: #E8604A; }
         .nv-ops-chrome .dot.y { background: #34D399; }
         .nv-ops-chrome .dot.g { background: #0D9488; }
-        .nv-ops-chrome-label { margin-left: 12px; font-size: 0.74rem; color: #7FB6A0; letter-spacing: 0.02em; }
+        .nv-ops-chrome-label { margin-left: 12px; font-size: 0.74rem; color: #8FCDB2; letter-spacing: 0.02em; }
         .nv-ops-body { display: grid; grid-template-columns: 1.5fr 1fr; gap: 0; }
         .nv-ops-feed { padding: 1.6rem 1.8rem; border-right: 1px solid rgba(255,255,255,0.08); }
-        .nv-ops-feed-head { display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: #7FB6A0; margin-bottom: 1.1rem; }
+        .nv-ops-feed-head { display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: #8FCDB2; margin-bottom: 1.1rem; }
         .live-dot { display: inline-flex; align-items: center; gap: 6px; color: var(--sage); }
         .live-dot .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); animation: pulseDot 1.8s infinite; }
         .nv-ops-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -484,9 +577,9 @@ export default function Landing() {
         .nv-ops-side { padding: 1.6rem 1.8rem; display: flex; flex-direction: column; gap: 1rem; }
         .nv-ops-stat { display: flex; align-items: center; gap: 10px; color: var(--gold); }
         .nv-ops-stat .num { font-size: 1.1rem; font-weight: 600; color: var(--parchment); line-height: 1.1; }
-        .nv-ops-stat .lbl { font-size: 0.74rem; color: #7FB6A0; margin-top: 2px; }
+        .nv-ops-stat .lbl { font-size: 0.74rem; color: #8FCDB2; margin-top: 2px; }
         .nv-ops-chart { padding-top: 0.4rem; }
-        .nv-ops-chart-head { display: flex; align-items: center; gap: 7px; font-size: 0.76rem; color: #7FB6A0; margin-bottom: 10px; }
+        .nv-ops-chart-head { display: flex; align-items: center; gap: 7px; font-size: 0.76rem; color: #8FCDB2; margin-bottom: 10px; }
         .nv-ops-bars { display: flex; align-items: flex-end; gap: 6px; height: 64px; }
         .nv-ops-bars span { flex: 1; background: linear-gradient(180deg, var(--gold), var(--spark-deep)); border-radius: 3px; transform-origin: bottom; }
         .nv-ops-notif { display: flex; align-items: center; gap: 9px; margin-top: 0.4rem; padding: 10px 12px; border-radius: 10px; background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--gold); font-size: 0.78rem; }
@@ -507,7 +600,7 @@ export default function Landing() {
         .nv-card2-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; flex: 1; }
         .nv-card2 h4 { font-family: 'Fraunces', serif; color: var(--parchment); font-size: 1.1rem; margin: 0; font-weight: 600; }
         .nv-card2 p.desc { color: #A9D6C3; font-size: 0.9rem; line-height: 1.55; margin: 0; flex: 1; }
-        .nv-card2 .place { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #7FB6A0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .nv-card2 .place { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #8FCDB2; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
         .countdown-chip { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; font-weight: 600; color: var(--gold); background: rgba(52,211,153,0.1); padding: 6px 10px; border-radius: 8px; width: fit-content; }
         .countdown-chip.urgent { color: #10B981; background: rgba(16,185,129,0.14); }
 
@@ -547,10 +640,11 @@ export default function Landing() {
         .nv-footer h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.1rem; }
         .nv-footer a, .nv-footer .line { display: flex; align-items: center; gap: 8px; color: #BFE3D3; text-decoration: none; font-size: 0.92rem; margin-bottom: 10px; }
         .nv-footer a:hover { color: var(--gold); }
-        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #6FA98D; font-family: 'IBM Plex Mono', monospace; }
+        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #84BEA2; font-family: 'IBM Plex Mono', monospace; }
 
         @media (max-width: 900px) {
           .nv-stats-grid { grid-template-columns: 1fr; gap: 2.2rem; }
+          .nv-legs-connector { display: none; }
           .nv-legs { grid-template-columns: 1fr; }
           .nv-feed-grid { grid-template-columns: 1fr; }
           .nv-split { grid-template-columns: 1fr; }
@@ -560,6 +654,22 @@ export default function Landing() {
         @media (prefers-reduced-motion: reduce) {
           .nv-mesh, .nv-hero-spotlight { display: none; }
         }
+
+        /* ---------- mobile performance: heavy blur/backdrop-filter is the
+           #1 cause of janky, "slow-feeling" scroll on phones. Cut the
+           radii and layer count down here so compositing stays cheap. ---------- */
+        @media (max-width: 720px) {
+          .nv-landing .nv-nav, .nv-landing .nv-nav.scrolled { backdrop-filter: blur(7px) saturate(140%); -webkit-backdrop-filter: blur(7px) saturate(140%); }
+          .nv-blob { filter: blur(36px); opacity: 0.28; }
+          .nv-blob-1, .nv-blob-2 { width: 260px; height: 260px; }
+          .nv-blob-3 { width: 190px; height: 190px; }
+          .nv-grain { opacity: 0.035; }
+          .nv-glass { backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%); }
+          .nv-hero { min-height: auto; padding-top: 2rem; }
+          .circle-graphic { width: 240px; height: 240px; }
+          .nv-hero-toast { display: none; }
+        }
+        .nv-mesh, .nv-hero-spotlight, .ember-particle, .circle-graphic { will-change: transform; transform: translateZ(0); }
       `}</style>
 
       {/* ---------- NAV ---------- */}
@@ -664,16 +774,19 @@ export default function Landing() {
           </motion.div>
 
           <motion.div
+            className="nv-hero-graphic-wrap"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, delay: 1.1, ease: [0.2, 0.7, 0.2, 1] }}
           >
+            <HeroToast side="left" offset={0} />
             <CircleGraphic parallaxX={parallaxX} parallaxY={parallaxY} />
+            <HeroToast side="right" offset={2} />
           </motion.div>
         </ClickSpark>
 
         <div className="nv-ticker-wrap">
-          <Marquee speed={32}>
+          <Marquee speed={70}>
             {RELAY_EVENTS.map((msg, i) => (
               <span className="nv-ticker-item" key={i}>
                 <Flame size={13} className="flame-ico" /> {msg} <span className="sep">•</span>
@@ -689,7 +802,7 @@ export default function Landing() {
           className="nv-stats-grid"
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.18 }}
           variants={staggerParent}
         >
           <motion.div variants={fadeUp}>
@@ -728,12 +841,21 @@ export default function Landing() {
 
       {/* ---------- HOW IT WORKS ---------- */}
       <section className="nv-how" id="how">
-        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
           <span className="nv-kicker">The full circle, in three steps</span>
           <h2 className="font-display">From your shelf to their table</h2>
           <p>No warehouses, no waiting lists. Nirvah is built for the gap between "we have extra" and "someone needs it right now."</p>
         </motion.div>
-        <motion.div className="nv-legs" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={staggerParent}>
+        <div className="nv-legs-wrap">
+          <motion.div
+            className="nv-legs-connector"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, amount: 0.14 }}
+            transition={{ duration: 1.1, ease: [0.2, 0.7, 0.2, 1], delay: 0.2 }}
+            aria-hidden="true"
+          />
+          <motion.div className="nv-legs" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.14 }} variants={staggerParent}>
           <motion.div className="nv-leg" variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 22px 40px rgba(11,43,33,0.1)" }} transition={{ duration: 0.25 }}>
             <span className="leg-tag">Step one</span>
             <div className="leg-icon"><PackagePlus size={24} /></div>
@@ -752,12 +874,13 @@ export default function Landing() {
             <h3>Watch it get delivered</h3>
             <p>An NGO claims it, picks it up and delivers it. You see the handoff through: a name, a place, a reason it mattered.</p>
           </motion.div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ---------- LIVE OPS PREVIEW ---------- */}
       <section className="nv-ops">
-        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
           <span className="nv-kicker">Behind every row, someone waiting</span>
           <h2 className="font-display">This is what fighting waste and hunger looks like</h2>
           <p>Every donation on Nirvah is moving toward a family, a shelter or a classroom that needs it today. Here is what that looks like, happening live.</p>
@@ -767,7 +890,7 @@ export default function Landing() {
           className="nv-ops-panel nv-glass"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.14 }}
           transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
         >
           <div className="nv-ops-chrome">
@@ -846,12 +969,12 @@ export default function Landing() {
 
       {/* ---------- LIVE FEED ---------- */}
       <section className="nv-feed" id="feed">
-        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
           <span className="nv-kicker">Happening on Nirvah right now</span>
           <h2 className="font-display">A few things waiting for a match</h2>
           <p>A live style preview of what is currently listed on the network. Real listings look exactly like this.</p>
         </motion.div>
-        <motion.div className="nv-feed-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={staggerParent}>
+        <motion.div className="nv-feed-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={staggerParent}>
           {DONATIONS.map((d) => {
             const Icon = d.icon;
             return (
@@ -877,7 +1000,7 @@ export default function Landing() {
       {/* ---------- SPLIT: GIVER / NGO ---------- */}
       <section className="nv-split" id="split">
         <div className="nv-split-panel giver">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} variants={fadeUp}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
             <div className="panel-icon"><Sparkles size={26} /></div>
             <h3 className="font-display">For givers</h3>
             <p className="copy">Whatever is in surplus, a kitchen's evening extras, a closet clearout, last term's supplies, takes minutes to list and finds a real recipient instead of a landfill.</p>
@@ -892,7 +1015,7 @@ export default function Landing() {
           </motion.div>
         </div>
         <div className="nv-split-panel ngo">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} variants={fadeUp}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
             <div className="panel-icon"><Users2 size={26} /></div>
             <h3 className="font-display">For NGOs</h3>
             <p className="copy">Stop chasing leads. Verified organisations get a live feed of nearby donations, filterable by category and distance, so your team spends time delivering, not searching.</p>
@@ -910,11 +1033,11 @@ export default function Landing() {
 
       {/* ---------- TESTIMONIALS ---------- */}
       <section className="nv-notes">
-        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+        <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
           <span className="nv-kicker">Notes from the network</span>
           <h2 className="font-display">People who have passed it on</h2>
         </motion.div>
-        <motion.div className="nv-notes-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={staggerParent}>
+        <motion.div className="nv-notes-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={staggerParent}>
           {[
             { initials: "SJ", quote: "I listed our restaurant's evening surplus at 9pm and it was claimed before we had finished closing up. Genuinely did not expect it to be that fast.", who: "Sarah Johnson", role: "Giver, Bengaluru", rotate: 0.8 },
             { initials: "MB", quote: "We used to spend hours cold calling donors. Now listings come to us, sorted by distance, the moment they go up.", who: "Michael Brown", role: "NGO Coordinator, Asha Foundation", rotate: -0.6 },
@@ -941,7 +1064,7 @@ export default function Landing() {
       {/* ---------- CTA BANNER ---------- */}
       <section className="nv-banner">
         <ClickSpark sparkColor="#06231A" sparkCount={9} sparkRadius={20} duration={480}>
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
             <h2 className="font-display">Your surplus is someone's tonight.</h2>
             <p>Free to join. Takes two minutes. The next circle starts with you.</p>
             <Magnetic strength={0.3}>
@@ -959,7 +1082,7 @@ export default function Landing() {
               <Logo size={30} />
               Nirvah
             </div>
-            <p style={{ color: "#7FB6A0", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>
+            <p style={{ color: "#8FCDB2", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>
               A network connecting givers and NGOs, so surplus finds its way to
               someone who needs it instead of a bin.
             </p>
