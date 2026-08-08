@@ -62,8 +62,8 @@ export default function DonorDashboard() {
       </div>
 
       {demoMode && (
-        <div className="nv-panel" style={{ marginBottom: "1.4rem", display: "flex", gap: "0.8rem", alignItems: "flex-start", background: "rgba(244,185,66,0.08)", borderColor: "rgba(244,185,66,0.3)" }}>
-          <Info size={18} color="#9A6A0E" style={{ flexShrink: 0, marginTop: 2 }} />
+        <div className="nv-panel" style={{ marginBottom: "1.4rem", display: "flex", gap: "0.8rem", alignItems: "flex-start", background: "rgba(52,211,153,0.08)", borderColor: "rgba(52,211,153,0.3)" }}>
+          <Info size={18} color="#047857" style={{ flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: "0.88rem", color: "var(--ink-soft)" }}>
             <strong style={{ color: "var(--ink)" }}>Showing demo data.</strong> Point <code>VITE_API_BASE_URL</code> at your backend in the frontend .env file to replace this with your real listings.
           </div>
@@ -72,28 +72,28 @@ export default function DonorDashboard() {
 
       <div className="nv-ring-grid">
         <div className="nv-ring-card">
-          <StatRing value={(stats.activeListings / 6) * 100} color="#FF7A45" />
+          <StatRing value={(stats.activeListings / 6) * 100} color="#10B981" />
           <div>
             <div className="nv-ring-num">{stats.activeListings}</div>
             <div className="nv-ring-label">Active listings</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={impactPercent} color="#F4B942" />
+          <StatRing value={impactPercent} color="#34D399" />
           <div>
             <div className="nv-ring-num">{stats.itemsGiven}</div>
             <div className="nv-ring-label">Items given in total</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={(stats.ngosMatched / 20) * 100} color="#6FA287" />
+          <StatRing value={(stats.ngosMatched / 20) * 100} color="#0D9488" />
           <div>
             <div className="nv-ring-num">{stats.ngosMatched}</div>
             <div className="nv-ring-label">NGOs matched with</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={100 - stats.avgMatchMinutes} color="#C7461F" />
+          <StatRing value={100 - stats.avgMatchMinutes} color="#047857" />
           <div>
             <div className="nv-ring-num">{stats.avgMatchMinutes}m</div>
             <div className="nv-ring-label">Average match time</div>
@@ -136,7 +136,7 @@ export default function DonorDashboard() {
             <h2 style={{ justifyContent: "center", marginBottom: "0.4rem" }}>Your impact ring</h2>
             <p className="sub" style={{ marginBottom: "1.4rem", fontSize: "0.86rem" }}>Three hundred items closes your first full circle</p>
             <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto" }}>
-              <StatRing value={impactPercent} size={160} stroke={12} color="#FF7A45" />
+              <StatRing value={impactPercent} size={160} stroke={12} color="#10B981" />
               <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
                 <div>
                   <div style={{ fontFamily: "Fraunces, serif", fontSize: "1.6rem", fontWeight: 600 }}>{impactPercent}%</div>
@@ -146,7 +146,7 @@ export default function DonorDashboard() {
             </div>
           </div>
 
-          <div className="nv-panel" style={{ background: "linear-gradient(135deg, #FFF3E6, #FFE6D2)", borderColor: "rgba(255,122,69,0.25)" }}>
+          <div className="nv-panel" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)", borderColor: "rgba(16,185,129,0.25)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
               <Sparkles size={18} color="var(--spark-deep)" />
               <strong style={{ fontFamily: "Fraunces, serif", fontSize: "1.05rem" }}>Tip for a faster match</strong>

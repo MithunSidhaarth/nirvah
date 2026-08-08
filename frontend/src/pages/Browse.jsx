@@ -38,14 +38,14 @@ export default function Browse() {
         .nv-browse-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: var(--char); }
         .nv-browse-hero { padding: 3.6rem 6vw 2rem; text-align: center; background: var(--char); color: var(--parchment); }
         .nv-browse-hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 3.6vw, 2.8rem); margin: 0 0 0.8rem; }
-        .nv-browse-hero p { color: #CFC3B0; max-width: 560px; margin: 0 auto; }
+        .nv-browse-hero p { color: #BFE3D3; max-width: 560px; margin: 0 auto; }
         .nv-filters { display: flex; gap: 10px; justify-content: center; padding: 1.6rem 6vw; background: var(--char); flex-wrap: wrap; }
-        .nv-filter-btn { padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(247,239,227,0.25); background: transparent; color: var(--parchment); font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .nv-filter-btn { padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: var(--parchment); font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         .nv-filter-btn.active { background: var(--spark); border-color: var(--spark); }
         .nv-browse-grid { max-width: 1180px; margin: 0 auto; padding: 3rem 6vw; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
         .nv-bcard { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; text-decoration: none; color: var(--ink); transition: transform 0.25s ease, box-shadow 0.25s ease; display: block; }
         .nv-bcard:hover { transform: translateY(-5px); box-shadow: var(--shadow-soft); }
-        .nv-bcard-media { height: 120px; display: grid; place-items: center; background: linear-gradient(135deg, #FFE6D2, #FFD3AE); color: var(--spark-deep); }
+        .nv-bcard-media { height: 120px; display: grid; place-items: center; background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--spark-deep); }
         .nv-bcard-body { padding: 1.3rem; }
         .nv-bcard h4 { font-family: 'Fraunces', serif; margin: 8px 0 4px; font-size: 1.05rem; }
         .nv-bcard .donor { font-size: 0.84rem; color: var(--ink-soft); margin-bottom: 10px; }

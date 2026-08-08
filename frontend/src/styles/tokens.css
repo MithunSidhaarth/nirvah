@@ -1,37 +1,38 @@
 /* =========================================================
    NIRVAH — shared design tokens
-   Theme: "the giving warmth". A sunrise coral-to-gold current
-   carries surplus from a giver's hands to an NGO's, and a living
-   sage green marks the moment it's verified and delivered.
-   Warm ember-charcoal nights (not navy), warm ivory paper by day —
-   this is a human cause, not a dev tool.
+   Theme: "white & emerald". Clean white paper throughout, one
+   confident emerald for the primary donor action, a deeper teal
+   for NGO / verified actions, and a bright spring-green for
+   highlights and glow. Deep emerald-black (not navy, not warm
+   brown) for the few immersive night sections. See the palette
+   breakdown in the project notes for exact roles per token.
 ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --char: #211710;
-  --char-2: #2C1F16;
-  --char-3: #3B2B1E;
-  --spark: #FF7A45;
-  --spark-deep: #C7461F;
-  --gold: #F4B942;
-  --gold-deep: #B9761E;
-  --sage: #6FA287;
-  --sage-deep: #3E6E56;
-  --parchment: #FBF4EA;
-  --parchment-2: #F0E4D3;
-  --surface: #FFFFFF;
-  --ink: #2A1D14;
-  --ink-soft: #6E5F51;
-  --line: rgba(42, 29, 20, 0.1);
-  --line-dark: rgba(251, 244, 234, 0.12);
+  --char: #062A1F;       /* deep emerald-black — hero/footer/sidebar nights */
+  --char-2: #0B3D2C;      /* mid-tone night, gradient stop */
+  --char-3: #12503B;      /* lightest night tone, card-on-dark bg */
+  --spark: #10B981;       /* primary emerald — donor / "giver" actions */
+  --spark-deep: #047857;  /* deep emerald — donor hover, headings on white */
+  --gold: #34D399;        /* bright spring-green — highlights, glow, dots */
+  --gold-deep: #059669;   /* mid emerald — icon accents */
+  --sage: #0D9488;        /* teal — NGO / verified actions */
+  --sage-deep: #115E59;   /* deep teal — NGO hover, verified text */
+  --parchment: #F7FBF9;   /* page background — barely-tinted white */
+  --parchment-2: #E3F5EC; /* light mint — secondary surfaces, tints */
+  --surface: #FFFFFF;     /* card/panel background — true white */
+  --ink: #0B2B21;         /* primary text — near-black emerald */
+  --ink-soft: #4B6B5F;    /* secondary text — muted deep sage-grey */
+  --line: rgba(11,43,33, 0.1);
+  --line-dark: rgba(255,255,255, 0.12);
 
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --shadow-soft: 0 20px 44px rgba(42, 29, 20, 0.09);
-  --shadow-deep: 0 24px 60px rgba(20, 13, 8, 0.45);
+  --shadow-soft: 0 20px 44px rgba(11,43,33, 0.09);
+  --shadow-deep: 0 24px 60px rgba(6,35,26, 0.45);
 }
 
 .nv-app, .nv-app * { box-sizing: border-box; }
@@ -63,22 +64,22 @@
 }
 .nv-btn.spark {
   background: linear-gradient(120deg, var(--spark), var(--spark-deep));
-  color: #FFF8F0;
-  box-shadow: 0 14px 30px rgba(255, 122, 69, 0.32);
+  color: #FFFFFF;
+  box-shadow: 0 14px 30px rgba(16,185,129, 0.32);
 }
-.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(255, 122, 69, 0.44); }
+.nv-btn.spark:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(16,185,129, 0.44); }
 .nv-btn.sage {
   background: linear-gradient(120deg, var(--sage), var(--sage-deep));
-  color: #F4FBF7;
-  box-shadow: 0 14px 30px rgba(62, 110, 86, 0.32);
+  color: #F0FFF9;
+  box-shadow: 0 14px 30px rgba(17,94,89, 0.32);
 }
-.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(62, 110, 86, 0.44); }
+.nv-btn.sage:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(17,94,89, 0.44); }
 .nv-btn.ghost-dark {
-  background: rgba(251, 244, 234, 0.06);
-  border-color: rgba(251, 244, 234, 0.55);
+  background: rgba(255,255,255, 0.06);
+  border-color: rgba(255,255,255, 0.55);
   color: var(--parchment);
 }
-.nv-btn.ghost-dark:hover { background: rgba(251, 244, 234, 0.14); border-color: var(--gold); color: var(--gold); }
+.nv-btn.ghost-dark:hover { background: rgba(255,255,255, 0.14); border-color: var(--gold); color: var(--gold); }
 .nv-btn.ghost-light {
   background: var(--surface);
   border-color: var(--line);
@@ -100,9 +101,9 @@
   padding: 6px 13px;
   border-radius: 999px;
 }
-.nv-pill.spark { background: rgba(255, 122, 69, 0.13); color: var(--spark-deep); border: 1px solid rgba(255, 122, 69, 0.32); }
-.nv-pill.sage { background: rgba(111, 162, 135, 0.16); color: var(--sage-deep); border: 1px solid rgba(111, 162, 135, 0.34); }
-.nv-pill.gold { background: rgba(244, 185, 66, 0.18); color: #8A5B12; border: 1px solid rgba(244, 185, 66, 0.4); }
+.nv-pill.spark { background: rgba(16,185,129, 0.13); color: var(--spark-deep); border: 1px solid rgba(16,185,129, 0.32); }
+.nv-pill.sage { background: rgba(13,148,136, 0.16); color: var(--sage-deep); border: 1px solid rgba(13,148,136, 0.34); }
+.nv-pill.gold { background: rgba(52,211,153, 0.18); color: #065F46; border: 1px solid rgba(52,211,153, 0.4); }
 
 /* ---------- shared cards ---------- */
 .nv-card {
@@ -114,8 +115,8 @@
 
 /* ---------- glass surface, for use over dark/photographic areas ---------- */
 .nv-glass {
-  background: rgba(251, 244, 234, 0.06);
-  border: 1px solid rgba(251, 244, 234, 0.12);
+  background: rgba(255,255,255, 0.06);
+  border: 1px solid rgba(255,255,255, 0.12);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
@@ -143,9 +144,9 @@
 /* ---------- living gradient wash, for use behind hero/dark sections ---------- */
 .nv-life-wash {
   background-image:
-    radial-gradient(60% 50% at 12% 8%, rgba(255, 122, 69, 0.22), transparent 60%),
-    radial-gradient(55% 55% at 88% 18%, rgba(244, 185, 66, 0.16), transparent 65%),
-    radial-gradient(60% 60% at 50% 100%, rgba(111, 162, 135, 0.14), transparent 70%);
+    radial-gradient(60% 50% at 12% 8%, rgba(16,185,129, 0.22), transparent 60%),
+    radial-gradient(55% 55% at 88% 18%, rgba(52,211,153, 0.16), transparent 65%),
+    radial-gradient(60% 60% at 50% 100%, rgba(13,148,136, 0.14), transparent 70%);
 }
 
 @media (prefers-reduced-motion: reduce) {

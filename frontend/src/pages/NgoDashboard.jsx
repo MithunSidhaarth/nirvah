@@ -72,7 +72,7 @@ export default function NgoDashboard() {
       </div>
 
       {demoMode && (
-        <div className="nv-panel" style={{ marginBottom: "1.4rem", display: "flex", gap: "0.8rem", alignItems: "flex-start", background: "rgba(111,162,135,0.08)", borderColor: "rgba(111,162,135,0.3)" }}>
+        <div className="nv-panel" style={{ marginBottom: "1.4rem", display: "flex", gap: "0.8rem", alignItems: "flex-start", background: "rgba(13,148,136,0.08)", borderColor: "rgba(13,148,136,0.3)" }}>
           <Info size={18} color="var(--sage-deep)" style={{ flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: "0.88rem", color: "var(--ink-soft)" }}>
             <strong style={{ color: "var(--ink)" }}>Showing demo data.</strong> Point <code>VITE_API_BASE_URL</code> at your backend in the frontend .env file to replace this with live listings.
@@ -82,28 +82,28 @@ export default function NgoDashboard() {
 
       <div className="nv-ring-grid">
         <div className="nv-ring-card">
-          <StatRing value={(stats.claimedThisMonth / 40) * 100} color="#6FA287" />
+          <StatRing value={(stats.claimedThisMonth / 40) * 100} color="#0D9488" />
           <div>
             <div className="nv-ring-num">{stats.claimedThisMonth}</div>
             <div className="nv-ring-label">Claimed this month</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={(stats.itemsReceived / 800) * 100} color="#F4B942" />
+          <StatRing value={(stats.itemsReceived / 800) * 100} color="#34D399" />
           <div>
             <div className="nv-ring-num">{stats.itemsReceived}</div>
             <div className="nv-ring-label">Items received in total</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={(stats.activeDonors / 50) * 100} color="#FF7A45" />
+          <StatRing value={(stats.activeDonors / 50) * 100} color="#10B981" />
           <div>
             <div className="nv-ring-num">{stats.activeDonors}</div>
             <div className="nv-ring-label">Active donors nearby</div>
           </div>
         </div>
         <div className="nv-ring-card">
-          <StatRing value={100 - stats.avgPickupMinutes} color="#3E6E56" />
+          <StatRing value={100 - stats.avgPickupMinutes} color="#115E59" />
           <div>
             <div className="nv-ring-num">{stats.avgPickupMinutes}m</div>
             <div className="nv-ring-label">Average pickup time</div>
@@ -151,7 +151,7 @@ export default function NgoDashboard() {
             <h2 style={{ justifyContent: "center", marginBottom: "0.4rem" }}>Monthly goal</h2>
             <p className="sub" style={{ marginBottom: "1.4rem", fontSize: "0.86rem" }}>Forty claims closes this month's circle</p>
             <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto" }}>
-              <StatRing value={(stats.claimedThisMonth / 40) * 100} size={160} stroke={12} color="#6FA287" />
+              <StatRing value={(stats.claimedThisMonth / 40) * 100} size={160} stroke={12} color="#0D9488" />
               <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
                 <div>
                   <div style={{ fontFamily: "Fraunces, serif", fontSize: "1.6rem", fontWeight: 600 }}>{stats.claimedThisMonth}/40</div>
@@ -161,7 +161,7 @@ export default function NgoDashboard() {
             </div>
           </div>
 
-          <div className="nv-panel" style={{ background: "linear-gradient(135deg, #EAF4EE, #D3E9DE)", borderColor: "rgba(111,162,135,0.3)" }}>
+          <div className="nv-panel" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)", borderColor: "rgba(13,148,136,0.3)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
               <Users2 size={18} color="var(--sage-deep)" />
               <strong style={{ fontFamily: "Fraunces, serif", fontSize: "1.05rem" }}>Grow your team</strong>

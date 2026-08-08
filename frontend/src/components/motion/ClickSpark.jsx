@@ -7,7 +7,7 @@ import { useRef, useEffect, useCallback } from "react";
  * signal — a tiny echo of the spark in the Nirvah mark.
  */
 const ClickSpark = ({
-  sparkColor = "#F4B942",
+  sparkColor = "#34D399",
   sparkSize = 10,
   sparkRadius = 18,
   sparkCount = 8,

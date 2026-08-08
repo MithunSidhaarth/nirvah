@@ -6,7 +6,7 @@
 }
 .nv-auth-side {
   position: relative;
-  background: radial-gradient(120% 100% at 20% 0%, var(--char-2) 0%, var(--char) 55%, #140D08 100%);
+  background: radial-gradient(120% 100% at 20% 0%, var(--char-2) 0%, var(--char) 55%, #06231A 100%);
   padding: 3rem 3rem;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   max-width: 460px;
 }
 .nv-auth-side .quote span { color: var(--gold); font-style: italic; }
-.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #D8C7B4; }
+.nv-auth-side .who { margin-top: 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #BFE3D3; }
 .nv-auth-form-wrap {
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
 .nv-field input:focus, .nv-field select:focus {
   outline: none;
   border-color: var(--spark);
-  box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.15);
+  box-shadow: 0 0 0 3px rgba(16,185,129, 0.15);
 }
 .nv-role-toggle { display: flex; gap: 10px; margin-bottom: 1.6rem; }
 .nv-role-btn {
@@ -74,11 +74,11 @@
   gap: 8px;
   transition: all 0.2s ease;
 }
-.nv-role-btn.active.donor { border-color: var(--spark); color: var(--spark-deep); background: rgba(232,163,61,0.08); }
-.nv-role-btn.active.ngo { border-color: var(--sage); color: var(--sage-deep); background: rgba(47,190,148,0.1); }
+.nv-role-btn.active.donor { border-color: var(--spark); color: var(--spark-deep); background: rgba(16,185,129,0.08); }
+.nv-role-btn.active.ngo { border-color: var(--sage); color: var(--sage-deep); background: rgba(13,148,136,0.1); }
 .nv-auth-error {
-  background: rgba(199, 70, 31, 0.08);
-  border: 1px solid rgba(199, 70, 31, 0.3);
+  background: rgba(4,120,87, 0.08);
+  border: 1px solid rgba(4,120,87, 0.3);
   color: var(--spark-deep);
   padding: 10px 14px;
   border-radius: 10px;

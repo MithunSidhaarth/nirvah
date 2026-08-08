@@ -38,7 +38,7 @@ export default function DonationDetail() {
       <style>{`
         .nv-detail-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; }
         .nv-detail-wrap { max-width: 760px; margin: 0 auto; padding: 1rem 6vw 4rem; }
-        .nv-detail-media { height: 220px; border-radius: 20px; background: linear-gradient(135deg, #FFE6D2, #FFD3AE); display: grid; place-items: center; color: var(--spark-deep); margin-bottom: 1.6rem; }
+        .nv-detail-media { height: 220px; border-radius: 20px; background: linear-gradient(135deg, #D1FAE5, #A7F3D0); display: grid; place-items: center; color: var(--spark-deep); margin-bottom: 1.6rem; }
         .nv-detail-wrap h1 { font-family: 'Fraunces', serif; font-size: clamp(1.7rem, 3vw, 2.3rem); margin: 0.6rem 0; }
         .nv-detail-meta { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-bottom: 1.6rem; color: var(--ink-soft); font-size: 0.92rem; }
         .nv-detail-meta span { display: flex; align-items: center; gap: 6px; }
@@ -61,7 +61,7 @@ export default function DonationDetail() {
         <p className="nv-detail-desc">{donation.description}</p>
 
         {claimed ? (
-          <div className="nv-panel" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(111,162,135,0.1)", borderColor: "rgba(111,162,135,0.3)" }}>
+          <div className="nv-panel" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(13,148,136,0.1)", borderColor: "rgba(13,148,136,0.3)" }}>
             <HeartHandshake size={18} color="var(--sage-deep)" />
             <span style={{ color: "var(--sage-deep)", fontWeight: 600 }}>Claimed. The giver has been notified.</span>
           </div>

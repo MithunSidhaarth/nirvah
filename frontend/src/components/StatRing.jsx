@@ -4,7 +4,7 @@ import React from "react";
  * A small radial progress ring used throughout the dashboards.
  * Echoes the "full circle" motif from the hero graphic on the landing page.
  */
-export default function StatRing({ value = 0, size = 56, stroke = 6, color = "#FF7A45", track = "#F0E4D3" }) {
+export default function StatRing({ value = 0, size = 56, stroke = 6, color = "#10B981", track = "#E3F5EC" }) {
   const clamped = Math.max(0, Math.min(100, value));
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;

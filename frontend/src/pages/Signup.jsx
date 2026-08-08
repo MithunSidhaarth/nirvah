@@ -45,7 +45,7 @@ export default function Signup() {
           </p>
           <div className="who">Volunteer Lead, community kitchen network</div>
         </div>
-        <div style={{ fontSize: "0.8rem", color: "#9C8E79", fontFamily: "IBM Plex Mono, monospace" }}>
+        <div style={{ fontSize: "0.8rem", color: "#6FA98D", fontFamily: "IBM Plex Mono, monospace" }}>
           Free for givers and NGOs. No hidden fees, ever.
         </div>
       </div>

@@ -42,7 +42,7 @@ export default function TiltCard({ children, className = "", style = {}, maxTilt
       <motion.div
         className="nv-tilt-glow"
         style={{
-          background: `radial-gradient(circle at ${glowX} ${glowY}, rgba(255,196,140,0.16), transparent 55%)`,
+          background: `radial-gradient(circle at ${glowX} ${glowY}, rgba(110,231,183,0.16), transparent 55%)`,
         }}
         aria-hidden="true"
       />

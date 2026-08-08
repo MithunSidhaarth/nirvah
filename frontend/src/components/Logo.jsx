@@ -24,8 +24,8 @@ export default function Logo({ size = 34, variant = "gradient", animated = true,
     >
       <defs>
         <linearGradient id={`nvLogoGrad-${id}`} x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#F4B942" />
-          <stop offset="100%" stopColor="#C7461F" />
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#047857" />
         </linearGradient>
         <filter id={`nvLogoGlow-${id}`} x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="1.4" result="blur" />
@@ -49,13 +49,13 @@ export default function Logo({ size = 34, variant = "gradient", animated = true,
       {/* the spark, travelling the ring and leaping the gap */}
       <g filter={`url(#nvLogoGlow-${id})`}>
         {animated ? (
-          <circle r="3.1" fill={variant === "gradient" ? "#FFD9A0" : "currentColor"}>
+          <circle r="3.1" fill={variant === "gradient" ? "#6EE7B7" : "currentColor"}>
             <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
               <mpath xlinkHref={`#nvRing-${id}`} />
             </animateMotion>
           </circle>
         ) : (
-          <circle cx="27.7" cy="8.6" r="3.1" fill={variant === "gradient" ? "#FFD9A0" : "currentColor"} />
+          <circle cx="27.7" cy="8.6" r="3.1" fill={variant === "gradient" ? "#6EE7B7" : "currentColor"} />
         )}
       </g>
     </svg>
