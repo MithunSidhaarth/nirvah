@@ -426,8 +426,8 @@ export default function Landing() {
         }
         .nv-mesh { position: absolute; inset: 0; z-index: 0; }
         .nv-blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.35; }
-        .nv-blob-1 { width: 420px; height: 420px; top: -8%; left: 4%; background: radial-gradient(circle, var(--spark), transparent 70%); }
-        .nv-blob-2 { width: 380px; height: 380px; bottom: -12%; right: 6%; background: radial-gradient(circle, var(--gold), transparent 70%); }
+        .nv-blob-1 { width: 420px; height: 420px; top: 5%; left: 8%; background: radial-gradient(circle, var(--spark), transparent 70%); }
+        .nv-blob-2 { width: 380px; height: 380px; bottom: 4%; right: 9%; background: radial-gradient(circle, var(--gold), transparent 70%); }
         .nv-blob-3 { width: 300px; height: 300px; top: 30%; right: 18%; background: radial-gradient(circle, var(--sage), transparent 72%); opacity: 0.18; }
         .ember-field { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
         .ember-particle {
