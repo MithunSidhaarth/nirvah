@@ -1,8 +1,17 @@
-node_modules
-dist
+node_modules/
+
+# Secrets — never commit a real .env, only .env.example
 .env
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-*.sqlite-shm
+.env.local
+.env.*.local
+
+# Locally uploaded files (QR codes, documents) — local disk only, not source
+backend/uploads/
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Logs / OS cruft
+*.log
 .DS_Store

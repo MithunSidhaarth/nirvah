@@ -1,6 +1,18 @@
 import jwt from "jsonwebtoken";
 import pool from "../db/index.js";
 
+// A missing JWT_SECRET used to silently fall back to a hardcoded default —
+// fine for local dev, but if that fallback ever ran anywhere real, every
+// token would be signed with a secret sitting in plain sight in this file,
+// and anyone could forge a valid session (including an admin one). Same
+// "is this actually local dev" check db/index.js already uses for SSL,
+// rather than trusting NODE_ENV to be set correctly by the platform.
+const isLocalDev = (process.env.DATABASE_URL || "").includes("localhost");
+if (!process.env.JWT_SECRET && !isLocalDev) {
+  throw new Error(
+    "JWT_SECRET is not set. Refusing to start with a default/guessable secret — set JWT_SECRET in your environment."
+  );
+}
 const JWT_SECRET = process.env.JWT_SECRET || "dev_only_secret_change_me";
 
 export function signToken(user) {

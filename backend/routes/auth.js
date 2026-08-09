@@ -212,10 +212,17 @@ router.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
 
   const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
   const user = result.rows[0];
-  if (!user) return res.status(401).json({ error: "We could not find an account with that email." });
+
+  // Same generic message whether the email doesn't exist or the password
+  // is wrong — every other auth endpoint here (forgot-password,
+  // resend-verification) already avoids confirming which emails have
+  // accounts; login was the one place still giving that away.
+  const invalidCreds = () => res.status(401).json({ error: "That email or password is incorrect." });
+
+  if (!user) return invalidCreds();
 
   const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) return res.status(401).json({ error: "That password does not match." });
+  if (!ok) return invalidCreds();
 
   if (!user.email_verified) {
     return res.status(403).json({
