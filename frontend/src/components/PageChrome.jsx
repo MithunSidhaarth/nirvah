@@ -126,6 +126,7 @@ export function PageFooter() {
           <h5>Quick links</h5>
           <Link to="/how-it-works">How it works</Link>
           <Link to="/browse">Explore donations</Link>
+          <Link to="/donate">Donate</Link>
           <Link to="/for-ngos">For NGOs</Link>
           <Link to="/contact">Contact</Link>
         </div>

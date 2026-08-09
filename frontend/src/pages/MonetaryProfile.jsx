@@ -163,7 +163,7 @@ export default function MonetaryProfile() {
 
         <div className="nv-field">
           <label htmlFor="qrUpload"><QrCode size={14} style={{ display: "inline", marginRight: 4 }} /> Payment QR code</label>
-          {qrCodeUrl && <img src={qrCodeUrl} alt="Your payment QR code" style={{ width: 110, height: 110, objectFit: "cover", borderRadius: 10, border: "1px solid var(--line)", display: "block", marginBottom: 8 }} />}
+          {qrCodeUrl && <img src={qrCodeUrl} alt="Your payment QR code" style={{ width: 110, height: 110, objectFit: "contain", background: "#fff", borderRadius: 10, border: "1px solid var(--line)", display: "block", marginBottom: 8 }} />}
           <input id="qrUpload" ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onQrSelected} disabled={uploadingQr} />
           {uploadingQr && <p className="sub" style={{ marginTop: 6 }}>Uploading…</p>}
         </div>

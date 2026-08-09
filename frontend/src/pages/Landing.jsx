@@ -394,6 +394,7 @@ export default function Landing() {
   const navLinks = [
     { label: "How it works", to: "/how-it-works" },
     { label: "Explore", to: "/browse" },
+    { label: "Donate", to: "/donate" },
     { label: "For NGOs", to: "/for-ngos" },
     { label: "Contact", to: "/contact" },
   ];

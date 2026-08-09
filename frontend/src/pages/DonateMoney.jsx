@@ -221,7 +221,7 @@ export default function DonateMoney() {
         .dm-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage-deep); background: rgba(13,148,136,0.08); padding: 4px 9px; border-radius: 999px; margin-bottom: 0.5rem; }
         .dm-card h3 { font-family: 'Fraunces', serif; font-size: 1.2rem; margin: 0; }
         .dm-cause { color: var(--ink-soft); font-size: 0.9rem; margin: 0.3rem 0 0; }
-        .dm-qr { width: 76px; height: 76px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); flex-shrink: 0; }
+        .dm-qr { width: 76px; height: 76px; object-fit: contain; background: #fff; border-radius: 10px; border: 1px solid var(--line); flex-shrink: 0; }
 
         .dm-meta { display: flex; align-items: center; gap: 6px; color: var(--ink-soft); font-size: 0.84rem; }
 
