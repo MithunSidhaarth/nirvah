@@ -12,6 +12,7 @@ const MOCK_LISTINGS = [
 ];
 
 const ICONS = { food: UtensilsCrossed, clothing: Shirt, supplies: BookOpen };
+const LOGISTICS_TAG = { donor_drop: "you drop off", ngo_pickup: "NGO picks up" };
 
 const STATUS_LABEL = {
   listed: "Finding a match",
@@ -127,7 +128,9 @@ export default function MyListings() {
                 <div className="nv-row-icon">{l.photoUrl ? <img src={l.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }} /> : <Icon size={19} />}</div>
                 <div className="nv-row-body">
                   <div className="nv-row-title">{l.title}</div>
-                  <div className="nv-row-sub">{l.place}{l.ngo ? ` · claimed by ${l.ngo}` : ""}</div>
+                  <div className="nv-row-sub">
+                    {l.place}{l.ngo ? ` · claimed by ${l.ngo}` : ""}{LOGISTICS_TAG[l.logisticsMode] ? ` · ${LOGISTICS_TAG[l.logisticsMode]}` : ""}
+                  </div>
                 </div>
                 <span className={`nv-row-status ${STATUS_STYLE_CLASS[l.status] || "listed"}`}>{STATUS_LABEL[l.status] || l.status}</span>
               </Link>

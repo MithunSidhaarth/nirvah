@@ -49,6 +49,17 @@ DO $$ BEGIN
   CREATE TYPE auth_token_type AS ENUM ('email_verify', 'password_reset');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
+-- How a listing physically changes hands. Either side can be the one who
+-- says which it'll be: the donor can state it right on the listing form
+-- (NewListing.jsx), or — if the donor left it open — the claiming NGO
+-- states it when they claim (see /:id/claim in routes/donations.js).
+-- Whichever side speaks first for a given listing wins; logistics_set_by
+-- records which one that was so the UI can show "the donor said..." vs
+-- "the NGO said...".
+DO $$ BEGIN
+  CREATE TYPE donation_logistics_mode AS ENUM ('donor_drop', 'ngo_pickup');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
 DO $$ BEGIN
   CREATE TYPE document_type AS ENUM (
     'ngo_verification',
@@ -210,6 +221,14 @@ CREATE TRIGGER donations_set_updated_at
 ALTER TABLE donations ADD COLUMN IF NOT EXISTS photo_url TEXT;
 ALTER TABLE donations ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;
 ALTER TABLE donations ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;
+
+-- Handover logistics: nullable until whichever side (donor or NGO) states
+-- it first — see the donation_logistics_mode comment above. logistics_note
+-- is free text for the specifics ("drop-off works after 6pm", "we have a
+-- van, can collect any morning").
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS logistics_mode donation_logistics_mode;
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS logistics_set_by user_role;
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS logistics_note TEXT;
 
 
 CREATE INDEX IF NOT EXISTS idx_donations_donor ON donations(donor_id);

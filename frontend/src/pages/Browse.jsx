@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, UtensilsCrossed, Shirt, BookOpen, PackageSearch, ArrowLeft, LocateFixed } from "lucide-react";
+import { MapPin, UtensilsCrossed, Shirt, BookOpen, PackageSearch, ArrowLeft, LocateFixed, Truck, HandHelping } from "lucide-react";
 import Logo from "../components/Logo";
 import { api } from "../lib/api";
 import "../styles/tokens.css";
@@ -13,6 +13,10 @@ const MOCK_DONATIONS = [
 ];
 
 const ICONS = { food: UtensilsCrossed, clothing: Shirt, supplies: BookOpen, other: PackageSearch };
+const LOGISTICS_BADGE = {
+  donor_drop: { label: "Drop-off offered", icon: HandHelping },
+  ngo_pickup: { label: "Pickup needed", icon: Truck },
+};
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "food", label: "Food" },
@@ -89,6 +93,7 @@ export default function Browse() {
         .nv-bcard .donor { font-size: 0.84rem; color: var(--ink-soft); margin-bottom: 10px; }
         .nv-bcard .place { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 10px; justify-content: space-between; }
         .nv-bcard .distance { font-weight: 600; color: var(--spark-deep); white-space: nowrap; }
+        .nv-bcard .logistics-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 600; color: var(--spark-deep); margin: 6px 0 0; }
         @media (max-width: 900px) { .nv-browse-grid { grid-template-columns: 1fr; } }
       `}</style>
 
@@ -126,6 +131,12 @@ export default function Browse() {
                 <span className="nv-pill spark">{d.status}</span>
                 <h4>{d.title}</h4>
                 <div className="donor">{d.donor}</div>
+                {d.logisticsMode && LOGISTICS_BADGE[d.logisticsMode] && (
+                  <div className="logistics-badge">
+                    {(() => { const Icon = LOGISTICS_BADGE[d.logisticsMode].icon; return <Icon size={12} />; })()}
+                    {LOGISTICS_BADGE[d.logisticsMode].label}
+                  </div>
+                )}
                 <div className="place">
                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}><MapPin size={12} /> {d.place}</span>
                   {d.distanceKm != null && <span className="distance">{d.distanceKm} km away</span>}

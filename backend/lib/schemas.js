@@ -62,6 +62,15 @@ export const resetPasswordSchema = z.object({
 const DONATION_CATEGORIES = ["food", "clothing", "supplies", "other"];
 const MAX_EXPIRY_MS = 1000 * 60 * 60 * 24 * 30; // 30 days out, generous ceiling for perishables
 
+// Who ends up moving the item. Nullable/optional everywhere it appears —
+// a donor can leave this open and let the claiming NGO decide instead.
+export const LOGISTICS_MODES = ["donor_drop", "ngo_pickup"];
+const logisticsMode = z
+  .enum(LOGISTICS_MODES, { errorMap: () => ({ message: "Handover must be either donor_drop or ngo_pickup." }) })
+  .optional()
+  .nullable();
+const logisticsNote = z.string().trim().max(300, "Keep the handover note under 300 characters.").optional().nullable();
+
 const latitude = z.coerce.number().min(-90).max(90).optional().nullable();
 const longitude = z.coerce.number().min(-180).max(180).optional().nullable();
 
@@ -91,11 +100,25 @@ export const createDonationSchema = z
       .nullable(),
     latitude,
     longitude,
+    // Optional at listing time — the donor can state how they'd like the
+    // handover to go, or leave it blank and let the claiming NGO propose
+    // it instead (see claimDonationSchema below).
+    logisticsMode,
+    logisticsNote,
   })
   .refine((data) => (data.latitude == null) === (data.longitude == null), {
     message: "Location needs both a latitude and a longitude.",
     path: ["longitude"],
   });
+
+// Body for POST /donations/:id/claim. Only meaningful when the donor left
+// the listing's handover unspecified — the route ignores these fields
+// otherwise, since a donor's stated preference isn't up for renegotiation
+// through this endpoint.
+export const claimDonationSchema = z.object({
+  logisticsMode,
+  logisticsNote,
+});
 
 // ---------------------------------------------------------------------------
 // NGO profile / verification (TODO sections 6-7, 9)

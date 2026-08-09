@@ -5,7 +5,7 @@ import { requireAdmin } from "../middleware/admin.js";
 import { validate, requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
 import { upload, fileUrlFor, handleUploadErrors } from "../lib/uploads.js";
-import { createDonationSchema, listDonationsQuerySchema } from "../lib/schemas.js";
+import { createDonationSchema, claimDonationSchema, listDonationsQuerySchema } from "../lib/schemas.js";
 import { advanceDonation, getDonationHistory, LifecycleError } from "../lib/lifecycle.js";
 
 const router = Router();
@@ -31,6 +31,12 @@ async function serialize(row) {
     photoUrl: row.photo_url,
     latitude: row.latitude != null ? Number(row.latitude) : null,
     longitude: row.longitude != null ? Number(row.longitude) : null,
+    // Handover logistics — null until either the donor (at listing time)
+    // or the claiming NGO (at claim time, if the donor left it open) states
+    // it. logisticsSetBy tells the UI whose call it was.
+    logisticsMode: row.logistics_mode,
+    logisticsSetBy: row.logistics_set_by,
+    logisticsNote: row.logistics_note,
     // Only present when the caller supplied their own lat/lng to GET
     // /donations (see the Haversine SELECT below) — undefined otherwise,
     // so it just disappears from the JSON rather than showing null noise.
@@ -188,14 +194,30 @@ router.get("/:id/history", requireIntParam(), async (req, res) => {
 
 router.post("/", writeLimiter, requireAuth, validate(createDonationSchema), async (req, res) => {
   if (req.userRole !== "donor") return res.status(403).json({ error: "Only givers can post a listing." });
-  const { title, category, quantity, description, place, expiresInMs, latitude, longitude } = req.body;
+  const { title, category, quantity, description, place, expiresInMs, latitude, longitude, logisticsMode, logisticsNote } = req.body;
 
+  // The donor is the first (and, for now, the deciding) voice on handover
+  // logistics if they say anything at all. Leaving it blank hands that
+  // decision to whichever NGO ends up claiming it — see POST /:id/claim.
   const expiresAt = expiresInMs ? new Date(Date.now() + expiresInMs).toISOString() : null;
   const inserted = await pool.query(
-    `INSERT INTO donations (donor_id, title, category, quantity, description, place, expires_at, latitude, longitude)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO donations (donor_id, title, category, quantity, description, place, expires_at, latitude, longitude, logistics_mode, logistics_set_by, logistics_note)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING *`,
-    [req.userId, title, category, quantity || null, description || null, place, expiresAt, latitude ?? null, longitude ?? null]
+    [
+      req.userId,
+      title,
+      category,
+      quantity || null,
+      description || null,
+      place,
+      expiresAt,
+      latitude ?? null,
+      longitude ?? null,
+      logisticsMode ?? null,
+      logisticsMode ? "donor" : null,
+      logisticsNote || null,
+    ]
   );
 
   await pool.query(
@@ -238,23 +260,46 @@ router.post(
   }
 );
 
-// listed -> claimed: an NGO commits to a listing.
-router.post("/:id/claim", writeLimiter, requireIntParam(), requireAuth, async (req, res) => {
-  if (req.userRole !== "ngo") return res.status(403).json({ error: "Only NGOs can claim a listing." });
+// listed -> claimed: an NGO commits to a listing. If the donor didn't
+// already say how the handover should go, the claiming NGO can say it here
+// instead — logisticsMode/logisticsNote in the body only take effect when
+// the listing doesn't have one set yet; a donor's stated preference is not
+// renegotiated through this endpoint.
+router.post(
+  "/:id/claim",
+  writeLimiter,
+  requireIntParam(),
+  requireAuth,
+  validate(claimDonationSchema),
+  async (req, res) => {
+    if (req.userRole !== "ngo") return res.status(403).json({ error: "Only NGOs can claim a listing." });
 
-  try {
-    const updated = await advanceDonation({
-      donationId: req.params.id,
-      toStatus: "claimed",
-      userId: req.userId,
-      action: "donation_claimed",
-      setColumns: { claimed_by: req.userId },
-    });
-    res.json({ donation: await serialize(updated) });
-  } catch (err) {
-    handleLifecycleError(err, res);
+    const existing = await pool.query("SELECT * FROM donations WHERE id = $1", [req.params.id]);
+    const row = existing.rows[0];
+    if (!row) return res.status(404).json({ error: "That listing could not be found." });
+
+    const { logisticsMode, logisticsNote } = req.body;
+    const setColumns = { claimed_by: req.userId };
+    if (row.logistics_mode == null && logisticsMode) {
+      setColumns.logistics_mode = logisticsMode;
+      setColumns.logistics_set_by = "ngo";
+      if (logisticsNote) setColumns.logistics_note = logisticsNote;
+    }
+
+    try {
+      const updated = await advanceDonation({
+        donationId: req.params.id,
+        toStatus: "claimed",
+        userId: req.userId,
+        action: "donation_claimed",
+        setColumns,
+      });
+      res.json({ donation: await serialize(updated) });
+    } catch (err) {
+      handleLifecycleError(err, res);
+    }
   }
-});
+);
 
 // claimed -> accepted: the giver confirms this NGO's claim (pickup details
 // agreed). Only the giver who posted it can do this.

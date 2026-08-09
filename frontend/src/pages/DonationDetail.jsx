@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft, MapPin, User, HeartHandshake, Gift, Handshake, Truck,
-  PackageCheck, BadgeCheck, ClipboardCheck, FileCheck2, CircleCheck, Sparkles,
+  PackageCheck, BadgeCheck, ClipboardCheck, FileCheck2, CircleCheck, Sparkles, HandHelping,
 } from "lucide-react";
 import Logo from "../components/Logo";
 import DonationVault from "../components/DonationVault";
@@ -42,6 +42,12 @@ const MOCK = {
     acknowledgedAt: null, impactRecordedAt: null, documentationCompleteAt: null, closedAt: null,
   },
 };
+
+const LOGISTICS_LABEL = {
+  donor_drop: "The giver will drop this off",
+  ngo_pickup: "The NGO will pick this up",
+};
+const LOGISTICS_SET_BY_LABEL = { donor: "the giver", ngo: "the claiming NGO" };
 
 function formatWhen(iso) {
   if (!iso) return null;
@@ -106,7 +112,11 @@ function nextAction({ donation, user }) {
 
   switch (donation.status) {
     case "listed":
-      if (user.role === "ngo" && !isDonor) {
+      // When the donor already said how the handover should go, claiming
+      // is a single button. When they left it open, DonationDetail renders
+      // a two-way choice instead (see needsLogisticsChoice below) so the
+      // NGO is the one who ends up stating it.
+      if (user.role === "ngo" && !isDonor && donation.logisticsMode) {
         return { label: "I can put this to use", call: (id) => api.claimDonation(id) };
       }
       return null;
@@ -148,12 +158,30 @@ export default function DonationDetail() {
   const canUploadDocuments = isDonor || isClaimingNgo;
   const canLogImpact = isClaimingNgo && ["delivered", "acknowledged"].includes(donation.status);
 
+  // The donor left handover open at listing time, so the claiming NGO is
+  // the one who states it, right as they claim.
+  const needsLogisticsChoice =
+    donation.status === "listed" && !!user && user.role === "ngo" && !isDonor && !donation.logisticsMode;
+
   const onAction = async () => {
     if (!action) return;
     setActing(true);
     setActionError("");
     try {
       const res = await action.call(id);
+      if (res?.donation) setDonation(res.donation);
+    } catch (err) {
+      setActionError(err?.message || "That didn't go through. Please try again.");
+    } finally {
+      setActing(false);
+    }
+  };
+
+  const onClaimWithLogistics = async (logisticsMode) => {
+    setActing(true);
+    setActionError("");
+    try {
+      const res = await api.claimDonation(id, { logisticsMode });
       if (res?.donation) setDonation(res.donation);
     } catch (err) {
       setActionError(err?.message || "That didn't go through. Please try again.");
@@ -241,13 +269,38 @@ export default function DonationDetail() {
         <div className="nv-detail-meta">
           <span><User size={14} /> {donation.donor}</span>
           <span><MapPin size={14} /> {donation.place}{donation.distanceKm != null ? ` · ${donation.distanceKm} km away` : ""}</span>
+          {donation.logisticsMode && (
+            <span>
+              {donation.logisticsMode === "ngo_pickup" ? <Truck size={14} /> : <HandHelping size={14} />}
+              {LOGISTICS_LABEL[donation.logisticsMode]}
+              {donation.logisticsSetBy ? ` (${LOGISTICS_SET_BY_LABEL[donation.logisticsSetBy]} said so)` : ""}
+            </span>
+          )}
         </div>
         <p className="nv-detail-desc">{donation.description}</p>
+        {donation.logisticsNote && (
+          <p className="nv-detail-desc" style={{ marginTop: "-1.4rem", fontStyle: "italic", color: "var(--ink-soft)" }}>
+            "{donation.logisticsNote}"
+          </p>
+        )}
 
         {donation.status === "closed" ? (
           <div className="nv-panel" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(13,148,136,0.1)", borderColor: "rgba(13,148,136,0.3)" }}>
             <CircleCheck size={18} color="var(--sage-deep)" />
             <span style={{ color: "var(--sage-deep)", fontWeight: 600 }}>This circle is closed.</span>
+          </div>
+        ) : needsLogisticsChoice ? (
+          <div>
+            <p className="sub" style={{ margin: "0 0 10px" }}>The giver didn't say how they'd like this handed over — you get to call it.</p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button className="nv-btn sage" disabled={acting} onClick={() => onClaimWithLogistics("ngo_pickup")}>
+                <Truck size={15} /> {acting ? "Working..." : "We'll pick it up"}
+              </button>
+              <button className="nv-btn sage" disabled={acting} onClick={() => onClaimWithLogistics("donor_drop")}>
+                <HandHelping size={15} /> {acting ? "Working..." : "Ask them to drop it off"}
+              </button>
+            </div>
+            {actionError && <div className="nv-detail-error">{actionError}</div>}
           </div>
         ) : action ? (
           <div>

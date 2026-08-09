@@ -10,6 +10,7 @@ const MOCK_CLAIMED = [
 ];
 
 const ICONS = { food: UtensilsCrossed, clothing: Shirt, supplies: BookOpen };
+const LOGISTICS_TAG = { donor_drop: "giver drops off", ngo_pickup: "we pick up" };
 
 const STATUS_LABEL = {
   claimed: "Awaiting acceptance", accepted: "Ready for pickup", pickup: "Picked up",
@@ -118,7 +119,9 @@ export default function ClaimedByUs() {
                 <div className="nv-row-icon sage">{c.photoUrl ? <img src={c.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }} /> : <Icon size={19} />}</div>
                 <div className="nv-row-body">
                   <div className="nv-row-title">{c.title}</div>
-                  <div className="nv-row-sub">{c.place}{c.donor ? ` · from ${c.donor}` : ""}</div>
+                  <div className="nv-row-sub">
+                    {c.place}{c.donor ? ` · from ${c.donor}` : ""}{LOGISTICS_TAG[c.logisticsMode] ? ` · ${LOGISTICS_TAG[c.logisticsMode]}` : ""}
+                  </div>
                 </div>
                 <span className={`nv-row-status ${STATUS_STYLE_CLASS[c.status] || "claimed"}`}>{STATUS_LABEL[c.status] || c.status}</span>
               </Link>

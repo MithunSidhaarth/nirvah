@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PackagePlus, CheckCircle2, ImagePlus, MapPinned, X } from "lucide-react";
+import { PackagePlus, CheckCircle2, ImagePlus, MapPinned, X, Truck, HandHelping, HelpCircle } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import { api } from "../lib/api";
+
+// Who ends up moving the item. Leaving it as "" keeps the listing open —
+// the claiming NGO gets asked the same question when they claim (see
+// DonationDetail.jsx) instead of the donor deciding for them.
+const LOGISTICS_OPTIONS = [
+  { value: "", label: "Not sure yet", icon: HelpCircle, hint: "Let the NGO propose it when they claim" },
+  { value: "donor_drop", label: "I can drop it off", icon: HandHelping, hint: "You'll bring it to the NGO" },
+  { value: "ngo_pickup", label: "I need it picked up", icon: Truck, hint: "The NGO collects it from you" },
+];
 
 export default function NewListing() {
   const navigate = useNavigate();
@@ -13,6 +22,8 @@ export default function NewListing() {
     place: "",
     description: "",
     expiresInHours: "",
+    logisticsMode: "",
+    logisticsNote: "",
   });
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -69,6 +80,8 @@ export default function NewListing() {
         expiresInMs: form.expiresInHours ? Number(form.expiresInHours) * 3600 * 1000 : null,
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
+        logisticsMode: form.logisticsMode || null,
+        logisticsNote: form.logisticsMode ? form.logisticsNote || null : null,
       });
       const newId = res?.donation?.id;
       if (newId && photo) {
@@ -178,6 +191,58 @@ export default function NewListing() {
                 <label htmlFor="description">Description</label>
                 <input id="description" name="description" value={form.description} onChange={onChange} placeholder="Anything an NGO should know before they claim it" />
               </div>
+
+              <div className="nv-field full">
+                <label>How should this change hands?</label>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+                  {LOGISTICS_OPTIONS.map((opt) => {
+                    const Icon = opt.icon;
+                    const active = form.logisticsMode === opt.value;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.value || "unset"}
+                        onClick={() => setForm((f) => ({ ...f, logisticsMode: opt.value }))}
+                        className="nv-btn ghost-light sm"
+                        style={{
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          gap: 4,
+                          height: "auto",
+                          padding: "10px 12px",
+                          borderColor: active ? "var(--spark-deep)" : undefined,
+                          background: active ? "rgba(52,211,153,0.1)" : undefined,
+                        }}
+                      >
+                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+                          <Icon size={15} /> {opt.label}
+                        </span>
+                        <span className="hint" style={{ margin: 0, textAlign: "left" }}>{opt.hint}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="hint">
+                  If you're not sure, the NGO that claims it can offer to pick it up instead.
+                </div>
+              </div>
+
+              {form.logisticsMode && (
+                <div className="nv-field full">
+                  <label htmlFor="logisticsNote">Handover details (optional)</label>
+                  <input
+                    id="logisticsNote"
+                    name="logisticsNote"
+                    value={form.logisticsNote}
+                    onChange={onChange}
+                    placeholder={
+                      form.logisticsMode === "donor_drop"
+                        ? "For example, I can drop it off between 6-8pm"
+                        : "For example, easiest to collect any morning before 11"
+                    }
+                  />
+                </div>
+              )}
             </div>
             <button type="submit" className="nv-btn spark" disabled={submitting} style={{ marginTop: "0.6rem" }}>
               <PackagePlus size={17} /> {submitting ? "Giving..." : "Give it"}

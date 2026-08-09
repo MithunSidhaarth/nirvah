@@ -114,7 +114,10 @@ export const api = {
     formData.append("photo", file);
     return requestForm(`/donations/${donationId}/photo`, { formData });
   },
-  claimDonation: (id) => request(`/donations/${id}/claim`, { method: "POST" }),
+  // payload is optional — only meaningful when the listing doesn't already
+  // have a handover preference from the donor. See NewListing.jsx for the
+  // donor side and DonationDetail.jsx for this side.
+  claimDonation: (id, payload) => request(`/donations/${id}/claim`, { method: "POST", body: payload }),
   acceptDonation: (id) => request(`/donations/${id}/accept`, { method: "POST" }),
   pickupDonation: (id) => request(`/donations/${id}/pickup`, { method: "POST" }),
   completeDonation: (id) => request(`/donations/${id}/complete`, { method: "POST" }),
