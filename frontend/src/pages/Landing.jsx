@@ -950,17 +950,17 @@ export default function Landing() {
 
             <div className="nv-ops-side">
               <div className="nv-ops-stat">
-                <Zap size={16} />
+                <ShieldCheck size={16} />
                 <div>
-                  <div className="num font-mono">18 min</div>
-                  <div className="lbl">avg. time someone waits</div>
+                  <div className="num font-mono">Verified</div>
+                  <div className="lbl">every NGO checked before going live</div>
                 </div>
               </div>
               <div className="nv-ops-stat">
-                <ShieldCheck size={16} />
+                <Zap size={16} />
                 <div>
-                  <div className="num font-mono">340+</div>
-                  <div className="lbl">verified NGOs on the ground</div>
+                  <div className="num font-mono">Real-time</div>
+                  <div className="lbl">matched with nearby NGOs as you list</div>
                 </div>
               </div>
               <div className="nv-ops-chart">
@@ -1092,9 +1092,9 @@ export default function Landing() {
         </motion.div>
         <motion.div className="nv-notes-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={staggerParent}>
           {[
-            { initials: "SJ", quote: "I listed our restaurant's evening surplus at 9pm and it was claimed before we had finished closing up. Genuinely did not expect it to be that fast.", who: "Sarah Johnson", role: "Giver, Bengaluru", rotate: 0.8 },
-            { initials: "MB", quote: "We used to spend hours cold calling donors. Now listings come to us, sorted by distance, the moment they go up.", who: "Michael Brown", role: "NGO Coordinator, Asha Foundation", rotate: -0.6 },
-            { initials: "LM", quote: "The countdown on perishable listings changed everything for us. We know exactly what needs picking up first.", who: "Lisa Miller", role: "Volunteer Lead", rotate: -0.3 },
+            { initials: "AR", quote: "Listed the leftover biryani from our Koramangala kitchen at 10pm — gone before our Swiggy riders had even clocked out for the night.", who: "Arjun Rao", role: "Giver, Koramangala", rotate: 0.8 },
+            { initials: "DP", quote: "Bangalore traffic used to mean the food went cold before we reached. Now listings near HSR and Indiranagar come straight to us, sorted by distance.", who: "Deepika Prasad", role: "NGO Coordinator, Asha Foundation", rotate: -0.6 },
+            { initials: "KV", quote: "Between the monsoon and the ORR jams, the countdown on perishable listings is the only reason we haven't lost a single meal this season.", who: "Karthik Venkatesh", role: "Volunteer Lead, Whitefield", rotate: -0.3 },
           ].map((t) => (
             <motion.div
               key={t.who}

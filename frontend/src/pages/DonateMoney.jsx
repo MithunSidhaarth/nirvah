@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, MapPin, Landmark, QrCode, Copy, Check, ArrowRight,
-  Mail, ExternalLink, HeartHandshake, Upload, ReceiptText, Loader2,
+  Mail, ExternalLink, HeartHandshake, Upload, ReceiptText, Loader2, X,
 } from "lucide-react";
 import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
@@ -43,8 +43,23 @@ function CopyField({ label, value }) {
   );
 }
 
+function QrModal({ url, name, onClose }) {
+  return (
+    <div className="dm-qr-modal-backdrop" onClick={onClose}>
+      <div className="dm-qr-modal" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="dm-qr-modal-close" onClick={onClose} aria-label="Close">
+          <X size={18} />
+        </button>
+        <img src={url} alt={`${name} payment QR code`} />
+        <p>{name}'s payment QR</p>
+      </div>
+    </div>
+  );
+}
+
 function NgoCard({ ngo }) {
   const displayName = ngo.org || ngo.name;
+  const [qrOpen, setQrOpen] = useState(false);
 
   return (
     <Reveal className="dm-card">
@@ -55,7 +70,9 @@ function NgoCard({ ngo }) {
           {ngo.cause && <p className="dm-cause">{ngo.cause}</p>}
         </div>
         {ngo.qrCodeUrl && (
-          <img src={ngo.qrCodeUrl} alt={`${displayName} payment QR code`} className="dm-qr" />
+          <button type="button" className="dm-qr-btn" onClick={() => setQrOpen(true)}>
+            <QrCode size={14} /> View QR
+          </button>
         )}
       </div>
 
@@ -84,6 +101,8 @@ function NgoCard({ ngo }) {
           See their impact page & photos <ArrowRight size={13} />
         </Link>
       </div>
+
+      {qrOpen && <QrModal url={ngo.qrCodeUrl} name={displayName} onClose={() => setQrOpen(false)} />}
     </Reveal>
   );
 }
@@ -222,6 +241,14 @@ export default function DonateMoney() {
         .dm-card h3 { font-family: 'Fraunces', serif; font-size: 1.2rem; margin: 0; }
         .dm-cause { color: var(--ink-soft); font-size: 0.9rem; margin: 0.3rem 0 0; }
         .dm-qr { width: 76px; height: 76px; object-fit: contain; background: #fff; border-radius: 10px; border: 1px solid var(--line); flex-shrink: 0; }
+        .dm-qr-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 76px; height: 76px; flex-shrink: 0; background: var(--parchment-2); border: 1px solid var(--line); border-radius: 10px; color: var(--sage-deep); font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .dm-qr-btn:hover { border-color: var(--sage-deep); background: rgba(13,148,136,0.08); }
+        .dm-qr-modal-backdrop { position: fixed; inset: 0; background: rgba(6,35,26,0.72); display: grid; place-items: center; z-index: 200; padding: 1.5rem; }
+        .dm-qr-modal { position: relative; background: #fff; border-radius: var(--radius-md); padding: 1.8rem; max-width: 320px; width: 100%; text-align: center; box-shadow: var(--shadow-soft); }
+        .dm-qr-modal img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; }
+        .dm-qr-modal p { margin: 0.9rem 0 0; font-size: 0.9rem; color: var(--ink-soft); }
+        .dm-qr-modal-close { position: absolute; top: 10px; right: 10px; background: var(--parchment-2); border: none; border-radius: 999px; width: 30px; height: 30px; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+        .dm-qr-modal-close:hover { background: var(--line); }
 
         .dm-meta { display: flex; align-items: center; gap: 6px; color: var(--ink-soft); font-size: 0.84rem; }
 
