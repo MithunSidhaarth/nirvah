@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ArrowRight, Mail, Phone, MapPin } from "lucide-react";
+import { Menu, X, ArrowRight, Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "./Logo";
 import Magnetic from "./motion/Magnetic";
@@ -85,17 +85,24 @@ export function PageNav({ active }) {
   );
 }
 
+const FOUNDERS = [
+  { name: "Mithun Sidhaarth", href: "https://mithunsidhaarth.in", icon: Globe },
+  { name: "Nidhi Sahare", href: "https://www.linkedin.com/in/nidhi-sahare-6688a8331", icon: Linkedin },
+  { name: "Pramish Bhusal", href: "https://www.linkedin.com/in/pramish-bhusal-36397b39a/", icon: Linkedin },
+];
+
 export function PageFooter() {
   return (
     <footer className="nv-footer" id="footer">
       <style>{`
         .nv-footer { background: var(--char); color: var(--parchment); padding: 5rem 6vw 2.4rem; }
-        .nv-footer-grid { max-width: 1080px; margin: 0 auto 3rem; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 3rem; }
+        .nv-footer-grid { max-width: 1200px; margin: 0 auto 3rem; display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 3rem; }
         .nv-footer h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.1rem; }
         .nv-footer a, .nv-footer .line { display: flex; align-items: center; gap: 8px; color: #BFE3D3; text-decoration: none; font-size: 0.92rem; margin-bottom: 10px; }
         .nv-footer a:hover { color: var(--gold); }
-        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #84BEA2; font-family: 'IBM Plex Mono', monospace; }
-        @media (max-width: 720px) { .nv-footer-grid { grid-template-columns: 1fr; gap: 2.2rem; } }
+        .nv-footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #84BEA2; font-family: 'IBM Plex Mono', monospace; }
+        @media (max-width: 900px) { .nv-footer-grid { grid-template-columns: 1fr 1fr; gap: 2.2rem; } }
+        @media (max-width: 560px) { .nv-footer-grid { grid-template-columns: 1fr; } }
       `}</style>
       <div className="nv-footer-grid">
         <div>
@@ -110,8 +117,8 @@ export function PageFooter() {
         </div>
         <div>
           <h5>Contact</h5>
-          <a href="mailto:hello@nirvah.org"><Mail size={14} /> hello@nirvah.org</a>
-          <a href="tel:+919987654321"><Phone size={14} /> +91 99876 54321</a>
+          <a href="mailto:hello.nirvah@gmail.com"><Mail size={14} /> hello.nirvah@gmail.com</a>
+          <a href="tel:+917619249879"><Phone size={14} /> +91 76192 49879</a>
           <div className="line"><MapPin size={14} /> Bengaluru, India</div>
         </div>
         <div>
@@ -120,6 +127,14 @@ export function PageFooter() {
           <Link to="/browse">Explore donations</Link>
           <Link to="/for-ngos">For NGOs</Link>
           <Link to="/contact">Contact</Link>
+        </div>
+        <div>
+          <h5>Founders</h5>
+          {FOUNDERS.map((f) => (
+            <a key={f.name} href={f.href} target="_blank" rel="noopener noreferrer">
+              <f.icon size={14} /> {f.name}
+            </a>
+          ))}
         </div>
       </div>
       <div className="nv-footer-bottom">

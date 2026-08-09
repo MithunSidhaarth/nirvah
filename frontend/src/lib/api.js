@@ -140,6 +140,9 @@ export const api = {
   updateProfile: (payload) => request("/settings/profile", { method: "PATCH", body: payload }),
   changePassword: (payload) => request("/settings/password", { method: "POST", body: payload }),
 
+  // ---- contact ----
+  sendContactMessage: (payload) => request("/contact", { method: "POST", body: payload, auth: false }),
+
   // ---- ngo team ----
   listTeam: () => request("/ngos/me/team"),
   addTeamMember: (payload) => request("/ngos/me/team", { method: "POST", body: payload }),

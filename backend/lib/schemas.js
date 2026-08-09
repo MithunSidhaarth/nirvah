@@ -240,6 +240,30 @@ export const changePasswordSchema = z
 // NGO team members
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Public contact form
+// ---------------------------------------------------------------------------
+
+export const contactMessageSchema = z.object({
+  name: z
+    .string({ required_error: "Please enter your name." })
+    .trim()
+    .min(1, "Please enter your name.")
+    .max(200, "That name is too long."),
+  email,
+  reason: z
+    .string()
+    .trim()
+    .max(120, "That reason is too long.")
+    .optional()
+    .default("General question"),
+  message: z
+    .string({ required_error: "Please enter a message." })
+    .trim()
+    .min(1, "Please enter a message.")
+    .max(5000, "That message is too long."),
+});
+
 export const addTeamMemberSchema = z.object({
   name: z
     .string({ required_error: "Please enter their name." })

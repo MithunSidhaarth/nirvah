@@ -21,6 +21,7 @@ import teamRoutes from "./routes/team.js";
 import adminRoutes from "./routes/admin.js";
 import adminUsersRoutes from "./routes/adminUsers.js";
 import siteSettingsRoutes from "./routes/siteSettings.js";
+import contactRoutes from "./routes/contact.js";
 import { generalLimiter } from "./middleware/rateLimit.js";
 import { UPLOAD_DIR } from "./lib/uploads.js";
 
@@ -89,6 +90,7 @@ app.use("/api/admin", adminRoutes);
 // their own sub-paths, mounted at /api/admin so they sit alongside admin.js.
 app.use("/api/admin", adminUsersRoutes);
 app.use("/api/admin", siteSettingsRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Uploaded documents/photos. Local disk today (see lib/uploads.js); swap
 // this for a signed-URL redirect to S3/Cloudinary later without touching

@@ -7,8 +7,6 @@ import {
   Radar,
   HeartHandshake,
   ArrowRight,
-  Mail,
-  Phone,
   Menu,
   X,
   UtensilsCrossed,
@@ -30,6 +28,7 @@ import {
 } from "lucide-react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
+import { PageFooter } from "../components/PageChrome";
 import Magnetic from "../components/motion/Magnetic";
 import CountUp from "../components/motion/CountUp";
 import Marquee from "../components/motion/Marquee";
@@ -686,13 +685,6 @@ export default function Landing() {
         .nv-banner p { color: rgba(6,35,26,0.72); font-size: 1.05rem; margin-bottom: 2.2rem; }
         .nv-banner .nv-btn.spark { background: var(--char); box-shadow: 0 14px 30px rgba(0,0,0,0.25); }
 
-        .nv-footer { background: var(--char); color: var(--parchment); padding: 5rem 6vw 2.4rem; }
-        .nv-footer-grid { max-width: 1080px; margin: 0 auto 3rem; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 3rem; }
-        .nv-footer h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.1rem; }
-        .nv-footer a, .nv-footer .line { display: flex; align-items: center; gap: 8px; color: #BFE3D3; text-decoration: none; font-size: 0.92rem; margin-bottom: 10px; }
-        .nv-footer a:hover { color: var(--gold); }
-        .nv-footer-bottom { max-width: 1080px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: #84BEA2; font-family: 'IBM Plex Mono', monospace; }
-
         @media (max-width: 900px) {
           .nv-stats-grid { grid-template-columns: 1fr; gap: 2.2rem; }
           .nv-legs-connector { display: none; }
@@ -701,7 +693,6 @@ export default function Landing() {
           .nv-returns-grid { grid-template-columns: 1fr; }
           .nv-split { grid-template-columns: 1fr; }
           .nv-notes-grid { grid-template-columns: 1fr; }
-          .nv-footer-grid { grid-template-columns: 1fr; gap: 2.2rem; }
         }
         @media (prefers-reduced-motion: reduce) {
           .nv-mesh, .nv-hero-spotlight { display: none; }
@@ -1176,38 +1167,7 @@ export default function Landing() {
       </section>
 
       {/* ---------- FOOTER ---------- */}
-      <footer className="nv-footer" id="footer">
-        <div className="nv-footer-grid">
-          <div>
-            <div className="nv-brand" style={{ marginBottom: "1rem" }}>
-              <Logo size={30} />
-              Nirvah
-            </div>
-            <p style={{ color: "#8FCDB2", fontSize: "0.92rem", lineHeight: 1.6, maxWidth: 320 }}>
-              A network connecting givers and NGOs, so surplus finds its way to
-              someone who needs it instead of a bin.
-            </p>
-          </div>
-          <div>
-            <h5>Contact</h5>
-            <a href="mailto:hello@nirvah.org"><Mail size={14} /> hello@nirvah.org</a>
-            <a href="tel:+919987654321"><Phone size={14} /> +91 99876 54321</a>
-            <div className="line"><MapPin size={14} /> Bengaluru, India</div>
-          </div>
-          <div>
-            <h5>Quick links</h5>
-            <Link to="/how-it-works">How it works</Link>
-            <Link to="/browse">Explore donations</Link>
-            <Link to="/for-ngos">For NGOs</Link>
-            <Link to="/contact">Contact</Link>
-            <Link to="/login">Log in or register</Link>
-          </div>
-        </div>
-        <div className="nv-footer-bottom">
-          <span>2026 Nirvah. Made for the cause. Free, always.</span>
-          <span>Terms and Privacy</span>
-        </div>
-      </footer>
+      <PageFooter />
     </div>
   );
 }

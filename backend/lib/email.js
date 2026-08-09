@@ -8,13 +8,14 @@
  * Every route in this app calls sendEmail(...) the same way regardless of
  * which path runs, so nothing else needs to change once Resend is wired up.
  */
-export async function sendEmail({ to, subject, text, html }) {
+export async function sendEmail({ to, subject, text, html, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
 
   if (!apiKey || !from) {
     console.log("\n---- EMAIL (dev stub — set RESEND_API_KEY + EMAIL_FROM to send for real) ----");
     console.log("To:     ", to);
+    if (replyTo) console.log("Reply-To:", replyTo);
     console.log("Subject:", subject);
     console.log(text);
     console.log("---- END EMAIL ----\n");
@@ -33,6 +34,7 @@ export async function sendEmail({ to, subject, text, html }) {
       subject,
       text,
       html: html || undefined,
+      reply_to: replyTo || undefined,
     }),
   });
 

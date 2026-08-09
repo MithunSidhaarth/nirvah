@@ -8,6 +8,7 @@ import {
 import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
 import Magnetic from "../components/motion/Magnetic";
+import { api } from "../lib/api";
 import "../styles/tokens.css";
 import "../styles/auth.css";
 
@@ -18,8 +19,8 @@ const fadeUp = {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 const CONTACT_CARDS = [
-  { icon: Mail, title: "Email", value: "hello@nirvah.org", href: "mailto:hello@nirvah.org", note: "Best for detailed questions — usually a reply within a day." },
-  { icon: Phone, title: "Phone", value: "+91 99876 54321", href: "tel:+919987654321", note: "Weekdays, 10am – 6pm IST, for anything time-sensitive." },
+  { icon: Mail, title: "Email", value: "hello.nirvah@gmail.com", href: "mailto:hello.nirvah@gmail.com", note: "Best for detailed questions — usually a reply within a few hours." },
+  { icon: Phone, title: "Phone", value: "+91 76192 49879", href: "tel:+917619249879", note: "Weekdays, 10am – 6pm IST, for anything time-sensitive." },
   { icon: MapPin, title: "Based in", value: "Bengaluru, India", href: null, note: "Serving givers and NGOs across the city and beyond." },
 ];
 
@@ -32,21 +33,32 @@ const REASONS = [
 
 const FAQ = [
   { q: "I run an NGO — should I use this form or just register?", a: "If you're ready to go, registering directly is faster — you'll hear back in one to two business days. Use this form only if you have a question first." },
-  { q: "How quickly will I hear back?", a: "Email replies typically land within a day. Anything marked urgent (a safety issue, a listing gone wrong) gets picked up same-day." },
+  { q: "How quickly will I hear back?", a: "Email replies typically land within a few hours. Anything marked urgent (a safety issue, a listing gone wrong) gets picked up same-day." },
   { q: "Can I suggest a feature or report a bug?", a: "Yes — that's exactly what the \"Report an issue\" option is for. Screenshots and steps to reproduce help a lot if it's a bug." },
 ];
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", reason: "General question", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+    try {
+      await api.sendContactMessage(form);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err?.message || "Couldn't send your message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -136,6 +148,7 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
+              {error && <div className="nv-auth-error" style={{ marginBottom: "1.2rem" }}>{error}</div>}
               <div className="ct-reasons">
                 {REASONS.map((r) => (
                   <button
@@ -172,8 +185,8 @@ export default function Contact() {
               </div>
 
               <Magnetic strength={0.3}>
-                <button type="submit" className="nv-btn spark" style={{ border: "none", width: "100%", justifyContent: "center" }}>
-                  Send message <Send size={16} />
+                <button type="submit" className="nv-btn spark" disabled={submitting} style={{ border: "none", width: "100%", justifyContent: "center" }}>
+                  {submitting ? "Sending..." : "Send message"} <Send size={16} />
                 </button>
               </Magnetic>
             </form>
@@ -184,7 +197,7 @@ export default function Contact() {
           <h3 className="font-display">Before you write in</h3>
           <div className="ct-side-row">
             <Clock3 size={16} />
-            <span className="t">Most emails get a reply within one business day.</span>
+            <span className="t">Most emails get a reply within a few hours.</span>
           </div>
           <div className="ct-side-row">
             <Building2 size={16} />
