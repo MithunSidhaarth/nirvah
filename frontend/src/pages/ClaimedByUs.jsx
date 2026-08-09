@@ -115,7 +115,7 @@ export default function ClaimedByUs() {
             const Icon = ICONS[c.category] || Compass;
             return (
               <Link to={`/browse/${c.id}`} className="nv-row" key={c.id} style={{ textDecoration: "none", color: "inherit" }}>
-                <div className="nv-row-icon sage"><Icon size={19} /></div>
+                <div className="nv-row-icon sage">{c.photoUrl ? <img src={c.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }} /> : <Icon size={19} />}</div>
                 <div className="nv-row-body">
                   <div className="nv-row-title">{c.title}</div>
                   <div className="nv-row-sub">{c.place}{c.donor ? ` · from ${c.donor}` : ""}</div>

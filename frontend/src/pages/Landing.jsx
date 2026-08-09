@@ -117,7 +117,25 @@ function SplitHeadline({ text, className = "", delayStart = 0 }) {
       variants={{ show: { transition: { staggerChildren: 0.055, delayChildren: delayStart } } }}
     >
       {words.map((w, i) => (
-        <span key={i} style={{ display: "inline-block", overflow: "hidden", verticalAlign: "top" }}>
+        <span
+          key={i}
+          style={{
+            display: "inline-block",
+            overflow: "hidden",
+            verticalAlign: "top",
+            // Buffer room inside the clipped box for descenders (g, y) and
+            // tall ascenders in Fraunces, which the h1's tight line-height
+            // (1.05, set for multi-line headline spacing) doesn't leave
+            // room for on its own — without this, overflow: hidden here
+            // (needed for the slide-up reveal) silently crops the bottom
+            // of letters like the "g" in "good" and "going". The negative
+            // margin cancels the added height back out so it doesn't
+            // introduce extra gap in the headline.
+            lineHeight: 1.25,
+            paddingBottom: "0.14em",
+            marginBottom: "-0.14em",
+          }}
+        >
           <motion.span variants={wordVariant} style={{ display: "inline-block" }}>
             {w}
             {i < words.length - 1 ? "\u00A0" : ""}
@@ -454,7 +472,7 @@ export default function Landing() {
         @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.55);} 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0);} 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0);} }
         .nv-hero h1 {
           font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(2.6rem, 5.4vw, 4.6rem);
-          line-height: 1.05; color: var(--parchment); letter-spacing: -0.01em; margin: 0 0 1.6rem;
+          line-height: 1.15; color: var(--parchment); letter-spacing: -0.01em; margin: 0 0 1.6rem;
         }
         .nv-hero h1 em {
           font-style: italic; font-weight: 500;

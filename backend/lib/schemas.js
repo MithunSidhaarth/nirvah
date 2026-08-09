@@ -62,30 +62,40 @@ export const resetPasswordSchema = z.object({
 const DONATION_CATEGORIES = ["food", "clothing", "supplies", "other"];
 const MAX_EXPIRY_MS = 1000 * 60 * 60 * 24 * 30; // 30 days out, generous ceiling for perishables
 
-export const createDonationSchema = z.object({
-  title: z
-    .string({ required_error: "Please fill in the required fields." })
-    .trim()
-    .min(1, "Please fill in the required fields.")
-    .max(200, "That title is too long."),
-  category: z.enum(DONATION_CATEGORIES, {
-    errorMap: () => ({ message: "Please choose a valid category." }),
-  }),
-  quantity: z.string().trim().max(200, "That quantity is too long.").optional().nullable(),
-  description: z.string().trim().max(2000, "That description is too long.").optional().nullable(),
-  place: z
-    .string({ required_error: "Please fill in the required fields." })
-    .trim()
-    .min(1, "Please fill in the required fields.")
-    .max(200, "That location is too long."),
-  expiresInMs: z
-    .number()
-    .int()
-    .positive("Expiry must be a positive duration.")
-    .max(MAX_EXPIRY_MS, "Expiry can't be more than 30 days out.")
-    .optional()
-    .nullable(),
-});
+const latitude = z.coerce.number().min(-90).max(90).optional().nullable();
+const longitude = z.coerce.number().min(-180).max(180).optional().nullable();
+
+export const createDonationSchema = z
+  .object({
+    title: z
+      .string({ required_error: "Please fill in the required fields." })
+      .trim()
+      .min(1, "Please fill in the required fields.")
+      .max(200, "That title is too long."),
+    category: z.enum(DONATION_CATEGORIES, {
+      errorMap: () => ({ message: "Please choose a valid category." }),
+    }),
+    quantity: z.string().trim().max(200, "That quantity is too long.").optional().nullable(),
+    description: z.string().trim().max(2000, "That description is too long.").optional().nullable(),
+    place: z
+      .string({ required_error: "Please fill in the required fields." })
+      .trim()
+      .min(1, "Please fill in the required fields.")
+      .max(200, "That location is too long."),
+    expiresInMs: z
+      .number()
+      .int()
+      .positive("Expiry must be a positive duration.")
+      .max(MAX_EXPIRY_MS, "Expiry can't be more than 30 days out.")
+      .optional()
+      .nullable(),
+    latitude,
+    longitude,
+  })
+  .refine((data) => (data.latitude == null) === (data.longitude == null), {
+    message: "Location needs both a latitude and a longitude.",
+    path: ["longitude"],
+  });
 
 // ---------------------------------------------------------------------------
 // NGO profile / verification (TODO sections 6-7, 9)
@@ -171,6 +181,12 @@ export const listDonationsQuerySchema = z.object({
       "closed",
     ])
     .optional(),
+  // Viewer's own coordinates (browser geolocation — see Browse.jsx's "Near
+  // me" toggle). Present together, GET /donations sorts by distance and
+  // every listing that itself has a latitude/longitude gets a distanceKm
+  // in the response; listings without coordinates just sort to the end.
+  lat: latitude,
+  lng: longitude,
 });
 
 // ---------------------------------------------------------------------------

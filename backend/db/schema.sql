@@ -168,6 +168,20 @@ CREATE TABLE IF NOT EXISTS donations (
   place TEXT NOT NULL,
   status donation_status NOT NULL DEFAULT 'listed',
 
+  -- photo_url: set via POST /donations/:id/photo after the listing is
+  -- created (same "create text first, attach the file after" pattern as
+  -- ngo/donation documents in lib/uploads.js). Nullable — a listing without
+  -- a photo is still valid.
+  photo_url TEXT,
+
+  -- latitude/longitude: captured client-side (browser geolocation, see
+  -- NewListing.jsx) at listing time, nullable since a donor can decline
+  -- location access and just type a place name. Distance-based sorting on
+  -- GET /donations only kicks in when both the listing and the viewer have
+  -- coordinates — see the Haversine calculation in routes/donations.js.
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+
   listed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   matched_at TIMESTAMPTZ,
   claimed_at TIMESTAMPTZ,
@@ -188,6 +202,15 @@ DROP TRIGGER IF EXISTS donations_set_updated_at ON donations;
 CREATE TRIGGER donations_set_updated_at
   BEFORE UPDATE ON donations
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Guarded ALTERs so this file stays safe to re-run against a database that
+-- already has the donations table from before photo_url/latitude/longitude
+-- existed (see the CREATE TABLE IF NOT EXISTS above — it won't add columns
+-- to a table that already exists).
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS photo_url TEXT;
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;
+
 
 CREATE INDEX IF NOT EXISTS idx_donations_donor ON donations(donor_id);
 CREATE INDEX IF NOT EXISTS idx_donations_claimed_by ON donations(claimed_by);

@@ -124,7 +124,7 @@ export default function MyListings() {
             const Icon = ICONS[l.category] || PackagePlus;
             return (
               <Link to={`/browse/${l.id}`} className="nv-row" key={l.id} style={{ textDecoration: "none", color: "inherit" }}>
-                <div className="nv-row-icon"><Icon size={19} /></div>
+                <div className="nv-row-icon">{l.photoUrl ? <img src={l.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }} /> : <Icon size={19} />}</div>
                 <div className="nv-row-body">
                   <div className="nv-row-title">{l.title}</div>
                   <div className="nv-row-sub">{l.place}{l.ngo ? ` · claimed by ${l.ngo}` : ""}</div>

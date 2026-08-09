@@ -64,7 +64,7 @@
 /* ---------- listing rows ---------- */
 .nv-row { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--line); }
 .nv-row:last-child { border-bottom: none; }
-.nv-row-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; background: linear-gradient(145deg, #D1FAE5, #A7F3D0); color: var(--spark-deep); }
+.nv-row-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; background: linear-gradient(145deg, #D1FAE5, #A7F3D0); color: var(--spark-deep); overflow: hidden; }
 .nv-row-icon.sage { background: linear-gradient(145deg, #CCFBF1, #6EE7B7); color: var(--sage-deep); }
 .nv-row-body { flex: 1; min-width: 0; }
 .nv-row-title { font-weight: 600; font-size: 0.94rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

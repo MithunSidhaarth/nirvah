@@ -4,6 +4,7 @@ import { requireAuth } from "../middleware/auth.js";
 import { requireAdmin } from "../middleware/admin.js";
 import { validate, requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
+import { upload, fileUrlFor, handleUploadErrors } from "../lib/uploads.js";
 import { createDonationSchema, listDonationsQuerySchema } from "../lib/schemas.js";
 import { advanceDonation, getDonationHistory, LifecycleError } from "../lib/lifecycle.js";
 
@@ -27,6 +28,13 @@ async function serialize(row) {
     description: row.description,
     place: row.place,
     status: row.status,
+    photoUrl: row.photo_url,
+    latitude: row.latitude != null ? Number(row.latitude) : null,
+    longitude: row.longitude != null ? Number(row.longitude) : null,
+    // Only present when the caller supplied their own lat/lng to GET
+    // /donations (see the Haversine SELECT below) — undefined otherwise,
+    // so it just disappears from the JSON rather than showing null noise.
+    distanceKm: row.distance_km != null ? Math.round(Number(row.distance_km) * 10) / 10 : undefined,
     expiresAt: row.expires_at,
     donor: donor?.org || donor?.name || "A giver on Nirvah",
     donorId: row.donor_id,
@@ -64,7 +72,7 @@ function handleLifecycleError(err, res) {
 }
 
 router.get("/", validate(listDonationsQuerySchema, "query"), async (req, res) => {
-  const { category, status } = req.query;
+  const { category, status, lat, lng } = req.query;
   const clauses = [];
   const args = [];
 
@@ -78,6 +86,35 @@ router.get("/", validate(listDonationsQuerySchema, "query"), async (req, res) =>
   }
 
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
+
+  // "Near me" — only kicks in when the viewer supplied their own
+  // coordinates (Browse.jsx's location toggle, browser geolocation, no
+  // external geocoding service involved). Haversine great-circle distance
+  // computed right in the SELECT rather than pulled in as a Postgres
+  // extension (earthdistance/postgis), since we only need "sort by
+  // approximate distance," not routing. Listings without their own
+  // latitude/longitude can't have a distance, so they sort after everyone
+  // who does (NULLS LAST) instead of disappearing from the list.
+  if (lat != null && lng != null) {
+    args.push(lat, lng);
+    const latIdx = args.length - 1;
+    const lngIdx = args.length;
+    const result = await pool.query(
+      `SELECT *,
+              CASE WHEN latitude IS NULL OR longitude IS NULL THEN NULL ELSE
+                6371 * acos(LEAST(1, GREATEST(-1,
+                  cos(radians($${latIdx})) * cos(radians(latitude)) * cos(radians(longitude) - radians($${lngIdx}))
+                  + sin(radians($${latIdx})) * sin(radians(latitude))
+                )))
+              END AS distance_km
+       FROM donations
+       ${where}
+       ORDER BY distance_km ASC NULLS LAST, created_at DESC`,
+      args
+    );
+    return res.json({ donations: await Promise.all(result.rows.map(serialize)) });
+  }
+
   const result = await pool.query(`SELECT * FROM donations ${where} ORDER BY created_at DESC`, args);
   res.json({ donations: await Promise.all(result.rows.map(serialize)) });
 });
@@ -151,14 +188,14 @@ router.get("/:id/history", requireIntParam(), async (req, res) => {
 
 router.post("/", writeLimiter, requireAuth, validate(createDonationSchema), async (req, res) => {
   if (req.userRole !== "donor") return res.status(403).json({ error: "Only givers can post a listing." });
-  const { title, category, quantity, description, place, expiresInMs } = req.body;
+  const { title, category, quantity, description, place, expiresInMs, latitude, longitude } = req.body;
 
   const expiresAt = expiresInMs ? new Date(Date.now() + expiresInMs).toISOString() : null;
   const inserted = await pool.query(
-    `INSERT INTO donations (donor_id, title, category, quantity, description, place, expires_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO donations (donor_id, title, category, quantity, description, place, expires_at, latitude, longitude)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING *`,
-    [req.userId, title, category, quantity || null, description || null, place, expiresAt]
+    [req.userId, title, category, quantity || null, description || null, place, expiresAt, latitude ?? null, longitude ?? null]
   );
 
   await pool.query(
@@ -169,6 +206,37 @@ router.post("/", writeLimiter, requireAuth, validate(createDonationSchema), asyn
 
   res.status(201).json({ donation: await serialize(inserted.rows[0]) });
 });
+
+// A listing photo is attached after the text listing exists, same
+// create-then-attach pattern as NGO/donation documents (lib/uploads.js) —
+// keeps this route a plain single-file multipart upload instead of mixing
+// multipart parsing into the JSON-validated POST / above. Only the donor
+// who posted it can attach or replace its photo.
+router.post(
+  "/:id/photo",
+  writeLimiter,
+  requireIntParam(),
+  requireAuth,
+  upload.single("photo"),
+  handleUploadErrors,
+  async (req, res) => {
+    const existing = await pool.query("SELECT * FROM donations WHERE id = $1", [req.params.id]);
+    const row = existing.rows[0];
+    if (!row) return res.status(404).json({ error: "That listing could not be found." });
+    if (row.donor_id !== req.userId) {
+      return res.status(403).json({ error: "Only the giver who posted this can add a photo." });
+    }
+    if (!req.file) return res.status(400).json({ error: "No photo was uploaded." });
+
+    const photoUrl = fileUrlFor(req.file.filename);
+    const updated = await pool.query(`UPDATE donations SET photo_url = $1 WHERE id = $2 RETURNING *`, [
+      photoUrl,
+      req.params.id,
+    ]);
+
+    res.json({ donation: await serialize(updated.rows[0]) });
+  }
+);
 
 // listed -> claimed: an NGO commits to a listing.
 router.post("/:id/claim", writeLimiter, requireIntParam(), requireAuth, async (req, res) => {

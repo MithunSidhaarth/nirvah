@@ -109,6 +109,11 @@ export const api = {
   getDonation: (id) => request(`/donations/${id}`, { auth: false }),
   getDonationHistory: (id) => request(`/donations/${id}/history`),
   createDonation: (payload) => request("/donations", { method: "POST", body: payload }),
+  uploadListingPhoto: (donationId, file) => {
+    const formData = new FormData();
+    formData.append("photo", file);
+    return requestForm(`/donations/${donationId}/photo`, { formData });
+  },
   claimDonation: (id) => request(`/donations/${id}/claim`, { method: "POST" }),
   acceptDonation: (id) => request(`/donations/${id}/accept`, { method: "POST" }),
   pickupDonation: (id) => request(`/donations/${id}/pickup`, { method: "POST" }),
