@@ -36,7 +36,13 @@ if (process.env.TRUST_PROXY !== "false") {
   app.set("trust proxy", 1);
 }
 
-app.use(helmet());
+// Uploaded files (QR codes, NGO verification documents) are served from
+// this API's own domain but embedded/viewed on the frontend's domain —
+// helmet's default Cross-Origin-Resource-Policy: same-origin blocks exactly
+// that, so <img> tags pointing at /uploads/* fail with
+// ERR_BLOCKED_BY_RESPONSE.NotSameOrigin even though the file loads fine.
+// These files are intentionally public, so relax it to cross-origin.
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // CORS is an allowlist, not a wildcard. ALLOWED_ORIGINS is a comma-separated
 // list; FRONTEND_URL is always included so the deployed frontend keeps
