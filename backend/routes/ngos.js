@@ -333,8 +333,8 @@ router.post(
 
     const updated = await pool.query(
       `UPDATE ngos
-       SET verification_status = $1,
-           verified_at = CASE WHEN $1 = 'verified' THEN now() ELSE verified_at END,
+       SET verification_status = $1::ngo_verification_status,
+           verified_at = CASE WHEN $1::ngo_verification_status = 'verified' THEN now() ELSE verified_at END,
            csr_eligible = $2
        WHERE user_id = $3
        RETURNING *`,

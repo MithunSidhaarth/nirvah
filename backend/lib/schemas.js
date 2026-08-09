@@ -303,6 +303,12 @@ export const contactMessageSchema = z.object({
     .max(5000, "That message is too long."),
 });
 
+export const paymentProofSchema = z.object({
+  donorEmail: email,
+  ngoName: z.string().trim().max(200, "That NGO name is too long.").optional().nullable(),
+  note: z.string().trim().max(1000, "That note is too long.").optional().nullable(),
+});
+
 export const addTeamMemberSchema = z.object({
   name: z
     .string({ required_error: "Please enter their name." })

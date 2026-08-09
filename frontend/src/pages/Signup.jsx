@@ -9,6 +9,7 @@ import "../styles/auth.css";
 export default function Signup() {
   const [params] = useSearchParams();
   const [role, setRole] = useState(params.get("role") === "ngo" ? "ngo" : "donor");
+  const next = params.get("next");
   const [form, setForm] = useState({ name: "", org: "", email: "", password: "", city: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,11 @@ export default function Signup() {
     setLoading(true);
     try {
       await api.signup({ ...form, role });
+      // Verification happens over email, so this browser session won't be
+      // the one that lands on /verify-email — stash where the person was
+      // headed so the login they'll do right after can still get them
+      // there, instead of dropping them on a generic dashboard.
+      if (next) sessionStorage.setItem("nirvah_post_verify_next", next);
       setSubmittedEmail(form.email);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");

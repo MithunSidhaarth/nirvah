@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Logo from "../components/Logo";
 import { api, setToken } from "../lib/api";
@@ -9,6 +9,13 @@ import "../styles/auth.css";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  // Arriving from the "give items" path (see Donate.jsx) — copy and the
+  // post-login redirect both change so it actually feels like "quick login,
+  // then list" instead of dropping the person on a generic dashboard.
+  const intent = searchParams.get("intent");
+  const next = searchParams.get("next") || sessionStorage.getItem("nirvah_post_verify_next") || "";
+  const listingIntent = intent === "list" || !!sessionStorage.getItem("nirvah_post_verify_next");
   const [form, setForm] = useState({ email: location.state?.resendFor || "", password: "" });
   const [error, setError] = useState("");
   const [needsVerification, setNeedsVerification] = useState(false);
@@ -27,7 +34,9 @@ export default function Login() {
       const data = await api.login(form);
       setToken(data.token);
       const role = data.user?.role;
-      if (role === "ngo") navigate("/dashboard/ngo");
+      sessionStorage.removeItem("nirvah_post_verify_next");
+      if (role === "donor" && next) navigate(next);
+      else if (role === "ngo") navigate("/dashboard/ngo");
       else if (role === "admin" || role === "manager") navigate("/dashboard/admin");
       else navigate("/dashboard/donor");
     } catch (err) {
@@ -70,8 +79,12 @@ export default function Login() {
       <div className="nv-auth-form-wrap">
         <div className="nv-auth-card">
           <Link to="/" className="nv-back-link"><ArrowLeft size={15} /> Back to Nirvah</Link>
-          <h1 className="font-display">Welcome back</h1>
-          <p className="sub">Log in to keep the circle going.</p>
+          <h1 className="font-display">{listingIntent ? "Quick login to list it" : "Welcome back"}</h1>
+          <p className="sub">
+            {listingIntent
+              ? "Just this, then straight to your listing form — takes under a minute."
+              : "Log in to keep the circle going."}
+          </p>
 
           {error && (
             <div className="nv-auth-error">
@@ -105,7 +118,10 @@ export default function Login() {
           </form>
 
           <div className="nv-auth-switch">
-            New to Nirvah? <Link to="/signup">Create a free account</Link>
+            New to Nirvah?{" "}
+            <Link to={`/signup?role=donor${next ? `&next=${encodeURIComponent(next)}` : ""}`}>
+              Create a free account
+            </Link>
           </div>
         </div>
       </div>

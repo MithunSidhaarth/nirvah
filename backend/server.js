@@ -22,6 +22,7 @@ import adminRoutes from "./routes/admin.js";
 import adminUsersRoutes from "./routes/adminUsers.js";
 import siteSettingsRoutes from "./routes/siteSettings.js";
 import contactRoutes from "./routes/contact.js";
+import paymentProofRoutes from "./routes/paymentProof.js";
 import { generalLimiter } from "./middleware/rateLimit.js";
 import { UPLOAD_DIR } from "./lib/uploads.js";
 
@@ -48,7 +49,7 @@ const configuredOrigins = (process.env.ALLOWED_ORIGINS || "")
   .filter(Boolean);
 const allowedOrigins = new Set([
   ...configuredOrigins,
-  process.env.FRONTEND_URL || "https://nirvah.cc.cd",
+  process.env.FRONTEND_URL || "http://localhost:5173",
 ]);
 
 app.use(
@@ -91,6 +92,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin", adminUsersRoutes);
 app.use("/api/admin", siteSettingsRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/payment-proof", paymentProofRoutes);
 
 // Uploaded documents/photos. Local disk today (see lib/uploads.js); swap
 // this for a signed-URL redirect to S3/Cloudinary later without touching

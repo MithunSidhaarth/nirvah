@@ -6,6 +6,7 @@ import HowItWorks from "./pages/HowItWorks";
 import ForNgos from "./pages/ForNgos";
 import Contact from "./pages/Contact";
 import NgoImpact from "./pages/NgoImpact";
+import Donate from "./pages/Donate";
 import DonateMoney from "./pages/DonateMoney";
 import DonorWrapped from "./pages/DonorWrapped";
 import Login from "./pages/Login";
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/browse" element={<Browse />} />
         <Route path="/browse/:id" element={<DonationDetail />} />
         <Route path="/impact/:ngoId" element={<NgoImpact />} />
+        <Route path="/donate" element={<Donate />} />
         <Route path="/donate-money" element={<DonateMoney />} />
 
         <Route path="/dashboard/donor" element={<RequireRole roles={["donor"]}><DonorDashboard /></RequireRole>} />

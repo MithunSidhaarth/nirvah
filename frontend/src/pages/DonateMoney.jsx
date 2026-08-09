@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, MapPin, Landmark, QrCode, Copy, Check, ArrowRight,
-  Mail, ExternalLink, HeartHandshake,
+  Mail, ExternalLink, HeartHandshake, Upload, ReceiptText, Loader2,
 } from "lucide-react";
 import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
 import { api } from "../lib/api";
 import "../styles/tokens.css";
+import "../styles/auth.css";
 
 /* ---------------------------------------------------------
    Public page for money donations. Every NGO listed here is
@@ -87,6 +88,97 @@ function NgoCard({ ngo }) {
   );
 }
 
+function PaymentProofForm() {
+  const [form, setForm] = useState({ donorEmail: "", ngoName: "", note: "" });
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [error, setError] = useState("");
+
+  function onChange(e) {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    if (!file) {
+      setError("Please attach a screenshot or photo of your payment.");
+      return;
+    }
+    setStatus("sending");
+    setError("");
+    try {
+      const data = new FormData();
+      data.append("donorEmail", form.donorEmail);
+      if (form.ngoName) data.append("ngoName", form.ngoName);
+      if (form.note) data.append("note", form.note);
+      data.append("screenshot", file);
+      await api.submitPaymentProof(data);
+      setStatus("sent");
+    } catch (err) {
+      setStatus("error");
+      setError(err?.message || "Couldn't submit your proof right now. Please try again.");
+    }
+  }
+
+  if (status === "sent") {
+    return (
+      <div className="dm-proof-sent">
+        <Check size={22} />
+        <div>
+          <h3>Got it — thank you</h3>
+          <p>We'll check this with the NGO and email your invoice to {form.donorEmail}.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form className="dm-proof-form" onSubmit={onSubmit}>
+      {error && <div className="dm-proof-error">{error}</div>}
+      <div className="dm-proof-grid">
+        <div className="nv-field">
+          <label htmlFor="donorEmail">Your email</label>
+          <input
+            id="donorEmail" type="email" name="donorEmail" required
+            placeholder="you@example.com" value={form.donorEmail} onChange={onChange}
+          />
+        </div>
+        <div className="nv-field">
+          <label htmlFor="ngoName">NGO you paid (optional)</label>
+          <input
+            id="ngoName" name="ngoName" placeholder="e.g. Asha Foundation"
+            value={form.ngoName} onChange={onChange}
+          />
+        </div>
+      </div>
+
+      <div className="nv-field">
+        <label htmlFor="screenshot">Payment screenshot or photo</label>
+        <label className="dm-file-drop" htmlFor="screenshot">
+          <Upload size={16} />
+          {file ? file.name : "Choose a file — PNG, JPG, WEBP, or PDF"}
+        </label>
+        <input
+          id="screenshot" type="file" accept="image/png,image/jpeg,image/webp,application/pdf"
+          onChange={(e) => setFile(e.target.files?.[0] || null)} style={{ display: "none" }}
+        />
+      </div>
+
+      <div className="nv-field">
+        <label htmlFor="note">Note (optional)</label>
+        <textarea
+          id="note" name="note" rows={2} placeholder="Anything that helps us match this to your payment"
+          value={form.note} onChange={onChange}
+        />
+      </div>
+
+      <button type="submit" className="nv-btn spark" disabled={status === "sending"}>
+        {status === "sending" ? (<><Loader2 size={15} className="dm-spin" /> Sending…</>) : (<>Send proof, get my invoice <ReceiptText size={15} /></>)}
+      </button>
+    </form>
+  );
+}
+
 export default function DonateMoney() {
   const [ngos, setNgos] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -150,7 +242,23 @@ export default function DonateMoney() {
 
         .dm-empty, .dm-loading { max-width: 480px; margin: 0 auto; text-align: center; color: var(--ink-soft); padding: 2rem 0; }
 
-        @media (max-width: 780px) { .dm-grid { grid-template-columns: 1fr; } }
+        .dm-proof-wrap { max-width: 640px; margin: 0 auto 5rem; padding: 0 6vw; }
+        .dm-proof-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); padding: 2rem; }
+        .dm-proof-card h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 8px; }
+        .dm-proof-card > p { color: var(--ink-soft); font-size: 0.9rem; margin: 0 0 1.4rem; line-height: 1.5; }
+        .dm-proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; }
+        .dm-proof-form textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: inherit; font-size: 0.95rem; color: var(--ink); resize: vertical; }
+        .dm-proof-form textarea:focus { outline: none; border-color: var(--spark); box-shadow: 0 0 0 3px rgba(16,185,129, 0.15); }
+        .dm-file-drop { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--line); background: var(--parchment-2); font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; transition: border-color 0.2s ease; }
+        .dm-file-drop:hover { border-color: var(--spark-deep); color: var(--ink); }
+        .dm-proof-error { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); color: #B91C1C; padding: 10px 14px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 1rem; }
+        .dm-proof-sent { display: flex; align-items: flex-start; gap: 12px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); color: var(--sage-deep); padding: 1.4rem 1.5rem; border-radius: var(--radius-md); }
+        .dm-proof-sent h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; }
+        .dm-proof-sent p { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+        .dm-spin { animation: dm-spin 0.9s linear infinite; }
+        @keyframes dm-spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 780px) { .dm-grid { grid-template-columns: 1fr; } .dm-proof-grid { grid-template-columns: 1fr; } }
       `}</style>
 
       <PageNav active="Donate" />
@@ -168,7 +276,7 @@ export default function DonateMoney() {
         <h2><Mail size={17} /> How a payment works</h2>
         <ol>
           <li>Pick an NGO below and pay them directly by bank transfer, UPI, or the QR code shown.</li>
-          <li>Send us your payment proof (a screenshot or transaction ID works) using the contact form.</li>
+          <li>Send us your payment proof (a screenshot works fine) using the form further down this page.</li>
           <li>We check the payment with the NGO, then email you a valid invoice for your records.</li>
         </ol>
       </div>
@@ -195,6 +303,14 @@ export default function DonateMoney() {
           </div>
         )}
       </section>
+
+      <Reveal className="dm-proof-wrap" as="div">
+        <div className="dm-proof-card">
+          <h2><ReceiptText size={18} /> Send your payment proof</h2>
+          <p>Already paid an NGO above? Send us the screenshot and your email — we'll verify it and email you a proper invoice.</p>
+          <PaymentProofForm />
+        </div>
+      </Reveal>
 
       <Reveal className="ni-cta" style={{ margin: "0 6vw 5rem", borderRadius: "var(--radius-lg)", background: "linear-gradient(120deg, #134E43, var(--char))", color: "var(--parchment)", padding: "3rem", textAlign: "center" }}>
         <h2 className="font-display">Run a verified NGO?</h2>

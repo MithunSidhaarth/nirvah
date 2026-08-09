@@ -9,7 +9,7 @@
  * /backend just works out of the box.
  */
 
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || "https://nirvah-api.onrender.com/api";
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || "http://localhost:4000/api";
 
 function getToken() {
   return localStorage.getItem("nirvah_token");
@@ -145,6 +145,8 @@ export const api = {
 
   // ---- contact ----
   sendContactMessage: (payload) => request("/contact", { method: "POST", body: payload, auth: false }),
+  // formData: donorEmail, ngoName?, note?, screenshot (file)
+  submitPaymentProof: (formData) => requestForm("/payment-proof", { method: "POST", formData, auth: false }),
 
   // ---- ngo team ----
   listTeam: () => request("/ngos/me/team"),
