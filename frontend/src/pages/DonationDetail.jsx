@@ -291,7 +291,7 @@ export default function DonationDetail() {
           </div>
         ) : needsLogisticsChoice ? (
           <div>
-            <p className="sub" style={{ margin: "0 0 10px" }}>The giver didn't say how they'd like this handed over — you get to call it.</p>
+            <p className="sub" style={{ margin: "0 0 10px" }}>The giver didn't say how they'd like this handed over, so you get to call it.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="nv-btn sage" disabled={acting} onClick={() => onClaimWithLogistics("ngo_pickup")}>
                 <Truck size={15} /> {acting ? "Working..." : "We'll pick it up"}
@@ -313,7 +313,7 @@ export default function DonationDetail() {
           <div className="nv-panel" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(13,148,136,0.1)", borderColor: "rgba(13,148,136,0.3)" }}>
             <HeartHandshake size={18} color="var(--sage-deep)" />
             <span style={{ color: "var(--sage-deep)", fontWeight: 600 }}>
-              {donation.status === "listed" ? "Looking for the right NGO." : "In progress — nothing for you to do here right now."}
+              {donation.status === "listed" ? "Looking for the right NGO." : "In progress. Nothing for you to do here right now."}
             </span>
           </div>
         )}

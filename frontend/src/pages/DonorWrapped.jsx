@@ -116,8 +116,8 @@ export default function DonorWrapped() {
           <span className="dw-eyebrow"><Sparkles size={12} /> {data.year} wrapped</span>
           <h1>You gave {data.itemsGiven} items a second life{user?.name ? `, ${user.name.split(" ")[0]}` : ""}.</h1>
           <p>
-            Across {data.listingsPosted} listings this year, your surplus found its way to {data.ngosMatched} different NGOs
-            — usually matched in under {data.avgMatchMinutes} minutes. Your fastest match ever took just {data.fastestMatchMinutes} minutes.
+            Across {data.listingsPosted} listings this year, your surplus found its way to {data.ngosMatched} different NGOs,
+            usually matched in under {data.avgMatchMinutes} minutes. Your fastest match ever took just {data.fastestMatchMinutes} minutes.
           </p>
           <Link to="/dashboard/donor/new" className="nv-btn spark">List another donation <ArrowRight size={15} /></Link>
         </div>
@@ -152,7 +152,7 @@ export default function DonorWrapped() {
           <div className="icn"><Trophy size={24} /></div>
           <div>
             <h3>A {data.streakWeeks}-week giving streak</h3>
-            <p>You listed something at least once a week for {data.streakWeeks} weeks straight — one of the longest active streaks on the network.</p>
+            <p>You listed something at least once a week for {data.streakWeeks} weeks straight, one of the longest active streaks on the network.</p>
           </div>
         </motion.div>
       </motion.div>

@@ -165,6 +165,22 @@ CREATE TRIGGER ngos_set_updated_at
 
 CREATE INDEX IF NOT EXISTS idx_ngos_verification_status ON ngos(verification_status);
 
+-- Monetary donation profile: bank/UPI/QR details an NGO can publish once
+-- verified, plus the cause text and where-it-goes note shown on the public
+-- donate page. accepts_monetary_donations is a separate opt-in flag so a
+-- verified NGO isn't listed for money until they've actually filled this in
+-- and chosen to turn it on.
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS accepts_monetary_donations BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS bank_account_name TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS bank_account_number TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS bank_ifsc TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS bank_name TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS upi_id TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS qr_code_url TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS org_address TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS cause TEXT;
+ALTER TABLE ngos ADD COLUMN IF NOT EXISTS fund_use_note TEXT;
+
 -- ---------------------------------------------------------------------------
 -- donations — one timestamp column per lifecycle stage (TODO section 8)
 -- ---------------------------------------------------------------------------

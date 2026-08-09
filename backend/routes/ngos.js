@@ -4,7 +4,8 @@ import { requireAuth } from "../middleware/auth.js";
 import { requireStaff } from "../middleware/admin.js";
 import { validate, requireIntParam } from "../middleware/validate.js";
 import { writeLimiter } from "../middleware/rateLimit.js";
-import { ngoProfileSchema, ngoVerifyDecisionSchema } from "../lib/schemas.js";
+import { ngoProfileSchema, ngoVerifyDecisionSchema, ngoMonetaryProfileSchema } from "../lib/schemas.js";
+import { upload, handleUploadErrors, fileUrlFor } from "../lib/uploads.js";
 
 const router = Router();
 
@@ -22,6 +23,22 @@ function serializeNgo(row, user) {
     csrEligible: row.csr_eligible,
     verificationStatus: row.verification_status,
     verifiedAt: row.verified_at,
+  };
+}
+
+function serializeMonetaryProfile(row) {
+  return {
+    verificationStatus: row.verification_status,
+    acceptsMonetaryDonations: row.accepts_monetary_donations,
+    bankAccountName: row.bank_account_name,
+    bankAccountNumber: row.bank_account_number,
+    bankIfsc: row.bank_ifsc,
+    bankName: row.bank_name,
+    upiId: row.upi_id,
+    qrCodeUrl: row.qr_code_url,
+    orgAddress: row.org_address,
+    cause: row.cause,
+    fundUseNote: row.fund_use_note,
   };
 }
 
@@ -88,6 +105,117 @@ router.patch("/me", requireAuth, validate(ngoProfileSchema), async (req, res) =>
   );
 
   res.json({ ngo: serializeNgo(updated.rows[0], existing) });
+});
+
+// Monetary donation profile — bank/UPI/address/cause details the NGO fills
+// in themselves. Turning acceptsMonetaryDonations on only takes effect once
+// the profile is verified (see GET /donate below), so an unverified NGO can
+// still prepare their profile ahead of time without it going live early.
+router.get("/me/monetary", requireAuth, async (req, res) => {
+  if (req.userRole !== "ngo") return res.status(403).json({ error: "This is for NGO accounts only." });
+  const row = await getOwnNgoRow(req.userId);
+  if (!row) return res.status(404).json({ error: "NGO profile not found." });
+  res.json({ monetary: serializeMonetaryProfile(row) });
+});
+
+router.patch("/me/monetary", requireAuth, validate(ngoMonetaryProfileSchema), async (req, res) => {
+  if (req.userRole !== "ngo") return res.status(403).json({ error: "This is for NGO accounts only." });
+
+  const existing = await getOwnNgoRow(req.userId);
+  if (!existing) return res.status(404).json({ error: "NGO profile not found." });
+
+  const {
+    bankAccountName,
+    bankAccountNumber,
+    bankIfsc,
+    bankName,
+    upiId,
+    orgAddress,
+    cause,
+    fundUseNote,
+    acceptsMonetaryDonations,
+  } = req.body;
+
+  const updated = await pool.query(
+    `UPDATE ngos SET
+       bank_account_name = COALESCE($1, bank_account_name),
+       bank_account_number = COALESCE($2, bank_account_number),
+       bank_ifsc = COALESCE($3, bank_ifsc),
+       bank_name = COALESCE($4, bank_name),
+       upi_id = COALESCE($5, upi_id),
+       org_address = COALESCE($6, org_address),
+       cause = COALESCE($7, cause),
+       fund_use_note = COALESCE($8, fund_use_note),
+       accepts_monetary_donations = COALESCE($9, accepts_monetary_donations)
+     WHERE user_id = $10
+     RETURNING *`,
+    [
+      bankAccountName ?? null,
+      bankAccountNumber ?? null,
+      bankIfsc ?? null,
+      bankName ?? null,
+      upiId ?? null,
+      orgAddress ?? null,
+      cause ?? null,
+      fundUseNote ?? null,
+      acceptsMonetaryDonations ?? null,
+      req.userId,
+    ]
+  );
+
+  res.json({ monetary: serializeMonetaryProfile(updated.rows[0]) });
+});
+
+// QR code image for UPI/bank transfer, uploaded the same way donation
+// photos and NGO verification documents are — accept the file, store it
+// under UPLOAD_DIR, save the public URL.
+router.post(
+  "/me/monetary/qr-code",
+  requireAuth,
+  upload.single("qrCode"),
+  handleUploadErrors,
+  async (req, res) => {
+    if (req.userRole !== "ngo") return res.status(403).json({ error: "This is for NGO accounts only." });
+    if (!req.file) return res.status(400).json({ error: "No file uploaded." });
+
+    const existing = await getOwnNgoRow(req.userId);
+    if (!existing) return res.status(404).json({ error: "NGO profile not found." });
+
+    const url = fileUrlFor(req.file.filename);
+    const updated = await pool.query(
+      `UPDATE ngos SET qr_code_url = $1 WHERE user_id = $2 RETURNING *`,
+      [url, req.userId]
+    );
+    res.json({ monetary: serializeMonetaryProfile(updated.rows[0]) });
+  }
+);
+
+// Public donate page (frontend: /donate-money). Only verified NGOs who have
+// filled in their monetary profile and opted in show up here — same
+// "verified before it can be seen as trustworthy" rule as the impact page,
+// so this list can't be used to publish payment details Nirvah hasn't
+// checked belong to a real, verified NGO.
+router.get("/donate", async (req, res) => {
+  const result = await pool.query(
+    `SELECT n.*, u.name, u.org, u.city FROM ngos n
+     JOIN users u ON u.id = n.user_id
+     WHERE n.verification_status = 'verified'
+       AND n.accepts_monetary_donations = TRUE
+       AND (n.bank_account_number IS NOT NULL OR n.upi_id IS NOT NULL)
+     ORDER BY n.verified_at DESC NULLS LAST`
+  );
+
+  res.json({
+    ngos: result.rows.map((row) => ({
+      userId: row.user_id,
+      name: row.name,
+      org: row.org,
+      city: row.city,
+      csrEligible: row.csr_eligible,
+      form80gNumber: row.form_80g_number,
+      ...serializeMonetaryProfile(row),
+    })),
+  });
 });
 
 // Public verification badge lookup — Browse/DonationDetail can show "80G

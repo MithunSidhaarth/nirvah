@@ -194,6 +194,16 @@ export const api = {
   // ---- public NGO impact page ----
   getNgoImpactSummary: (ngoId) => request(`/ngos/${ngoId}/impact-summary`, { auth: false }),
 
+  // ---- monetary donations (public donate page + NGO's own profile) ----
+  listDonateNgos: () => request("/ngos/donate", { auth: false }),
+  getMyMonetaryProfile: () => request("/ngos/me/monetary"),
+  updateMyMonetaryProfile: (payload) => request("/ngos/me/monetary", { method: "PATCH", body: payload }),
+  uploadMyQrCode: (file) => {
+    const formData = new FormData();
+    formData.append("qrCode", file);
+    return requestForm("/ngos/me/monetary/qr-code", { formData });
+  },
+
   // ---- admin / manager dashboard ----
   // Read-only for both roles. Verify/reject decisions reuse the existing
   // admin-only routes below — a manager calling them gets a 403 from the

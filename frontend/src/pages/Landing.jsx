@@ -30,7 +30,6 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePres
 import Logo from "../components/Logo";
 import { PageFooter } from "../components/PageChrome";
 import Magnetic from "../components/motion/Magnetic";
-import CountUp from "../components/motion/CountUp";
 import Marquee from "../components/motion/Marquee";
 import TiltCard from "../components/motion/TiltCard";
 import ClickSpark from "../components/motion/ClickSpark";
@@ -543,19 +542,6 @@ export default function Landing() {
         .nv-return-card a.see-more { margin-top: 1.2rem; font-size: 0.84rem; font-weight: 600; color: var(--gold); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
         .nv-returns-close { text-align: center; max-width: 520px; margin: 3rem auto 0; color: #BFE3D3; font-size: 0.98rem; font-style: italic; font-family: 'Fraunces', serif; }
 
-        .nv-stats {
-          position: relative; background: var(--parchment); padding: 4.4rem 6vw 3.8rem; overflow: hidden;
-        }
-        .nv-stats::before {
-          content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
-          width: 640px; height: 320px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(16,185,129,0.14), transparent 68%); filter: blur(10px); pointer-events: none;
-        }
-        .nv-stats-grid { position: relative; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; text-align: center; }
-        .nv-stat-num { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: clamp(1.9rem,3.4vw,2.6rem); background: linear-gradient(120deg, var(--spark-deep), var(--sage-deep)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .nv-stat-label { margin-top: 6px; font-size: 0.92rem; color: var(--ink-soft); font-weight: 500; }
-        .nv-stats-note { position: relative; text-align: center; margin-top: 1.8rem; font-size: 0.78rem; color: var(--ink-soft); opacity: 0.7; }
-
         /* ---------- TRUST BAR ---------- */
         .nv-trust {
           background: linear-gradient(180deg, var(--parchment-2) 0%, var(--parchment) 100%);
@@ -686,7 +672,6 @@ export default function Landing() {
         .nv-banner .nv-btn.spark { background: var(--char); box-shadow: 0 14px 30px rgba(0,0,0,0.25); }
 
         @media (max-width: 900px) {
-          .nv-stats-grid { grid-template-columns: 1fr; gap: 2.2rem; }
           .nv-legs-connector { display: none; }
           .nv-legs { grid-template-columns: 1fr; }
           .nv-feed-grid { grid-template-columns: 1fr; }
@@ -857,31 +842,6 @@ export default function Landing() {
         </motion.div>
       </section>
 
-      {/* ---------- STATS ---------- */}
-      <section className="nv-stats">
-        <motion.div
-          className="nv-stats-grid"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.18 }}
-          variants={staggerParent}
-        >
-          <motion.div variants={fadeUp}>
-            <div className="nv-stat-num"><CountUp value={12480} /></div>
-            <div className="nv-stat-label">meals delivered since launch</div>
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <div className="nv-stat-num"><CountUp value={340} suffix="+" /></div>
-            <div className="nv-stat-label">verified NGOs on the network</div>
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <div className="nv-stat-num"><CountUp value={18} suffix=" min" /></div>
-            <div className="nv-stat-label">average time to first match</div>
-          </motion.div>
-        </motion.div>
-        <p className="nv-stats-note">Illustrative platform figures, updated as the Nirvah network grows.</p>
-      </section>
-
       {/* ---------- TRUST BAR ---------- */}
       <section className="nv-trust">
         <div className="nv-trust-grid">
@@ -891,7 +851,7 @@ export default function Landing() {
           </div>
           <div className="nv-trust-item">
             <Lock size={18} />
-            <span>Nothing sold, nothing warehoused — direct handoff only</span>
+            <span>Nothing sold, nothing warehoused, direct handoff only</span>
           </div>
           <div className="nv-trust-item">
             <Activity size={18} />
@@ -956,7 +916,7 @@ export default function Landing() {
         >
           <div className="nv-ops-chrome">
             <span className="dot r" /><span className="dot y" /><span className="dot g" />
-            <span className="nv-ops-chrome-label font-mono">nirvah.org / today's impact — live</span>
+            <span className="nv-ops-chrome-label font-mono">nirvah.org / today's impact / live</span>
           </div>
 
           <div className="nv-ops-body">
@@ -1097,14 +1057,14 @@ export default function Landing() {
         <motion.div className="nv-section-head" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} variants={fadeUp}>
           <span className="nv-kicker">What you get back</span>
           <h2 className="font-display">Some returns can't be deposited into a bank account. They stay with people.</h2>
-          <p>Giving on Nirvah pays back in three ways — none of them measured in rupees.</p>
+          <p>Giving on Nirvah pays back in three ways, none of them measured in rupees.</p>
         </motion.div>
         <motion.div className="nv-returns-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={staggerParent}>
           <motion.div className="nv-return-card" variants={fadeUp}>
             <span className="nv-return-tag">Return 01</span>
             <div className="nv-return-icon"><HeartHandshake size={22} /></div>
             <h3>Human return</h3>
-            <p>You helped someone. Not a statistic — a name, a place and a reason it mattered.</p>
+            <p>You helped someone. Not a statistic, but a name, a place and a reason it mattered.</p>
           </motion.div>
           <motion.div className="nv-return-card" variants={fadeUp}>
             <span className="nv-return-tag">Return 02</span>
@@ -1116,7 +1076,7 @@ export default function Landing() {
             <span className="nv-return-tag">Return 03</span>
             <div className="nv-return-icon"><FileText size={22} /></div>
             <h3>Practical return</h3>
-            <p>You can see exactly what you gave, who received it and when — every donation keeps its own record.</p>
+            <p>You can see exactly what you gave, who received it and when. Every donation keeps its own record.</p>
             <Link to="/dashboard/donor" className="see-more">View my giving <ArrowRight size={14} /></Link>
           </motion.div>
         </motion.div>

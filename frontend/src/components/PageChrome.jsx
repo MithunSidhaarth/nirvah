@@ -13,6 +13,7 @@ import Magnetic from "./motion/Magnetic";
 const NAV_LINKS = [
   { label: "How it works", to: "/how-it-works" },
   { label: "Explore", to: "/browse" },
+  { label: "Donate", to: "/donate-money" },
   { label: "For NGOs", to: "/for-ngos" },
   { label: "Contact", to: "/contact" },
 ];

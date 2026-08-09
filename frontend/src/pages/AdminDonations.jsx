@@ -30,7 +30,7 @@ export default function AdminDonations() {
       <div className="nv-topbar">
         <div>
           <h1 className="font-display">Donations & claims</h1>
-          <p className="sub">Every listing on Nirvah — view only. {donations.length} shown.</p>
+          <p className="sub">Every listing on Nirvah, view only. {donations.length} shown.</p>
         </div>
       </div>
 

@@ -92,7 +92,7 @@ export default function AdminSettings() {
                 rows={3}
                 value={form.announcementBanner || ""}
                 onChange={onChange}
-                placeholder="Optional — leave blank to hide it."
+                placeholder="Optional, leave blank to hide it."
               />
             </div>
             <div className="nv-field" style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>

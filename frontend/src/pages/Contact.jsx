@@ -19,7 +19,7 @@ const fadeUp = {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 const CONTACT_CARDS = [
-  { icon: Mail, title: "Email", value: "hello.nirvah@gmail.com", href: "mailto:hello.nirvah@gmail.com", note: "Best for detailed questions — usually a reply within a few hours." },
+  { icon: Mail, title: "Email", value: "hello.nirvah@gmail.com", href: "mailto:hello.nirvah@gmail.com", note: "Best for detailed questions, usually a reply within a few hours." },
   { icon: Phone, title: "Phone", value: "+91 76192 49879", href: "tel:+917619249879", note: "Weekdays, 10am – 6pm IST, for anything time-sensitive." },
   { icon: MapPin, title: "Based in", value: "Bengaluru, India", href: null, note: "Serving givers and NGOs across the city and beyond." },
 ];
@@ -32,9 +32,9 @@ const REASONS = [
 ];
 
 const FAQ = [
-  { q: "I run an NGO — should I use this form or just register?", a: "If you're ready to go, registering directly is faster — you'll hear back in one to two business days. Use this form only if you have a question first." },
+  { q: "I run an NGO, should I use this form or just register?", a: "If you're ready to go, registering directly is faster. You'll hear back in one to two business days. Use this form only if you have a question first." },
   { q: "How quickly will I hear back?", a: "Email replies typically land within a few hours. Anything marked urgent (a safety issue, a listing gone wrong) gets picked up same-day." },
-  { q: "Can I suggest a feature or report a bug?", a: "Yes — that's exactly what the \"Report an issue\" option is for. Screenshots and steps to reproduce help a lot if it's a bug." },
+  { q: "Can I suggest a feature or report a bug?", a: "Yes, that's exactly what the \"Report an issue\" option is for. Screenshots and steps to reproduce help a lot if it's a bug." },
 ];
 
 export default function Contact() {
@@ -117,7 +117,7 @@ export default function Contact() {
       <header className="ct-hero">
         <span className="ct-eyebrow"><MessageCircle size={13} /> We read every message</span>
         <h1>Let's talk</h1>
-        <p>Question about listing, claiming, registering your NGO, or something else entirely — this is the fastest way to reach a real person.</p>
+        <p>Question about listing, claiming, registering your NGO, or something else entirely, this is the fastest way to reach a real person.</p>
       </header>
 
       <div className="ct-cards">
@@ -201,11 +201,11 @@ export default function Contact() {
           </div>
           <div className="ct-side-row">
             <Building2 size={16} />
-            <span className="t">NGO? Registering directly is faster than emailing first — <Link to="/for-ngos" style={{ color: "var(--gold)" }}>see how it works</Link>.</span>
+            <span className="t">NGO? Registering directly is faster than emailing first. <Link to="/for-ngos" style={{ color: "var(--gold)" }}>See how it works</Link>.</span>
           </div>
           <div className="ct-side-row">
             <LifeBuoy size={16} />
-            <span className="t">Something urgent with an active pickup? Call us — it's the fastest path to a person.</span>
+            <span className="t">Something urgent with an active pickup? Call us, it's the fastest path to a person.</span>
           </div>
           <div className="ct-side-row">
             <MapPin size={16} />

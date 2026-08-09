@@ -90,7 +90,7 @@ export default function AdminNgoVerification() {
               {docsByNgo[ngo.userId].length === 0 && <li style={{ opacity: 0.6 }}>No documents uploaded yet.</li>}
               {docsByNgo[ngo.userId].map((d) => (
                 <li key={d.id}>
-                  <a href={d.fileUrl} target="_blank" rel="noreferrer">{d.fileName || d.type}</a> — {d.type} ({d.status})
+                  <a href={d.fileUrl} target="_blank" rel="noreferrer">{d.fileName || d.type}</a>: {d.type} ({d.status})
                 </li>
               ))}
             </ul>
@@ -106,7 +106,7 @@ export default function AdminNgoVerification() {
               </button>
             </div>
           ) : (
-            <div style={{ fontSize: "0.8rem", opacity: 0.6 }}>Read-only — ask an admin to approve or reject.</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.6 }}>Read-only. Ask an admin to approve or reject.</div>
           )}
         </div>
       ))}

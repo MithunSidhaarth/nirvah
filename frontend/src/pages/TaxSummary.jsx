@@ -42,7 +42,7 @@ export default function TaxSummary() {
       <div className="nv-topbar">
         <div>
           <h1>Tax summary</h1>
-          <p className="sub">Every donation that reached an NGO, and the paperwork attached to it — everything your CA will ask for.</p>
+          <p className="sub">Every donation that reached an NGO, and the paperwork attached to it: everything your CA will ask for.</p>
         </div>
       </div>
 

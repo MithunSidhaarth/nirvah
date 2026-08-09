@@ -36,7 +36,7 @@ export default function AdminDashboard() {
           <h1 className="font-display">Nirvah operations{user?.name ? `, ${user.name.split(" ")[0]}` : ""}.</h1>
           <p className="sub">
             {user?.role === "manager"
-              ? "You can view every donation, claim, and NGO in review — and verify or reject NGOs yourself."
+              ? "You can view every donation, claim, and NGO in review, and verify or reject NGOs yourself."
               : "Full access: review NGOs, approve documents, manage users, and see everything moving through Nirvah."}
           </p>
         </div>

@@ -139,6 +139,22 @@ export const ngoProfileSchema = z.object({
   form80gValidUntil: isoDateOrNull,
 });
 
+// Monetary donation profile — only meaningful once an NGO is verified (see
+// PATCH /ngos/me/monetary), but self-reported the same way as the
+// registration/80G fields above, so it uses the same "everything optional,
+// COALESCE on write" shape.
+export const ngoMonetaryProfileSchema = z.object({
+  bankAccountName: z.string().trim().max(200).optional().nullable(),
+  bankAccountNumber: z.string().trim().max(50).optional().nullable(),
+  bankIfsc: z.string().trim().max(20).optional().nullable(),
+  bankName: z.string().trim().max(200).optional().nullable(),
+  upiId: z.string().trim().max(100).optional().nullable(),
+  orgAddress: z.string().trim().max(500).optional().nullable(),
+  cause: z.string().trim().max(300).optional().nullable(),
+  fundUseNote: z.string().trim().max(1000).optional().nullable(),
+  acceptsMonetaryDonations: z.boolean().optional(),
+});
+
 export const ngoVerifyDecisionSchema = z.object({
   status: z.enum(["verified", "rejected", "under_review"], {
     errorMap: () => ({ message: "Status must be verified, rejected, or under_review." }),

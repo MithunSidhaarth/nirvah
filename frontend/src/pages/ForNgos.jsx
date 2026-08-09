@@ -9,7 +9,6 @@ import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
 import Magnetic from "../components/motion/Magnetic";
 import TiltCard from "../components/motion/TiltCard";
-import CountUp from "../components/motion/CountUp";
 import "../styles/tokens.css";
 
 const fadeUp = {
@@ -19,15 +18,15 @@ const fadeUp = {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 const BENEFITS = [
-  { icon: Radar, title: "Live, local alerts", body: "See donations the second they're listed within your service radius — no refreshing, no waiting for someone to remember to call you." },
+  { icon: Radar, title: "Live, local alerts", body: "See donations the second they're listed within your service radius, no refreshing, no waiting for someone to remember to call you." },
   { icon: Zap, title: "One-tap claiming", body: "Claim a listing in a single tap. The giver is notified instantly with your org's verified badge and pickup contact." },
-  { icon: BarChart3, title: "Impact you can show", body: "Every delivery rolls into your dashboard automatically — meals served, families reached, ready to hand to funders and board members." },
+  { icon: BarChart3, title: "Impact you can show", body: "Every delivery rolls into your dashboard automatically: meals served, families reached, ready to hand to funders and board members." },
   { icon: HandCoins, title: "Zero cost, always", body: "No subscription, no per-claim fee, no premium tier. Nirvah is free for verified NGOs, full stop." },
 ];
 
 const VERIFY_STEPS = [
   { icon: ClipboardList, title: "Apply", body: "Tell us who you are: registration number, service area, categories you can handle." },
-  { icon: FileCheck2, title: "We check the paperwork", body: "A real person reviews your registration and ID — usually within one to two business days." },
+  { icon: FileCheck2, title: "We check the paperwork", body: "A real person reviews your registration and ID, usually within one to two business days." },
   { icon: ShieldCheck, title: "You go live, verified", body: "Your badge appears on every claim, so givers always know a legitimate org picked it up." },
   { icon: Bell, title: "Alerts start flowing", body: "The moment you're approved, matching listings in your area start landing in your feed." },
 ];
@@ -41,7 +40,7 @@ const REQUIREMENTS = [
 
 const TESTIMONIALS = [
   { initials: "MB", quote: "We used to spend hours cold calling donors. Now listings come to us, sorted by distance, the moment they go up.", who: "Michael Brown", role: "Coordinator, Asha Foundation" },
-  { initials: "RK", quote: "The verified badge matters more than we expected — givers trust us faster because the app already vouched for us.", who: "Ritu Kapoor", role: "Programme Lead, Lakeview Trust" },
+  { initials: "RK", quote: "The verified badge matters more than we expected, givers trust us faster because the app already vouched for us.", who: "Ritu Kapoor", role: "Programme Lead, Lakeview Trust" },
   { initials: "AS", quote: "Our board asks for numbers every quarter. The dashboard basically writes that report for us now.", who: "Arjun Shetty", role: "Director, Whitefield Shelter Network" },
 ];
 
@@ -136,7 +135,7 @@ export default function ForNgos() {
           <span className="fn-eyebrow"><Users2 size={13} /> Built for verified organisations</span>
           <h1>Stop chasing leads. Let <em>donations come to you.</em></h1>
           <p className="lede">
-            A live, local feed of surplus food, clothing and supplies — filtered to your
+            A live, local feed of surplus food, clothing and supplies, filtered to your
             service area, ranked by urgency, claimable in one tap. Free, forever, for every
             verified NGO on the network.
           </p>
@@ -200,7 +199,7 @@ export default function ForNgos() {
         <Reveal className="fn-section-head">
           <span className="fn-kicker">Getting started</span>
           <h2 className="font-display">Verification takes a couple of days, not weeks</h2>
-          <p>One-time, thorough, and worth it — the badge is what makes givers trust a claim.</p>
+          <p>One-time, thorough, and worth it. The badge is what makes givers trust a claim.</p>
         </Reveal>
         <motion.div className="fn-verify-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger}>
           <div className="fn-verify-connector" aria-hidden="true" />
@@ -219,7 +218,7 @@ export default function ForNgos() {
         <Reveal className="fn-req-panel">
           <div>
             <h3 className="font-display">What you'll need to apply</h3>
-            <p>Nothing exotic — if you're a functioning registered organisation, you likely already have all of this on hand.</p>
+            <p>Nothing exotic. If you're a functioning registered organisation, you likely already have all of this on hand.</p>
           </div>
           <ul className="fn-req-list">
             {REQUIREMENTS.map((r) => (
@@ -227,28 +226,6 @@ export default function ForNgos() {
             ))}
           </ul>
         </Reveal>
-      </section>
-
-      {/* STATS */}
-      <section className="fn-section">
-        <Reveal className="fn-section-head">
-          <span className="fn-kicker">The network, right now</span>
-          <h2 className="font-display">You'd be joining a network already moving</h2>
-        </Reveal>
-        <motion.div className="fn-benefit-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger}>
-          {[
-            { value: 340, suffix: "+", label: "verified NGOs already on Nirvah" },
-            { value: 18, suffix: " min", label: "average time to a claim" },
-            { value: 96, suffix: "%", label: "of listings claimed before they expire" },
-          ].map((s) => (
-            <motion.div className="fn-benefit-card" key={s.label} variants={fadeUp} style={{ textAlign: "center" }}>
-              <div className="font-display" style={{ fontSize: "1.9rem", color: "var(--sage-deep)" }}>
-                <CountUp value={s.value} suffix={s.suffix} />
-              </div>
-              <p style={{ marginTop: 6 }}>{s.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
 
       {/* TESTIMONIALS */}

@@ -10,7 +10,6 @@ import { PageNav, PageFooter } from "../components/PageChrome";
 import Reveal from "../components/Reveal";
 import Magnetic from "../components/motion/Magnetic";
 import TiltCard from "../components/motion/TiltCard";
-import CountUp from "../components/motion/CountUp";
 import "../styles/tokens.css";
 
 const fadeUp = {
@@ -21,37 +20,37 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 const GIVER_STEPS = [
   { icon: Camera, tag: "01 · Minutes", title: "List what you have", body: "Snap a photo, choose a category, drop a pin on the map. Perishable food automatically gets an expiry countdown, so an NGO knows exactly how much time they have." },
-  { icon: MapPinned, tag: "02 · Instant", title: "Nirvah finds who's nearby", body: "The moment you publish, every verified NGO within range sees it in their live feed — ranked by distance and how urgently they need what you're offering." },
+  { icon: MapPinned, tag: "02 · Instant", title: "Nirvah finds who's nearby", body: "The moment you publish, every verified NGO within range sees it in their live feed, ranked by distance and how urgently they need what you're offering." },
   { icon: Bell, tag: "03 · Usually < 20 min", title: "Someone claims it", body: "You get a notification the instant an NGO claims your listing, with their name, verification badge and a pickup window that works for you." },
-  { icon: HeartHandshake, tag: "04 · Closing the loop", title: "Watch the handoff", body: "The NGO marks pickup and delivery as it happens. You see the full circle close — a place, a name, a reason it mattered — not just a form that vanished." },
+  { icon: HeartHandshake, tag: "04 · Closing the loop", title: "Watch the handoff", body: "The NGO marks pickup and delivery as it happens. You see the full circle close: a place, a name, a reason it mattered, not just a form that vanished." },
 ];
 
 const NGO_STEPS = [
-  { icon: ClipboardCheck, tag: "01 · Once", title: "Register & get verified", body: "Submit your registration details and ID. Our team checks every organisation by hand before it goes live — no bots, no fake listings, no wasted trips." },
+  { icon: ClipboardCheck, tag: "01 · Once", title: "Register & get verified", body: "Submit your registration details and ID. Our team checks every organisation by hand before it goes live, no bots, no fake listings, no wasted trips." },
   { icon: Radar, tag: "02 · Ongoing", title: "Get matched to your area", body: "Set your service radius and the categories you can handle. From then on, relevant listings land straight in your dashboard feed as they're posted." },
   { icon: Zap, tag: "03 · One tap", title: "Claim in a single tap", body: "No calls, no back-and-forth. Claim a listing and the giver is notified immediately with your org's verified badge and your pickup contact." },
-  { icon: Truck, tag: "04 · Report back", title: "Deliver and log it", body: "Pick up, deliver, and mark it complete. Every delivery rolls up into your organisation's dashboard — proof of impact you can show your funders." },
+  { icon: Truck, tag: "04 · Report back", title: "Deliver and log it", body: "Pick up, deliver, and mark it complete. Every delivery rolls up into your organisation's dashboard, proof of impact you can show your funders." },
 ];
 
 const MATCHING_FACTORS = [
-  { icon: MapPinned, title: "Distance first", body: "Nearby NGOs are surfaced before far ones — nobody should drive across the city for a box of notebooks." },
+  { icon: MapPinned, title: "Distance first", body: "Nearby NGOs are surfaced before far ones. Nobody should drive across the city for a box of notebooks." },
   { icon: Clock3, title: "Urgency-weighted", body: "Perishable listings with a tight countdown are pushed to the top of the feed so they don't expire unclaimed." },
-  { icon: ShieldCheck, title: "Verified organisations only", body: "Only NGOs that have passed manual verification can claim a listing — givers always know exactly who's collecting." },
+  { icon: ShieldCheck, title: "Verified organisations only", body: "Only NGOs that have passed manual verification can claim a listing, so givers always know exactly who's collecting." },
 ];
 
 const CATEGORIES = [
   { icon: UtensilsCrossed, name: "Perishable food", note: "Auto expiry countdown, cold-chain guidance shown to the claiming NGO." },
   { icon: Shirt, name: "Clothing", note: "Sorted by size range so NGOs can match donations to who actually needs them." },
   { icon: BookOpen, name: "Books & supplies", note: "Great for school terms ending, office cleanouts, and library donations." },
-  { icon: PackageSearch, name: "Everything else", note: "Furniture, appliances, medical aids — list it and let the network sort it out." },
+  { icon: PackageSearch, name: "Everything else", note: "Furniture, appliances, medical aids, list it and let the network sort it out." },
 ];
 
 const FAQ = [
   { q: "Is Nirvah free to use?", a: "Completely. There's no listing fee for givers and no subscription for NGOs. Nirvah is built to remove friction, not add a toll." },
-  { q: "How fast does a listing actually get claimed?", a: "Right now the network average is about 18 minutes from listing to claim, though it depends on your area and category. Perishable food in a well-covered city tends to move fastest." },
-  { q: "What happens if nobody claims my listing in time?", a: "You'll get a nudge before a perishable listing's window closes, and can extend it, re-list it in a wider radius, or pull it down — your call, always." },
-  { q: "How are NGOs verified?", a: "Every NGO submits registration paperwork and ID before their account goes live. Our team reviews it by hand — this isn't a self-certified checkbox." },
-  { q: "Can a business or restaurant use this, not just individuals?", a: "Yes — a large share of listings come from restaurants, caterers, schools and offices with recurring surplus. Some even automate it into their closing routine." },
+  { q: "How fast does a listing actually get claimed?", a: "It depends on your area and category, but perishable food in a well-covered city tends to move fastest." },
+  { q: "What happens if nobody claims my listing in time?", a: "You'll get a nudge before a perishable listing's window closes, and can extend it, re-list it in a wider radius, or pull it down. Your call, always." },
+  { q: "How are NGOs verified?", a: "Every NGO submits registration paperwork and ID before their account goes live. Our team reviews it by hand, this isn't a self-certified checkbox." },
+  { q: "Can a business or restaurant use this, not just individuals?", a: "Yes, a large share of listings come from restaurants, caterers, schools and offices with recurring surplus. Some even automate it into their closing routine." },
 ];
 
 function FaqItem({ item, isOpen, onToggle }) {
@@ -97,10 +96,6 @@ export default function HowItWorks() {
         .hiw-hero p.lede { color: #BFE3D3; font-size: 1.08rem; max-width: 560px; margin: 0 auto 2rem; line-height: 1.6; }
         .hiw-hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-        .hiw-stats { max-width: 1080px; margin: -3rem auto 0; position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; padding: 0 6vw; }
-        .hiw-stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-soft); padding: 1.6rem; text-align: center; }
-        .hiw-stat .num { font-family: 'Fraunces', serif; font-size: 2rem; color: var(--spark-deep); }
-        .hiw-stat .lbl { color: var(--ink-soft); font-size: 0.86rem; margin-top: 4px; }
 
         .hiw-section { max-width: 1120px; margin: 0 auto; padding: 6rem 6vw 1rem; }
         .hiw-section-head { max-width: 620px; margin: 0 auto 3rem; text-align: center; }
@@ -152,10 +147,10 @@ export default function HowItWorks() {
         .hiw-cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
         @media (max-width: 900px) {
-          .hiw-stats, .hiw-match-grid, .hiw-cat-grid { grid-template-columns: 1fr 1fr; }
+          .hiw-match-grid, .hiw-cat-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 640px) {
-          .hiw-stats, .hiw-match-grid, .hiw-cat-grid { grid-template-columns: 1fr; }
+          .hiw-match-grid, .hiw-cat-grid { grid-template-columns: 1fr; }
           .hiw-timeline-line { display: none; }
         }
       `}</style>
@@ -166,10 +161,10 @@ export default function HowItWorks() {
       <header className="hiw-hero">
         <div className="hiw-hero-inner">
           <span className="hiw-eyebrow"><Sparkles size={13} /> The full circle, step by step</span>
-          <h1>From your shelf to <em>their table</em> — exactly how it happens</h1>
+          <h1>From your shelf to <em>their table</em>: exactly how it happens</h1>
           <p className="lede">
             No warehouses, no waiting lists, no cold calls. Here's precisely what happens
-            from the moment you list something to the moment it's delivered — for givers
+            from the moment you list something to the moment it's delivered, for givers
             and for the NGOs who claim it.
           </p>
           <div className="hiw-hero-ctas">
@@ -178,20 +173,6 @@ export default function HowItWorks() {
           </div>
         </div>
       </header>
-
-      {/* STATS STRIP */}
-      <div className="hiw-stats">
-        {[
-          { value: 18, suffix: " min", label: "avg. time a listing waits" },
-          { value: 340, suffix: "+", label: "verified NGOs on the ground" },
-          { value: 96, suffix: "%", label: "of listings claimed before expiry" },
-        ].map((s) => (
-          <Reveal key={s.label} className="hiw-stat">
-            <div className="num font-display"><CountUp value={s.value} suffix={s.suffix} /></div>
-            <div className="lbl">{s.label}</div>
-          </Reveal>
-        ))}
-      </div>
 
       {/* GIVER TRACK */}
       <section className="hiw-section">
@@ -242,7 +223,7 @@ export default function HowItWorks() {
         <Reveal className="hiw-section-head">
           <span className="hiw-kicker">Under the hood</span>
           <h2 className="font-display">How a listing finds the right NGO</h2>
-          <p>No manual sorting on either end — the network ranks matches by three signals.</p>
+          <p>No manual sorting on either end. The network ranks matches by three signals.</p>
         </Reveal>
         <motion.div className="hiw-match-grid" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger}>
           {MATCHING_FACTORS.map((m) => (

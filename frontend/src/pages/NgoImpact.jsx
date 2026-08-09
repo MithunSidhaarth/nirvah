@@ -128,7 +128,7 @@ export default function NgoImpact() {
         <div style={{ maxWidth: 560, margin: "6rem auto", textAlign: "center", padding: "0 6vw" }}>
           <h1 className="font-display">{unverifiedName}</h1>
           <p className="sub" style={{ marginTop: "0.8rem" }}>
-            This NGO has signed up on Nirvah but hasn't completed verification yet — their impact page
+            This NGO has signed up on Nirvah but hasn't completed verification yet. Their impact page
             goes live once the Nirvah team has reviewed their documents.
           </p>
           <Link to="/browse" className="nv-btn spark" style={{ marginTop: "1.4rem" }}>See what's on Nirvah <ArrowRight size={15} /></Link>

@@ -6,6 +6,7 @@ import HowItWorks from "./pages/HowItWorks";
 import ForNgos from "./pages/ForNgos";
 import Contact from "./pages/Contact";
 import NgoImpact from "./pages/NgoImpact";
+import DonateMoney from "./pages/DonateMoney";
 import DonorWrapped from "./pages/DonorWrapped";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -22,6 +23,7 @@ import CsrSummary from "./pages/CsrSummary";
 import MyListings from "./pages/MyListings";
 import ClaimedByUs from "./pages/ClaimedByUs";
 import Team from "./pages/Team";
+import MonetaryProfile from "./pages/MonetaryProfile";
 import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminDonations from "./pages/AdminDonations";
@@ -47,6 +49,7 @@ export default function App() {
         <Route path="/browse" element={<Browse />} />
         <Route path="/browse/:id" element={<DonationDetail />} />
         <Route path="/impact/:ngoId" element={<NgoImpact />} />
+        <Route path="/donate-money" element={<DonateMoney />} />
 
         <Route path="/dashboard/donor" element={<RequireRole roles={["donor"]}><DonorDashboard /></RequireRole>} />
         <Route path="/dashboard/donor/new" element={<RequireRole roles={["donor"]}><NewListing /></RequireRole>} />
@@ -58,6 +61,7 @@ export default function App() {
         <Route path="/dashboard/ngo/claims" element={<RequireRole roles={["ngo"]}><ClaimedByUs /></RequireRole>} />
         <Route path="/dashboard/ngo/csr" element={<RequireRole roles={["ngo"]}><CsrSummary /></RequireRole>} />
         <Route path="/dashboard/ngo/team" element={<RequireRole roles={["ngo"]}><Team /></RequireRole>} />
+        <Route path="/dashboard/ngo/donate-setup" element={<RequireRole roles={["ngo"]}><MonetaryProfile /></RequireRole>} />
 
         <Route path="/dashboard/settings" element={<RequireRole roles={["donor", "ngo", "admin", "manager"]}><Settings /></RequireRole>} />
 
