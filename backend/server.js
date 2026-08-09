@@ -48,7 +48,7 @@ const configuredOrigins = (process.env.ALLOWED_ORIGINS || "")
   .filter(Boolean);
 const allowedOrigins = new Set([
   ...configuredOrigins,
-  process.env.FRONTEND_URL || "http://localhost:5173",
+  process.env.FRONTEND_URL || "https://nirvah.cc.cd",
 ]);
 
 app.use(

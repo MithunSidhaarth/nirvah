@@ -9,7 +9,7 @@
  * /backend just works out of the box.
  */
 
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || "http://localhost:4000/api";
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || "https://nirvah-api.onrender.com/api";
 
 function getToken() {
   return localStorage.getItem("nirvah_token");
